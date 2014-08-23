@@ -11,7 +11,7 @@ paginate_path: "page:num"
 
 # presonal config
 title: 94geek
-description:94geek.com,blog of Seapeak.Xu,powered by Jekyll...
+description: 94geek.com,blog of Seapeak.Xu,powered by Jekyll...
 feed: http://www.94geek.com/atom.xml
 
 author: Seapeak.Xu
