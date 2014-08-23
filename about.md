@@ -11,9 +11,10 @@ title: "94geek"
 3：5年linux c编程经验;  
 4：2年java编程经验;  
 5：熟悉git，svn等版本控制工具;  
-6：自认分析能力和解决问题能力还行但智商是硬伤(智商测试从没过60分，属于"弱智");  
-7：e文一般，文档没问题，顺便翻译了libev使用手册(其实德国人那个e文也是......);  
-8：看到这里blog就你介绍了，github：https://github.com/xvhfeng  
+6：分析和解决问题的能力还行,但智商是硬伤(智商测试从没过50分，属于"弱智",严重“
+        脑缺”);  
+7：e文一般，文档没问题，顺便翻译libev使用手册玩玩(其实德国人那个e文也是......);  
+8：看到这里blog就不给你介绍了，github：https://github.com/xvhfeng  
 
 ####工作经历  
 2006/07 -- 2009/04 足下信息产业机构  
@@ -32,7 +33,7 @@ title: "94geek"
 架构师  
 
 ####简历  
-<http://www.94geek.com/resume/index.html>  
+更多信息： <http://www.94geek.com/resume/index.html>  
 
 
 
