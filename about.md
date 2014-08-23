@@ -14,7 +14,7 @@ title: "94geek"
 6：分析和解决问题的能力还行,但智商是硬伤(智商测试从没过50分，属于"弱智",严重“
         脑缺”);  
 7：e文一般，文档没问题，顺便翻译libev使用手册玩玩(其实德国人那个e文也是......);  
-8：看到这里blog就不给你介绍了，github：https://github.com/xvhfeng  
+8：<a href="https://github.com/xvhfeng" target="_blank">github</a>  
 
 ####工作经历  
 2006/07 -- 2009/04 足下信息产业机构  
@@ -33,10 +33,10 @@ title: "94geek"
 架构师  
 
 ####简历  
-更多信息： <http://www.94geek.com/resume/index.html>  
-
-
-
+<a href="http://www.94geek.com/resume/index.html" target="_blank">84年的徐大嘴
+</a>  
+</br>
+</br>
 ####Basic Info  
 I'm Seapeak.Xu,you can call me:dazui(big mouth).born 11-21-1984, married, living in Shanghai now.  
 
@@ -50,7 +50,7 @@ I'm Seapeak.Xu,you can call me:dazui(big mouth).born 11-21-1984, married, living
 (IQ test is never less 60, which belongs to the "stupid");  
 7:english is not good but not bad, w&r document is no problem, and translation
 of the libev manual (in fact,english of the Germans is...);  
-8:here,blog is not interesting,so github:https://github.com/xvhfeng  
+8:<a href="https://github.com/xvhfeng" target="_blank">github</a>  
 
 ####Work Experience  
 07/2006 - 04/2009  information industry organization of zuxia  
@@ -69,7 +69,8 @@ chief architect of distributed system
 The architect  
 
 ####Resume  
-For more information:<http://www.94geek.com/resume/index.html>  
+<a href="http://www.94geek.com/resume/index.html" target="_blank">84年的徐大嘴
+</a>
 
 <!-- Blog Comments -->
 <div class="media">
