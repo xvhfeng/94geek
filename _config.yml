@@ -1,0 +1,25 @@
+markdown: redcarpet
+permalink: /:categories/:title.html
+url: 
+lsi: false
+pygments: true
+safe: true
+auto: false 
+
+paginate: 10
+paginate_path: "page:num"
+
+# presonal config
+title: 94geek
+description:94geek.com,blog of Seapeak.Xu,powered by Jekyll...
+feed: http://www.94geek.com/atom.xml
+
+author: Seapeak.Xu
+
+seo: 
+  keyword: 
+  description: 
+config:
+  js_dir:
+  img_dir:
+  css_dir:
