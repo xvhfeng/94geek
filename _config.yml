@@ -17,7 +17,8 @@ feed: http://www.94geek.com/atom.xml
 author: Seapeak.Xu
 
 seo: 
-  keyword: 94geek,geek,geeker,blog,bloger
+  keyword: 94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师
   description: 
 config:
   js_dir:
