@@ -1,6 +1,8 @@
 ---
 layout: default
 ---
+<ul id="cate" class="list-unstyled">
+</ul>
 <script src="/js/Jquery.Query.js">
 </script>
 <script type="text/javascript">
@@ -17,5 +19,3 @@ var dataStr = '{ {% for cat in site.categories %}{% if cat[0] != site.categories
     $(#cate).html(t);
 </script>
 
-<ul id="cate" class="list-unstyled">
-</ul>
