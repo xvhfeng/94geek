@@ -1,6 +1,6 @@
 ---
 layout: post
-category: "java,albianj"
+categories: [java,albianj]
 title:  "Albianj使用手册"
 tags: [albianj,manual,java,ioc,orm]
 ---

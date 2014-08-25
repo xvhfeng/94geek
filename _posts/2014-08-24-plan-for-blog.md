@@ -1,6 +1,6 @@
 ---
 layout: post
-category: "heart"
+categories: [heart]
 title:  "blog近期的计划"
 tags: [blog,计划]
 ---
