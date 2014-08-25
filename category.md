@@ -1,5 +1,6 @@
 ---
 layout: default
+title: "94geek.com - by Seapeak.Xu"
 ---
 <ul id="cate" class="list-unstyled">
 </ul>
