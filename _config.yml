@@ -1,9 +1,9 @@
 markdown: redcarpet
-permalink: /:categories/:title.html
+permalink: /:year/:month/:day/:title.html
 url: 
 lsi: false
 pygments: true
-safe: true
+safe: false
 auto: false 
 
 paginate: 10
