@@ -2,7 +2,7 @@
 layout: default
 title: "分类：Categories"
 ---
-<script src="js/Jquery.Queryjs">
+<script src="/js/Jquery.Queryjs">
 </script>
 <ul class="list-unstyled">
  <script type="text/javascript">
