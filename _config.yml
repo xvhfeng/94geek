@@ -6,7 +6,7 @@ pygments: true
 safe: false
 auto: false 
 
-paginate: 10
+paginate: 5
 paginate_path: "page:num"
 
 excerpt_separator: "<!-- more -->"
@@ -15,6 +15,8 @@ excerpt_separator: "<!-- more -->"
 title: 94geek.com - by Seapeak.Xu
 description: 94geek.com,blog of Seapeak.Xu,powered by Jekyll...
 feed: http://www.94geek.com/atom.xml
+info: 94geek.com
+copyright: Copyright &copy; 94geek.com on GitHub with Jekyll
 
 author: Seapeak.Xu
 
