@@ -3,7 +3,16 @@ layout: default
 title: "94geek"
 ---
 ####基础信息  
-徐海峰，人称：大嘴。出生于1984-11-21，已婚，目前定居上海。
+徐海峰,出生于1984-11-21，已婚，目前定居上海  
+外号：大嘴。同事们都这么叫我.PS：大嘴并不是我管不住嘴，而是天生嗓门比较大  
+一身都是病：VIM重症患者，CUI重症患者，键盘重症患者,网络重症患者......  
+代码洁癖重症患者，看见或者想到可以重构的代码会往往管不住自己的手指  
+音乐重症患者，上班带耳机，写代码带耳机......,走路不带（PS：杀手太多，不敢带）  
+阅读中度患者，家里2个书架基本上都被我霸占了  
+机械爱好者，不喜欢电子产品。PS：奇怪，我怎么做码农这一行的？  
+宅男，只要不是LP拖着，哪里都不想去  
+弱智，IQ缺乏重症患者，看见智商测试就头疼，并且从未超过36分  
+懒，超级懒。懒到桌子经常被成为"垃圾堆"，懒到我妈觉得没人嫁给我（PS:显然她失算了)  
 
 ####IT技能  
 1：8年工作经验，其中3年传统行业，5年互联网行业;  
@@ -11,8 +20,7 @@ title: "94geek"
 3：5年linux c编程经验;  
 4：2年java编程经验;  
 5：熟悉git，svn等版本控制工具;  
-6：分析和解决问题的能力还行,但智商是硬伤(智商测试从没过50分，属于"弱智",严重“
-        脑缺”);  
+6：分析和解决问题的能力还行,发散性思维厉害；  
 7：e文一般，文档没问题，顺便翻译libev使用手册玩玩(其实德国人那个e文也是......);  
 8：<a href="https://github.com/xvhfeng" target="_blank">github</a>  
 
@@ -27,7 +35,7 @@ title: "94geek"
 国际机票架构师  
 
 2012/03 -- 2014/04 5173.com  
-分布式系统首席架构师  
+系统架构师  
 
 2014/05 --         腾讯文学  
 架构师  
@@ -63,21 +71,12 @@ project manager, team leader of architecture
 architect of international air ticket  
 
 03/2012 - 04/2014 5173.com  
-chief architect of distributed system  
+system architect  
 
 05/2014 - Tencent literature  
-The architect  
+architect  
 
 ####Resume  
 <a href="http://www.94geek.com/resume/index.html" target="_blank">84年的徐大嘴
 </a>
 
-<!-- Blog Comments -->
-<!-- UY BEGIN -->
-<!--
-<div class="media">
-<div id="uyan_frame"></div>
-<script type="text/javascript" src="http://v2.uyan.cc/code/uyan.js?uid=1960125"></script>
-</div>
--->
-<!-- UY END -->
