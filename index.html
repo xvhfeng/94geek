@@ -21,19 +21,19 @@ layout: default
   {% if paginator.previous_page %} {% if paginator.previous_page == 1 %}
   <li class="previous">
     <a href="{{ site.url }}/">
-      &larr; Older
+      &larr; Previous
     </a>
   </li>
   {% else %}
   <li class="previous">
     <a href="{{ site.url }}/page{{ paginator.previous_page }}">
-      &larr; Older
+      &larr; Previous
     </a>
   </li>
   {% endif %} {% endif %} {% if paginator.next_page %}
   <li class="next">
     <a href="{{ site.url }}/page{{ paginator.next_page }}">
-      Newer &rarr;
+        Next &rarr;
     </a>
   </li>
   {% endif %}
