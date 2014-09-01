@@ -5,6 +5,8 @@ title:  "blog近期的计划"
 tags: [blog,计划]
 ---
 ####计划
+![plan](/img/plan/plan.jpg)
+</br>
 1. 近期在使用libev，顺便翻译了libev的使用文档，准备公开出来（给libev的作者发了
 mail，希望得到许可，但是石沉大海。等不及了，先公开再说吧！);  
 2. 最近在写YDB，其实就是一个分布式文件系统，里面有一些关于libev的实践和一些技
