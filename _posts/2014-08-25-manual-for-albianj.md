@@ -10,7 +10,7 @@ tags: [albianj,manual,java,ioc,orm]
 
 
 ##Albianj使用手册
-![manual](/img/manual/manual.jpeg)
+![manual](/img/manual/manual.jpg)
 
 总述：
 -----
