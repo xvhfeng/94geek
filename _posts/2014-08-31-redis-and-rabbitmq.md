@@ -1,7 +1,7 @@
 ---
 layout: post
 categories: [arch]
-title: "redis vs rabbitmq相关功能介绍和测试"
+title: "redis vs rabbitmq队列功能介绍和测试"
 tags: [arch]
 ---
 ####摘要
