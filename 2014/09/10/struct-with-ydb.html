@@ -96,63 +96,18 @@
       <div class="row">
         <!-- Blog Entries Column -->
         <div class="col-md-8">
-          
+          <!-- Blog Post -->
+<!-- Title -->
 <h2>
-  <a href="/2014/10/23/libev-doc-zh-cn.html">
-    libev文档中文版--简介
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	23 Oct 2014
-  </div>
-</h2>
-<hr>
- <p>libev - a high performance full-featured event loop written in C<br>
-libev-一个用c写成的全功能事件循环库（PS：event loop不知道怎么翻译好）。</p>
-
-<p>SYNOPSIS<br>
-简介<br>
-<code>
-    #include &lt;ev.h&gt;
-</code></p>
-
-    <p> <a href="/2014/10/23/libev-doc-zh-cn.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
-
-<h2>
-  <a href="/2014/10/13/mempool.html">
-    关于内存池的设计思路和实现方法
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	13 Oct 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
-
-<p><img src="/img/mempool/1.jpg" alt="car">
-<br/>
-以前我也写过mempool，但是因为觉得麻烦，而且对于dfs这种系统，说实话，感觉
-mempool没有http服务器对于mempool的需求那么大，所以也就没有把mempool放在心上，
-直到前几天在debug程序，检查code的时候突然发现有几个函数中竟然没有把alloc的内存
-给free了，当时汗就下来了......，遂想到很久之前写过的那个mempool，赶紧拿出来，
-然后开启封条，重新组装，发挥作用。  </p>
-
-    <p> <a href="/2014/10/13/mempool.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
-
-<h2>
-  <a href="/2014/09/10/struct-with-ydb.html">
     YDB的内核的模块化设计
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	10 Sep 2014
-  </div>
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        10 Sep 2014
+    </div>
 </h2>
+<!-- Author -->
 <hr>
- <h4>摘要</h4>
+<h4>摘要</h4>
 
 <p><img src="/img/module/1.jpg" alt="car">
     <br />
@@ -166,69 +121,56 @@ client，再由client存储到db中；在需要的时候，通过key，就可以
 job的状态dispatch，disk-io的操作。其中，网络的交互和disk-io都是典型的blacking
 操作，需要我们另外想办法解决。  </p>
 
-    <p> <a href="/2014/09/10/struct-with-ydb.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
+<!-- more -->
 
-<h2>
-  <a href="/2014/09/07/struct-with-libev.html">
-    关于使用libev设计YDB的网络主体结构
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	07 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
+<h4>设计</h4>
 
-<p><img src="/img/sol/1.png" alt="car">
-</br>
-在前两年中，我在5173写了一个分布式文件系统（以下简称DFS），后来在写完以后因为
-某些原因，最后并没有在线上实施（目前5173 online环境上的DFS还是09年的时候部署的
-DIY版本的FASTDFS）。后来离开5173后，来到了腾讯文学，再一次需要DFS，所以重新动
-工开始写DFS，到目前为止，我一个人写了3个月了，基本的功能差不多了，数据备份和恢
-复功能已经完成了1/4，还有一半的完整性同步和整个的单盘恢复还没完成。从5173到腾
-讯文学，第二次写DFS，重新设计了DFS的内核框架，纠正了以前犯的一些错误。<br>
-相对于DFS来说，主要的问题有2个，一个是对于磁盘的IO，另外一个是对于网络的IO。这
-里我们只要讨论对于网络的IO。  </p>
+<p>根据摘要的描述，我们容易的得到ydb的内部其实分成了几个部分：网络，dio，notify。
+这3部分相互之间的协作构成了我们整个系统。鉴于这3个部分的共性：它们基本上都是
+listen message，然后deal message，最后再把处理完的message dispatch到它的下游（
+或者上游）。那么我们就能从这3部分的特性中提炼出来一个大家都拥有的概念，在ydb中
+，我们把它称之为module。在ydb中，我们把module定义在spx中，spx_module就是模块的
+定义。<br>
+在每一个module中，我们使用到了多线程，即每一个module包含了n个线程，每个线程一
+个libev的loop，这样，我们通过通过id或者任何你可以hash的key来确定该request应该
+由module中的哪一个thread来处理。因为一个request只会被一个module的一个thread处
+理，并且是通过loop来处理的，所以不会出现并发的现象，不需要mutex locker。<br>
+deal function使用的也是callback的方式（PS：虽然callback的方式对于devper来说简
+直就是灾难，但是在lib中你也不得不使用这种简单而高效的方式，就算我是callback编
+程的反对者，但是也无济于事）。<br>
+spx-module是一个base module，每个module都会拥有自己的功能，所以我们在spx中根据
+ydb的需要，也根据通常的需要，我们定义了
+notifier-module,network-module,task-module.它们分别用来处理网络连接的通知、网
+络的读取和写入、任务的处理。在spx中定义的只是最基本的module操作，相对于ydb来说
+，它还有自定义的notifier，network，task模块。因为ydb的特殊性，在ydb的task
+module中，我们还使用thread的loop来处理对于dio的noblacking操作。  </p>
 
-    <p> <a href="/2014/09/07/struct-with-libev.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
+<h4>结构说明</h4>
 
-<h2>
-  <a href="/2014/09/05/icloud.html">
-    由劳伦斯想到的
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	05 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>是不是很熟悉</h4>
+<p><img src="/img/module/dim.png" alt="car">
+<br />
+<img src="/img/module/cs.png" alt="car"></p>
 
-<div class="row">
-  <div class="col-md-6" ><img src="/img/icloud/2_215.jpg" /></div>
-  <div class="col-md-6" ><img src="/img/icloud/1_215.jpg" /></div>
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2014/09/07/struct-with-libev.html">
+            关于使用libev设计YDB的网络主体结构
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2014/10/13/mempool.html">
+            关于内存池的设计思路和实现方法
+        </a>
+    </span>
+    
 </div>
-
-<p>这几天这个很火，作为一个DFS的开发者，是不是应该普及一下所谓的&quot;云&quot;对于我们生活
-的改变，同时在这个互联网时代，我们的一些隐私问题，特别是很多&quot;默默无闻&quot;的运行在
-后台的软件功能对于我们隐私的一些挑战.  </p>
-
-    <p> <a href="/2014/09/05/icloud.html"><span >阅读全文 &raquo; </span></a></p>
 <hr>
-
-<!-- Pager -->
-<ul class="pager">
-   
-  <li class="next">
-    <a href="/page2">
-        Next &rarr;
-    </a>
-  </li>
-  
-</ul>
 
         </div>
         <!-- Blog Sidebar Widgets Column -->

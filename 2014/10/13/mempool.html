@@ -96,40 +96,18 @@
       <div class="row">
         <!-- Blog Entries Column -->
         <div class="col-md-8">
-          
+          <!-- Blog Post -->
+<!-- Title -->
 <h2>
-  <a href="/2014/10/23/libev-doc-zh-cn.html">
-    libev文档中文版--简介
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	23 Oct 2014
-  </div>
-</h2>
-<hr>
- <p>libev - a high performance full-featured event loop written in C<br>
-libev-一个用c写成的全功能事件循环库（PS：event loop不知道怎么翻译好）。</p>
-
-<p>SYNOPSIS<br>
-简介<br>
-<code>
-    #include &lt;ev.h&gt;
-</code></p>
-
-    <p> <a href="/2014/10/23/libev-doc-zh-cn.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
-
-<h2>
-  <a href="/2014/10/13/mempool.html">
     关于内存池的设计思路和实现方法
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	13 Oct 2014
-  </div>
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        13 Oct 2014
+    </div>
 </h2>
+<!-- Author -->
 <hr>
- <h4>摘要</h4>
+<h4>摘要</h4>
 
 <p><img src="/img/mempool/1.jpg" alt="car">
 <br/>
@@ -139,96 +117,78 @@ mempool没有http服务器对于mempool的需求那么大，所以也就没有�
 给free了，当时汗就下来了......，遂想到很久之前写过的那个mempool，赶紧拿出来，
 然后开启封条，重新组装，发挥作用。  </p>
 
-    <p> <a href="/2014/10/13/mempool.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
+<!-- more -->
 
-<h2>
-  <a href="/2014/09/10/struct-with-ydb.html">
-    YDB的内核的模块化设计
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	10 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
+<p><br/></p>
 
-<p><img src="/img/module/1.jpg" alt="car">
-    <br />
-ydb是一个公司使用的分布式文件系统，如果有需要，也可以拿来当k-v的storage来使用
-。ydb主要应对的一个使用场景就是我们的章节存储，还有的一个可能就是图片的存储。
-这些都是典型的k-v模型。<br>
-那么，ydb就很明确了，首先它需要一个服务器端，用来存储k-v结构，然后把key返回给
-client，再由client存储到db中；在需要的时候，通过key，就可以从ydb中得到key相应
-的value，并且还能对value做相应的更改和删除等操作。<br>
-既然是典型的C-S模型，那么对于Server来说，他需要解决几个问题：网络的交互、内部
-job的状态dispatch，disk-io的操作。其中，网络的交互和disk-io都是典型的blacking
-操作，需要我们另外想办法解决。  </p>
+<h4>结构</h4>
 
-    <p> <a href="/2014/09/10/struct-with-ydb.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
+<p>memory pool的结构非常简单，组成这个pool的最重要的就是两个memory buffer和
+large list。<br>
+memory buffer在代码中是struct spx<em>mbuff的结构体，在pool中是一个单向list，
+它主要提供的功能
+就是分配小对象，mbuff可以自由的增大，不会受限制（但是受系统内存的限制）；<br>
+large list其实就是大对象的列表，它是struct spx</em>large的结构体，在pool中是一个双
+向的list，它主要维护了大对象在pool中的存在方式。<br>
+不管对于pooling object还是large object，我们都需要提供一单一的，一致的，简单的
+object模型。通过这个模型，可以方便的得出这个对象是否是pooling的，它的size等等
+信息，相当于让object有一个自解释的功能。所以，我们定义了struct spx_object这个
+结构体来完成这个功能。但是仅仅通过这个结构体还不能够实现，其中还需要一些c中的
+指针和内存映射小技巧来完成（其实就是模拟父类，子类，继承等概念）。<br>
+<br/></p>
 
-<h2>
-  <a href="/2014/09/07/struct-with-libev.html">
-    关于使用libev设计YDB的网络主体结构
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	07 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
+<h4>功能</h4>
 
-<p><img src="/img/sol/1.png" alt="car">
-</br>
-在前两年中，我在5173写了一个分布式文件系统（以下简称DFS），后来在写完以后因为
-某些原因，最后并没有在线上实施（目前5173 online环境上的DFS还是09年的时候部署的
-DIY版本的FASTDFS）。后来离开5173后，来到了腾讯文学，再一次需要DFS，所以重新动
-工开始写DFS，到目前为止，我一个人写了3个月了，基本的功能差不多了，数据备份和恢
-复功能已经完成了1/4，还有一半的完整性同步和整个的单盘恢复还没完成。从5173到腾
-讯文学，第二次写DFS，重新设计了DFS的内核框架，纠正了以前犯的一些错误。<br>
-相对于DFS来说，主要的问题有2个，一个是对于磁盘的IO，另外一个是对于网络的IO。这
-里我们只要讨论对于网络的IO。  </p>
+<p>其实内存池相对来说，还是比较简单的。毕竟你写的不是gc，所以没必要整的非常复杂，
+从大的出发点来说它只要满足能分配对象，能清空（或者释放）对象就可以了。还有的一
+些功能都是为了mempool更好用，额外加上去的。<br>
+那么我们这个mempool有哪些功能呢？<br>
+分配和释放对象肯定是有的啦，要不然怎么能成为
+mempool呢？<br>
+为了更好的使用mempool和pooling object，我们还需要一个memory algin功
+能；<br>
+当然机器的内存也不能一味的使用，当一次request结束后，mempool是可以被释放的
+，那么为了效率的综合考虑，我们假如了一个keep memory buffer size功能，其实就是
+每次clear的时候，最多保存多少内存是被memset的，多于的内存都会被free掉；<br>
+还有一个当你分配的对象很大的时候，超过了一个阀值，那么就把这个object成为large
+object，他会单独的被分配，不会占用memory buffer的容量,large object不会在clear
+被留下来，他们会被全部free掉，因为reset之后，程序并不知道应该怎么使用large
+object；<br>
+<br/></p>
 
-    <p> <a href="/2014/09/07/struct-with-libev.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
+<h4>spx<em>object和spx</em>large</h4>
 
-<h2>
-  <a href="/2014/09/05/icloud.html">
-    由劳伦斯想到的
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	05 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>是不是很熟悉</h4>
+<p>在mempool中，spx object是所有的heap object的基础，它是构成整个mempool的最基本
+的元素，在mempool中所有的对象都是spx object对象的子对象。spx object的定义是在
+spx<em>types.h文件中完成的，其实构成这个定义的还有一个SpxObjectStruct的marco。
+mempool通过SpxObjectStruct和指针运算来完成对于对象的解析和自解释工作。在large
+的定义中，SpxObjectStruct的位置只能放置在large的buf之前，因为只有这样，才能在
+free的时候，可以通过指针的运算来得到large对于spx object整个类型的表示，得到这
+个spx object后，才能通过is</em>pooling参数来得到该对象是large还是pooling，再采取相
+应的free策略。<br>
+在整个mempool中，其实有很多的运算和oo模拟都是通过指针运算来解决的。类似的解决
+办法如mbuff。</p>
 
-<div class="row">
-  <div class="col-md-6" ><img src="/img/icloud/2_215.jpg" /></div>
-  <div class="col-md-6" ><img src="/img/icloud/1_215.jpg" /></div>
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2014/09/10/struct-with-ydb.html">
+            YDB的内核的模块化设计
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2014/10/23/libev-doc-zh-cn.html">
+            libev文档中文版--简介
+        </a>
+    </span>
+    
 </div>
-
-<p>这几天这个很火，作为一个DFS的开发者，是不是应该普及一下所谓的&quot;云&quot;对于我们生活
-的改变，同时在这个互联网时代，我们的一些隐私问题，特别是很多&quot;默默无闻&quot;的运行在
-后台的软件功能对于我们隐私的一些挑战.  </p>
-
-    <p> <a href="/2014/09/05/icloud.html"><span >阅读全文 &raquo; </span></a></p>
 <hr>
-
-<!-- Pager -->
-<ul class="pager">
-   
-  <li class="next">
-    <a href="/page2">
-        Next &rarr;
-    </a>
-  </li>
-  
-</ul>
 
         </div>
         <!-- Blog Sidebar Widgets Column -->

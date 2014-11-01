@@ -96,139 +96,66 @@
       <div class="row">
         <!-- Blog Entries Column -->
         <div class="col-md-8">
-          
+          <!-- Blog Post -->
+<!-- Title -->
 <h2>
-  <a href="/2014/10/23/libev-doc-zh-cn.html">
-    libev文档中文版--简介
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	23 Oct 2014
-  </div>
+    blog近期的计划
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        24 Aug 2014
+    </div>
 </h2>
+<!-- Author -->
 <hr>
- <p>libev - a high performance full-featured event loop written in C<br>
-libev-一个用c写成的全功能事件循环库（PS：event loop不知道怎么翻译好）。</p>
+<h4>计划</h4>
 
-<p>SYNOPSIS<br>
-简介<br>
-<code>
-    #include &lt;ev.h&gt;
-</code></p>
-
-    <p> <a href="/2014/10/23/libev-doc-zh-cn.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
-
-<h2>
-  <a href="/2014/10/13/mempool.html">
-    关于内存池的设计思路和实现方法
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	13 Oct 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
-
-<p><img src="/img/mempool/1.jpg" alt="car">
-<br/>
-以前我也写过mempool，但是因为觉得麻烦，而且对于dfs这种系统，说实话，感觉
-mempool没有http服务器对于mempool的需求那么大，所以也就没有把mempool放在心上，
-直到前几天在debug程序，检查code的时候突然发现有几个函数中竟然没有把alloc的内存
-给free了，当时汗就下来了......，遂想到很久之前写过的那个mempool，赶紧拿出来，
-然后开启封条，重新组装，发挥作用。  </p>
-
-    <p> <a href="/2014/10/13/mempool.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
-
-<h2>
-  <a href="/2014/09/10/struct-with-ydb.html">
-    YDB的内核的模块化设计
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	10 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
-
-<p><img src="/img/module/1.jpg" alt="car">
-    <br />
-ydb是一个公司使用的分布式文件系统，如果有需要，也可以拿来当k-v的storage来使用
-。ydb主要应对的一个使用场景就是我们的章节存储，还有的一个可能就是图片的存储。
-这些都是典型的k-v模型。<br>
-那么，ydb就很明确了，首先它需要一个服务器端，用来存储k-v结构，然后把key返回给
-client，再由client存储到db中；在需要的时候，通过key，就可以从ydb中得到key相应
-的value，并且还能对value做相应的更改和删除等操作。<br>
-既然是典型的C-S模型，那么对于Server来说，他需要解决几个问题：网络的交互、内部
-job的状态dispatch，disk-io的操作。其中，网络的交互和disk-io都是典型的blacking
-操作，需要我们另外想办法解决。  </p>
-
-    <p> <a href="/2014/09/10/struct-with-ydb.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
-
-<h2>
-  <a href="/2014/09/07/struct-with-libev.html">
-    关于使用libev设计YDB的网络主体结构
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	07 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>摘要</h4>
-
-<p><img src="/img/sol/1.png" alt="car">
+<p><img src="/img/plan/plan.jpg" alt="plan">
 </br>
-在前两年中，我在5173写了一个分布式文件系统（以下简称DFS），后来在写完以后因为
-某些原因，最后并没有在线上实施（目前5173 online环境上的DFS还是09年的时候部署的
-DIY版本的FASTDFS）。后来离开5173后，来到了腾讯文学，再一次需要DFS，所以重新动
-工开始写DFS，到目前为止，我一个人写了3个月了，基本的功能差不多了，数据备份和恢
-复功能已经完成了1/4，还有一半的完整性同步和整个的单盘恢复还没完成。从5173到腾
-讯文学，第二次写DFS，重新设计了DFS的内核框架，纠正了以前犯的一些错误。<br>
-相对于DFS来说，主要的问题有2个，一个是对于磁盘的IO，另外一个是对于网络的IO。这
-里我们只要讨论对于网络的IO。  </p>
+1. 近期在使用libev，顺便翻译了libev的使用文档，准备公开出来（给libev的作者发了
+mail，希望得到许可，但是石沉大海。等不及了，先公开再说吧！);<br>
+2. 最近在写YDB，其实就是一个分布式文件系统，里面有一些关于libev的实践和一些技
+巧，这部分也可以在近期公开;<br>
+3. 4月份的时候，我重新检验了albianj，并且增加了一些功能，albianj目前已经在公司
+上线，源码因为是我自己的，并且在没进入公司之前就已经写成，所以已经签入github，
+这部分也可以公开，.net版本的因为工作关系问题，目前还未公开;<br>
+4. 最近帮一个朋友搞一个632项目。作为帮忙一起搞的，我也可以把这部分的工作公开;  </p>
 
-    <p> <a href="/2014/09/07/struct-with-libev.html"><span >阅读全文 &raquo; </span></a></p>
-<hr>
+<!-- more -->
 
-<h2>
-  <a href="/2014/09/05/icloud.html">
-    由劳伦斯想到的
-  </a> 
-  <div class="post-date">
-	<span class="glyphicon glyphicon-time"></span>
-	05 Sep 2014
-  </div>
-</h2>
-<hr>
- <h4>是不是很熟悉</h4>
+<p></br>
+目前这些应该已经差不多了吧，至少已经足够写上一阵子了。</p>
 
-<div class="row">
-  <div class="col-md-6" ><img src="/img/icloud/2_215.jpg" /></div>
-  <div class="col-md-6" ><img src="/img/icloud/1_215.jpg" /></div>
+<p></br></p>
+
+<h4>关于blog</h4>
+
+<p>这是一个&quot;纯技术&quot;的blog，原则上只会存在关于技术的文章。当然，这里所有的文章你都
+可以转载，并不需要得到我本人的任何意见，但是我希望你能尊重我的知识，所以如果你
+想转载，请你在你转载的页面上保留关于本blog的信息,具体如下:<br>
+1. 94geek.com标识<br>
+2. 原文章的链接地址  </p>
+
+<p></br></p>
+
+<h4>写在最后</h4>
+
+<p>这是我的第一篇blog，目的只有2个:<br>
+1. 公示一下我最近要做什么，blog能帮助我做多少;<br>
+2. 最重要也是紧急的事情就是：检查一下blog是否OK？</p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2014/08/25/manual-for-albianj.html">
+            Albianj使用手册
+        </a>
+    </span>
+    
 </div>
-
-<p>这几天这个很火，作为一个DFS的开发者，是不是应该普及一下所谓的&quot;云&quot;对于我们生活
-的改变，同时在这个互联网时代，我们的一些隐私问题，特别是很多&quot;默默无闻&quot;的运行在
-后台的软件功能对于我们隐私的一些挑战.  </p>
-
-    <p> <a href="/2014/09/05/icloud.html"><span >阅读全文 &raquo; </span></a></p>
 <hr>
-
-<!-- Pager -->
-<ul class="pager">
-   
-  <li class="next">
-    <a href="/page2">
-        Next &rarr;
-    </a>
-  </li>
-  
-</ul>
 
         </div>
         <!-- Blog Sidebar Widgets Column -->

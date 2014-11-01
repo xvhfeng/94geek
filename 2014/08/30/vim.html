@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-8">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    vim配置
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        30 Aug 2014
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<h4>摘要</h4>
+
+<p><img src="/img/vim/vim.jpg" alt="VIM">
+</br>
+这次主要讲讲VIM对于一些&quot;古怪&quot;安静绑定的前因后果。这有助于我们更加了解VIM的历史
+。然后再讲一下，在现在的键盘上，我们怎么通过&quot;经济&quot;的办法来达到使用VIM时，能保
+证小手指尽量的舒适，一些按键能尽量的控制在键盘的大区内；然后，我会讲一下我的
+VIM配置文件的组成，以及为什么我要用这种方法来配置我的VIM。最后当然是重头的VIM
+配置文件。  </p>
+
+<h4>解放你的小手指</h4>
+
+<p>讲VIM的小手指问题，我们得先讲讲VIM的出生年代。在Bill Joy开发VI的时候，其实他使
+用的机器是ADM-3A。这款机器的键盘和现在机器的键盘是不一样的，详细看图：<br>
+<img src="/img/vim/vim-kb.jpg" alt="ADM-3A的键盘">
+这是理解了吧。这不是Joy有意，实在是他使用的键盘CTRL的按键确实很方便，所以快捷
+键很多都是CTRL。后来计算机键盘的发展把CTRL放到了下角，才导致了现在使用VIM的时
+候，只要时间一长，小手指就像不是你的一样。<br>
+再看一下键盘的上下左右按键，分别对应的是HJKL，所以VIM也就使用这几个键来作为基
+本的移动按键。我觉得如果但是的键盘上有单独的上下左右按键，Joy应该也会随大流吧
+。PS：其实后来有一款游戏CS（一款对战游戏）还重新定义了一种叫做WASD的移动风格。<br>
+还有一个就是ESC，对于ESC按键，当初在键盘上的位置就在CTRL上边，就是现在我们TAB
+键的位置，你按按TAB键试试，是不是很上手？<br>
+那么面对这种情况，我们不是没有改变的办法，我们改变的办法就是重新绑定我们这几个
+功能键，把它绑定到我们自己认为舒服的位置就可以。<br>
+具体的方法就是，在你的HOME下新建一个.Xmodmap文件就可以，然后输入以下内容：  </p>
+
+<!-- more -->
+
+<pre><code>
+keycode 66 = Control_L
+keycode 108 = Escape
+clear Lock
+add Control = Control_L
+keycode 135 = Caps_Lock
+add Lock = Caps_Lock
+</code></pre>  
+
+<p>有的时候，你具体的键值可能是不一样的，这个时候你必须要使用软件来检测一下你的键
+盘上CAPS、CTRP，ALT（right）和ESC的键值各是多少，然后根据你的实际情况换进去就
+可以。<br>
+如果你的米足够，并且是一个键盘党，那么这里推荐一款键盘，HHKB。其貌不扬的外观下
+面是一颗静电容的芯。目前我使用的就是这款，它的键盘布局就非常适合Linux的CUI操作
+用户，特别是VIMer。但是不适合Emacer（因为按键太少了，也没带脚踏板功能！)<br>
+<img src="/img/vim/hhkb.jpg" alt="HHKB"></p>
+
+<h4>VIM配置的进化</h4>
+
+<p>在很久之前，好像是3年吧。那个时候VIM的插件管理还没有什么好的办法。一般的做法都
+是从vim.org上下载一个插件，然后解压，在cp到你的.vim目录下。如果有需要，再在
+vimrc中配置一下插件，个性化一下或者重新绑定几个快捷键什么的。但是这种插件的管
+理方法看似很简单，实则非常落后。主要是
+1. 乱，你的.vim文件夹的子文件夹内到处充满了不知道是什么插件的问题；<br>
+2. 不要禁用插件。当你想试用一下某个插件，等你安装完后觉得不爽，想删除的时候，
+因为它是散落在多个文件夹的，所以你根本无法去删除或者是删除干净；<br>
+3. 版本不好控制。这种方式一般都是自己管理版本。把vimrc和.vim下面的文件全部签到
+你自己的github或者googlecode上，这样就可以了，但是如果插件本身升级了，你还得手
+动的去下载一个插件，覆盖掉你本地的插件，然后在签入自己的。或者你fork一个子项目
+，然后定期更新什么的。反正比较麻烦。<br>
+后来，估计是有几个VIMer对于这种方式实在恼火了，vundle这类&quot;全家旅游，杀人越货&quot;
+级别的必备良药出现了。大家很快就使用了这种方式来管理。瞬间&quot;这个世界变的清静了
+&quot;.  </p>
+
+<h4>VIM配置文件</h4>
+
+<p>首先，我的配置文件由4个分文件构成。原因就是全部写在一个vimrc中的话，这个文件实
+在太长了，也无法很好的定位和管理。所以我就把这个总的vimrc文件分成了4个文件。具
+体如下:<br>
+1. main.vimrc 这个是主vimrc文件，里面加载另外的3个文件，并且一些基本的vim配置
+都是在这个文件中完成；<br>
+2. bundle.vimrc 这个vimrc文件主要配置了你需要使用的第三方插件；要使用这个文件
+，必须先安装vundle插件；<br>
+3. keymmaping.vimrc 这个文件是快捷键绑定文件，主要就是一些vim内置功能（不包括第
+三方插件，第三方插件的快捷键在bundle.vimrc中配置）的快捷键；<br>
+4. function.vimrc 这个文件主要管理一些自定义的功能函数。一般都是使用vim script
+写的简单功能。<br>
+<pre><code>
+&quot;==========================================
+&quot; Base Settings  基本设置 main.vimrc
+&quot;==========================================
+</br>
+:set nocompatible
+</br>
+&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;
+&quot; Include vimrc 读取子vimrc
+&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;&quot;
+&quot; install Vundle bundles
+if filereadable(expand(&quot;~/.vim/myvim/bundle.vimrc&quot;))
+  source ~/.vim/myvim/bundle.vimrc
+endif
+</br>
+&quot; ensure ftdetect et al work by including this after the Vundle stuff
+filetype plugin indent on
+</br>
+&quot;loading key-mapping
+if filereadable(expand(&quot;~/.vim/myvim/keymapping.vimrc&quot;))
+  source ~/.vim/myvim/keymapping.vimrc
+endif
+</br>
+&quot;loading function
+if filereadable(expand(&quot;~/.vim/myvim/function.vimrc&quot;))
+  source ~/.vim/myvim/function.vimrc
+endif
+</br>
+&quot;自动启用vimrc配置
+autocmd! bufwritepost .vimrc source ~/.vimrc
+:set switchbuf=useopen
+&quot;设置光标可以到最后一个字面后
+set virtualedit=onemore
+&quot;设置快捷键等待时间
+ &quot; set timeout timeoutlen=300
+ set timeout ttimeoutlen=-1
+&quot;设置退格键为删除键
+set backspace=indent,eol,start
+&quot;设置移动命令在行首或者行尾时依然有效
+set whichwrap+=b,s,&lt;,&gt;,[,]
+set whichwrap+=&lt;,&gt;,h,l
+&quot;设置历史命令保存数
+set history=1000
+&quot;关闭智能补全预览窗口
+set completeopt=longest,menu
+&quot;设置鼠标可以选择文本
+set selectmode+=mouse
+&quot;设置自动读取外面对于文件的变更
+set autoread
+&quot;设置命令行高度为2
+set cmdheight=1
+set nobackup
+set nowb
+set noswapfile
+&quot;与windows共享剪贴板
+set clipboard+=unnamed
+&quot;set clipboard+=unamedplus
+&quot;增强模式中的命令行自动完成操作
+set wildmenu
+&quot;开启鼠标
+set mouse=a
+&quot; 启动的时候不显示那个援助索马里儿童的提示
+set shortmess=atI
+&quot; 不让vim发出讨厌的滴滴声
+set novisualbell         &quot; don&#39;t beep
+set noerrorbells
+&quot;自动切换当前目录为当前文件所在目录
+set autochdir
+&quot;打开时忽略文件名后缀
+set wildignore+=*.o,*.obj,*.pyc,*.db,*.swp,*.bak,*.class
+&quot;默认就是全buffer搜索
+set gdefault
+&quot;切换到当前tab打开文件的路径下
+autocmd BufEnter * cd %:p:h
+&quot;检测文件类型
+filetype on
+&quot;针对不同的文件类型采用不同的缩进格式
+filetype indent on
+&quot;允许插件
+filetype plugin on
+&quot;启动自动补全
+filetype plugin indent on
+&quot;create undo file
+set undolevels=1000         &quot; How many undos
+set undoreload=10000        &quot; number of lines to save for undo
+if v:version &gt;= 730
+    set undofile                &quot; keep a persistent backup file
+    set undodir=/tmp/vimundo/
+endif
+&quot; 修复ctrl+m 多光标操作选择的bug，但是改变了ctrl+v进行字符选中时将包含光标下的字符
+&quot;set selection=exclusive
+&quot; set selection=inclusive
+&quot; set selectmode=mouse,key
+&quot; No annoying sound on errors
+set title                &quot; change the terminal&#39;s title
+set t<em>vb=
+set tm=500
+&quot; Remember info about open buffers on close&quot;
+set viminfo^=%
+&quot; For regular expressions turn magic on
+set magic
+</br>
+&quot;==========================================
+&quot; Display Settings 展示/排版等界面格式设置
+&quot;==========================================
+&quot;设置一行字数
+set tw=78
+&quot;折行
+set lbr
+&quot;中文折行不断字
+set fo+=mB
+:set formatoptions+=mM &quot;format for chinese
+&quot; 高亮显示匹配的括号
+set showmatch
+&quot;带有如下符号的单词不要被换行分割
+set iskeyword+=$,@,%,#,-,</em>_
+set ambiwidth=double
+&quot;开启行号显示
+:set number
+&quot;显示当前的行号列号：
+set ruler
+&quot;&quot;在状态栏显示正在输入的命令
+set showcmd
+&quot; Show current mode
+set showmode
+&quot; Set 7 lines to the cursor - when moving vertically using j/k 上下滚动,始终在中间
+set scrolloff=7
+&quot; 命令行（在状态行下）的高度，默认为1，这里是2
+ set statusline=%&lt;%f\ %h%m%r%=%k[%{(&amp;fenc==\&quot;\&quot;)?&amp;enc:&amp;fenc}%{(&amp;bomb?\&quot;,BOM\&quot;:\&quot;\&quot;)}]\ %-14.(%l,%c%V%)\ %P
+&quot; Always show the status line
+set laststatus=2
+&quot; 取消换行。
+&quot; set nowrap
+&quot; How many tenths of a second to blink when matching brackets
+set mat=2
+&quot; 突出显示当前行等
+&quot; set cursorcolumn
+set cursorline          &quot; 突出显示当前行
+</br>
+&quot;设置文内智能搜索提示
+&quot; 高亮search命中的文本。
+set hlsearch
+&quot; 搜索时忽略大小写
+set ignorecase
+&quot; 在搜索时，输入的词句的逐字符高亮（类似firefox的搜索）
+set incsearch
+&quot; 有一个或以上大写字母时仍大小写敏感
+set smartcase     &quot; ignore case if search pattern is all lowercase, case-sensitive otherwise
+</br>
+&quot; 代码折叠
+set foldenable
+&quot; 折叠方法
+&quot; manual    手工折叠
+&quot; indent    使用缩进表示折叠
+&quot; expr      使用表达式定义折叠
+&quot; syntax    使用语法定义折叠
+&quot; diff      对没有更改的文本进行折叠
+&quot; marker    使用标记进行折叠, 默认标记是 }
+set foldmethod=marker
+set foldlevel=1
+</br>
+&quot; 缩进配置
+set smartindent   &quot; Smart indent
+set autoindent    &quot; always set autoindenting on
+set copyindent
+&quot; never add copyindent, case error   &quot; copy the previous indentation on autoindenting
+&quot;c程序可以在v模式中按=格式化
+set cin
+set cursorline
+</br>
+&quot; tab相关变更
+set tabstop=4     &quot; 设置Tab键的宽度        [等同的空格个数]
+set shiftwidth=4  &quot; number of spaces to use for autoindenting
+set softtabstop=4 &quot; 按退格键时可以一次删掉 4 个空格
+set smarttab      &quot; insert tabs on the start of a line according to shiftwidth, not tabstop 按退格键时可以一次删掉 4 个空格
+set expandtab     &quot; 将Tab自动转化成空格    [需要输入真正的Tab键时，使用 Ctrl+V + Tab]
+set shiftround    &quot; use multiple of shiftwidth when indenting with &#39;&lt;&#39; and &#39;&gt;&#39;
+set cindent shiftwidth=4
+set autoindent shiftwidth=4
+</br>
+&quot; A buffer becomes hidden when it is abandoned
+&quot; 允许在有未保存的修改时切换缓冲区，此时的修改由 vim 负责保存
+set hidden
+set autowrite
+set wildmode=list:longest
+set ttyfast
+</br>
+&quot;设置 退出vim后，内容显示在终端屏幕, 可以用于查看和复制
+&quot;好处：误删什么的，如果以前屏幕打开，可以找回
+set t<em>ti= t</em>te=
+</br>
+&quot;==========================================
+&quot; FileEncode Settings 文件编码,格式
+&quot;==========================================
+&quot; 设置新文件的编码为 UTF-8
+set encoding=utf-8
+&quot; 自动判断编码时，依次尝试以下编码：
+set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
+</br>
+&quot;如果帮助无法显示中文,增加这句试试:
+set helplang=cn
+</br>
+&quot; 下面这句只影响普通模式 (非图形界面) 下的 Vim。
+set termencoding=utf-8
+</br>
+&quot; Use Unix as the standard file type
+set ffs=unix,dos,mac
+</br>
+&quot; 如遇Unicode值大于255的文本，不必等到空格再折行。
+set formatoptions+=m
+</br>
+&quot; 合并两行中文时，不在中间加空格：
+set formatoptions+=B
+</br>
+if has(&quot;win32&quot;) || has(&quot;win64&quot;)
+    set fileencoding=chinese
+else
+    set fileencodings=utf-8,chinese,latin-1
+endif
+</br>
+if !has(&quot;gui<em>running&quot;)
+    :set tenc=utf-8,gb2312,chinese
+endif
+</br>
+&quot;解决consle输出乱码
+language messages zh</em>CN.utf-8
+</br>
+&quot;==========================================
+&quot; Theme Settings  主题设置
+&quot;==========================================
+</br>
+&quot; Set extra options when running in GUI mode
+if has(&quot;gui<em>running&quot;)
+    set guifont=Monaco:h14
+    set guioptions-=T
+    set guioptions+=e
+    set guioptions-=r
+    set guioptions-=L
+    set guitablabel=%M\ %t
+    set showtabline=1
+    set linespace=2
+    set noimd
+    &quot; set t</em>Co=256
+    &quot;定义givm的颜色和去掉gvim的工具栏
+    set guioptions-=T
+</br>
+    &quot;高亮显示
+    if &amp;t<em>Co &gt; 2
+        syntax on
+        set hlsearch
+    endif
+endif
+</br>
+&quot;当终端支持颜色显示时打开彩色显示
+if &amp;t</em>Co &gt; 1
+    syntax enable
+endif
+</br>
+&quot; theme主题
+&quot;背景变暗dark，亮设置为light
+set background=dark
+&quot;colorscheme solarized
+&quot; colorscheme elise
+set t<em>Co=256
+</br>
+hi cursorline guibg=#333333     &quot; highlight bg color of current line
+hi CursorColumn guibg=#333333   &quot; highlight cursor
+</br>
+&quot;设置标记一列的背景颜色和数字一行颜色一致
+hi! link SignColumn   LineNr
+hi! link ShowMarksHLl DiffAdd
+hi! link ShowMarksHLu DiffChange
+</br>
+&quot;&quot; for error highlight，防止错误整行标红导致看不清
+highlight clear SpellBad
+highlight SpellBad term=standout ctermfg=1 term=underline cterm=underline
+highlight clear SpellCap
+highlight SpellCap term=underline cterm=underline
+highlight clear SpellRare
+highlight SpellRare term=underline cterm=underline
+highlight clear SpellLocal
+highlight SpellLocal term=underline cterm=underline
+</br>
+&quot;==========================================
+&quot; others 其它设置
+&quot;==========================================
+autocmd! bufwritepost _vimrc source % &quot; vimrc文件修改之后自动加载。 windows。
+autocmd! bufwritepost .vimrc source % &quot; vimrc文件修改之后自动加载。 linux。
+</br>
+&quot; 自动补全配置
+&quot;让Vim的补全菜单行为与一般IDE一致(参考VimTip1228)
+set completeopt=longest,menu
+</br>
+&quot;离开插入模式后自动关闭预览窗口
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+</br>
+&quot; if this not work ,make sure .viminfo is writable for you
+if has(&quot;autocmd&quot;)
+  au BufReadPost * if line(&quot;&#39;\&quot;&quot;) &gt; 1 &amp;&amp; line(&quot;&#39;\&quot;&quot;) &lt;= line(&quot;$&quot;) | exe &quot;normal! g&#39;\&quot;&quot; | endif
+endif
+</code></pre>
+</br>
+<pre><code><br>
+&quot;==========================================
+    &quot;配置插件管理 bundle.vimrc
+&quot;==========================================
+filetype off
+</br>
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+</br>
+Bundle &quot;vundle&quot;
+</br>
+&quot; 多语言语法检查
+Bundle &#39;scrooloose/syntastic&#39;
+let g:syntastic</em>error<em>symbol=&#39;&gt;&gt;&#39;
+let g:syntastic</em>warning<em>symbol=&#39;&gt;&#39;
+let g:syntastic</em>check<em>on</em>open=1
+let g:syntastic<em>enable</em>highlighting = 0
+let g:syntastic<em>python</em>checkers=[&#39;pyflakes&#39;] &quot; 使用pyflakes,速度比pylint快
+highlight SyntasticErrorSign guifg=white guibg=black
+</br>
+Bundle &#39;genutils&#39;
+</br>
+Bundle &#39;xvhfeng/c.vim&#39;
+map &lt;c-x&gt;c \cc
+map &lt;c-x&gt;u \co
+</br>
+&quot; Bundle &#39;The-NERD-Commenter&#39;
+Bundle &#39;ShowTrailingWhitespace&#39;
+</br>
+Bundle &#39;EasyMotion&#39;
+let g:EasyMotion<em>leader</em>key = &#39;f&#39;
+</br>
+Bundle &#39;FencView.vim&#39;
+</br>
+Bundle &#39;The-NERD-tree&#39;
+let NERDTreeWinPos = &quot;left&quot; &quot;where NERD tree window is placed on the screen
+let NERDTreeWinSize = 30 &quot;size of the NERD tree
+nmap &lt;F7&gt; &lt;ESC&gt;:NERDTreeToggle&lt;RETURN&gt;&quot; Open and close the NERD<em>tree.vim separately
+</br>
+Bundle &#39;auto</em>mkdir&#39;
+</br>
+Bundle &#39;bufexplorer.zip&#39;
+:vmap &lt;c-x&gt;b &lt;esc&gt;:w!&lt;esc&gt;,be
+:nmap &lt;c-x&gt;b &lt;esc&gt;:w!&lt;esc&gt;,be
+</br>
+Bundle &#39;CRefVim&#39;
+if !hasmapto(&#39;&lt;Plug&gt;CRV<em>CRefVimInvoke&#39;)
+    map &lt;silent&gt; &lt;unique&gt; &lt;Leader&gt;ci &lt;Plug&gt;CRV</em>CRefVimInvoke
+endif
+</br>
+Bundle &#39;DoxygenToolkit.vim&#39;
+let g:DoxygenToolkit<em>briefTag</em>pre=&quot;@Remark:&quot;
+let g:DoxygenToolkit<em>paramTag</em>pre=&quot;@Param:&quot;
+let g:DoxygenToolkit<em>returnTag=&quot;@Returns:&quot;
+map &lt;c-x&gt;f &lt;ESC&gt;:Dox&lt;cr&gt;
+</br>
+Bundle &#39;grep.vim&#39;
+:nmap &lt;c-g&gt; &lt;ESC&gt;:Grep&lt;CR&gt;
+</br>
+Bundle &#39;lookupfile&#39;
+&quot; lookup file with ignore case
+        function! LookupFile</em>IgnoreCaseFunc(pattern)
+        let <em>tags = &amp;tags
+        try
+            let &amp;tags = eval(g:LookupFile</em>TagExpr)
+            let newpattern = &#39;\c&#39; . a:pattern
+            let tags = taglist(newpattern)
+        catch
+            echohl ErrorMsg | echo &quot;Exception: &quot; . v:exception | echohl NONE
+            return &quot;&quot;
+        finally
+            let &amp;tags = <em>tags
+        endtry
+    &quot; Show the matches for what is typed so far.
+        let files = map(tags, &#39;v:val[&quot;filename&quot;]&#39;)
+        return files
+    endfunction
+</br>
+let g:LookupFile</em>LookupFunc = &#39;LookupFile<em>IgnoreCaseFunc&#39;
+let g:LookupFile</em>MinPatLength = 2
+let g:LookupFile<em>PreserveLastPattern = 0
+let g:LookupFile</em>PreservePatternHistory = 1
+let g:LookupFile<em>AlwaysAcceptFirst = 1
+let g:LookupFile</em>AllowNewFiles = 0
+&quot;if filereadable(&quot;./filenametags&quot;)
+&quot;let g:LookupFile<em>TagExpr = &#39;&quot;./filenametags&quot;&#39;
+&quot;endif
+nmap &lt;silent&gt; &lt;leader&gt;lf :LookupFile&lt;cr&gt;
+nmap &lt;silent&gt; &lt;leader&gt;lb :LUBufs&lt;cr&gt;
+nmap &lt;silent&gt; &lt;leader&gt;lw :LUWalk&lt;cr&gt;
+</br>
+Bundle &#39;ShowMarks&#39;
+</br>
+Bundle &#39;statusline.vim&#39;
+</br>
+Bundle &#39;taglist.vim&#39;
+let Tlist</em>Exit<em>OnlyWindow = 1
+&quot;taglist窗口是否出现在右边，默认是左边
+let Tlist</em>Use<em>Right</em>Window = 1
+&quot;是否在选择了taglist后自动关闭taglist窗口
+let Tlist<em>Close</em>On<em>Select = 0
+&quot;是否在打开了taglist的同时把焦点设置到taglist窗口
+let Tlist</em>GainFocus<em>On</em>ToggleOpen = 1
+&quot;当多个文件在taglist从显示的时候，只打开当前文件，折叠别的文件
+let Tlist<em>File</em>Fold<em>Auto</em>Close = 0
+let Tlist<em>Auto</em>Update = 1
+&quot;map &lt;silent&gt; &lt;leader&gt;tl :TlistToggle&lt;cr&gt;
+map &lt;F8&gt; &lt;ESC&gt;:TlistToggle&lt;cr&gt;
+</br>
+Bundle &#39;vmark.vim--Visual-Bookmarking&#39;
+</br>
+Bundle &#39;terryma/vim-multiple-cursors&#39;
+let g:multi<em>cursor</em>use<em>default</em>mapping=1
+let g:multi<em>cursor</em>next<em>key=&#39;&lt;C-n&gt;&#39;
+let g:multi</em>cursor<em>prev</em>key=&#39;&lt;C-p&gt;&#39;
+let g:multi<em>cursor</em>skip<em>key=&#39;&lt;C-k&gt;&#39;
+let g:multi</em>cursor<em>quit</em>key=&#39;&lt;Esc&gt;&#39;
+</br>
+Bundle &#39;Yggdroot/indentLine&#39;
+&quot;config for indentLine
+let g:indentLine<em>indentLevel = 5
+let g:indentLine</em>enabled = 1
+&quot;hi Conceal ctermfg=red ctermbg=red
+&quot;let g:indentLine<em>char = &#39;|&#39;
+</br>
+Bundle &#39;a.vim&#39;
+&quot;设置c语言的header和c文件转换
+:nmap &lt;C-x&gt;h &lt;ESC&gt;:w!&lt;ESC&gt;:A!&lt;CR&gt;
+</br>
+Bundle &#39;Valloric/YouCompleteMe&#39;
+let g:ycm</em>global<em>ycm</em>extra<em>conf = &#39;~/.ycm</em>extra<em>conf.py&#39;
+let g:ycm</em>error<em>symbol = &#39;&gt;&gt;&#39;
+let g:ycm</em>warning<em>symbol = &#39;&gt;*&#39;
+let g:ycm</em>min<em>num</em>of<em>chars</em>for<em>completion = 2
+let g:ycm</em>min<em>num</em>identifier<em>candidate</em>chars = 0
+&quot; 直接触发自动补全
+let g:ycm<em>key</em>invoke<em>completion = &#39;&lt;c-x&gt;&lt;c-o&gt;&#39;
+let g:ycm</em>cache<em>omnifunc = 1
+let g:ycm</em>auto<em>trigger = 0
+let g:ycm</em>enable<em>diagnostic</em>signs = 0
+let g:ycm<em>enable</em>diagnostic<em>highlighting = 1
+let g:ycm</em>echo<em>current</em>diagnostic = 1
+&quot;youcompleteme  默认tab  s-tab 和自动补全冲突
+let g:ycm<em>key</em>list<em>select</em>completion=[&#39;&lt;c-n&gt;&#39;]
+&quot; let g:ycm<em>key</em>list<em>select</em>completion = [&#39;&lt;Down&gt;&#39;]
+let g:ycm<em>key</em>list<em>previous</em>completion=[&#39;&lt;c-p&gt;&#39;]
+&quot; let g:ycm<em>key</em>list<em>previous</em>completion = [&#39;&lt;Up&gt;&#39;]
+let g:ycm<em>complete</em>in<em>comments = 1  &quot;在注释输入中也能补全
+let g:ycm</em>complete<em>in</em>strings = 1   &quot;在字符串输入中也能补全
+let g:ycm<em>collect</em>identifiers<em>from</em>comments<em>and</em>strings = 1   &quot;注释和字符串中的文字也会被收入补全
+let g:ycm<em>seed</em>identifiers<em>with</em>syntax=1   &quot;语言关键字补全, 不过python关键字都很短，所以，需要的自己打开
+let g:ycm<em>collect</em>identifiers<em>from</em>tags<em>files = 1
+nnoremap &lt;leader&gt;gd :YcmCompleter GoToDeclaration&lt;CR&gt;
+nnoremap &lt;leader&gt;gi :YcmCompleter GoToDefinition&lt;CR&gt;
+nnoremap &lt;leader&gt;gb :YcmCompleter GoToDefinitionElseDeclaration&lt;CR&gt;
+nmap &lt;leader&gt;yd :YcmDiags&lt;CR&gt;
+nmap &lt;F11&gt; :YcmRestartServer&lt;CR&gt;
+</br>
+Bundle &#39;terryma/vim-expand-region&#39;
+map + &lt;Plug&gt;(expand</em>region<em>expand)
+map _ &lt;Plug&gt;(expand</em>region<em>shrink)
+</br>
+Bundle &#39;tpope/vim-commentary&#39;
+</br>
+&quot; 代码片段快速插入
+&quot;Bundle &#39;SirVer/ultisnips&#39;
+&quot; Snippets are separated from the engine. Add this if you want them:
+</br>
+&quot;Bundle &#39;snipMate&#39;
+</br>
+Bundle &#39;honza/vim-snippets&#39;
+let g:UltiSnipsExpandTrigger = &quot;&lt;tab&gt;&quot;
+let g:UltiSnipsJumpForwardTrigger = &quot;&lt;tab&gt;&quot;
+&quot; 定义存放代码片段的文件夹 .vim/additional</em>snippets下，使用自定义和默认的，将会的到全局，有冲突的会提示
+let g:UltiSnipsSnippetDirectories=[&quot;additional<em>snippets&quot;, &#39;UltiSnips&#39;]
+</br>
+&quot; 自动补全html/xml标签
+Bundle &#39;docunext/closetag.vim&#39;
+let g:closetag</em>html<em>style=1
+</br>
+&quot; 快速加入修改环绕字符
+Bundle &#39;tpope/vim-surround&#39;
+</br>
+&quot; for repeat -&gt; enhance surround.vim, . to repeat command
+Bundle &#39;tpope/vim-repeat&#39;
+</br>
+&quot; 快速去行尾空格 [, + &lt;Space&gt;]
+Bundle &#39;bronson/vim-trailing-whitespace&#39;
+map &lt;leader&gt;es :FixWhitespace<cr>
+</br>
+&quot; 文件搜索
+Bundle &#39;kien/ctrlp.vim&#39;
+let g:ctrlp</em>map = &#39;&lt;leader&gt;p&#39;
+let g:ctrlp<em>cmd = &#39;CtrlP&#39;
+map &lt;leader&gt;f :CtrlPMRU&lt;CR&gt;
+&quot;set wildignore+=<em>/tmp/</em>,<em>.so,</em>.swp,*.zip     &quot; MacOSX/Linux&quot;
+let g:ctrlp</em>custom<em>ignore = {
+    \ &#39;dir&#39;:  &#39;\v[\/].(git|hg|svn|rvm)$&#39;,
+    \ &#39;file&#39;: &#39;\v.(exe|so|dll|zip|tar|tar.gz)$&#39;,
+    \ }
+&quot;\ &#39;link&#39;: &#39;SOME</em>BAD<em>SYMBOLIC</em>LINKS&#39;,
+let g:ctrlp<em>working</em>path<em>mode=0
+let g:ctrlp</em>match<em>window</em>bottom=1
+let g:ctrlp<em>max</em>height=15
+let g:ctrlp<em>match</em>window<em>reversed=0
+let g:ctrlp</em>mruf<em>max=500
+let g:ctrlp</em>follow<em>symlinks=1
+</br>
+&quot;状态栏增强展示
+&quot; Bundle &#39;Lokaltog/vim-powerline&#39;
+&quot;if want to use fancy,need to add font patch -&gt; git clone git://gist.github.com/1630581.git ~/.fonts/ttf-dejavu-powerline
+&quot;let g:Powerline</em>symbols = &#39;fancy&#39;
+&quot; let g:Powerline<em>symbols = &#39;unicode&#39;
+</br>
+&quot;括号显示增强
+Bundle &#39;kien/rainbow</em>parentheses.vim&#39;
+let g:rbpt<em>colorpairs = [
+    \ [&#39;brown&#39;,       &#39;RoyalBlue3&#39;],
+    \ [&#39;Darkblue&#39;,    &#39;SeaGreen3&#39;],
+    \ [&#39;darkgray&#39;,    &#39;DarkOrchid3&#39;],
+    \ [&#39;darkgreen&#39;,   &#39;firebrick3&#39;],
+    \ [&#39;darkcyan&#39;,    &#39;RoyalBlue3&#39;],
+    \ [&#39;darkred&#39;,     &#39;SeaGreen3&#39;],
+    \ [&#39;darkmagenta&#39;, &#39;DarkOrchid3&#39;],
+    \ [&#39;brown&#39;,       &#39;firebrick3&#39;],
+    \ [&#39;gray&#39;,        &#39;RoyalBlue3&#39;],
+    \ [&#39;black&#39;,       &#39;SeaGreen3&#39;],
+    \ [&#39;darkmagenta&#39;, &#39;DarkOrchid3&#39;],
+    \ [&#39;Darkblue&#39;,    &#39;firebrick3&#39;],
+    \ [&#39;darkgreen&#39;,   &#39;RoyalBlue3&#39;],
+    \ [&#39;darkcyan&#39;,    &#39;SeaGreen3&#39;],
+    \ [&#39;darkred&#39;,     &#39;DarkOrchid3&#39;],
+    \ [&#39;red&#39;,         &#39;firebrick3&#39;],
+    \ ]
+let g:rbpt</em>max = 40
+let g:rbpt<em>loadcmd</em>toggle = 0
+au VimEnter * RainbowParenthesesToggle
+au Syntax * RainbowParenthesesLoadRound
+au Syntax * RainbowParenthesesLoadSquare
+au Syntax * RainbowParenthesesLoadBraces
+</br>
+&quot;################### 显示增强-主题 ###################&quot;
+</br>
+&quot;主题 solarized
+Bundle &#39;altercation/vim-colors-solarized&#39;
+&quot;let g:solarized<em>termcolors=256
+let g:solarized</em>termtrans=1
+let g:solarized<em>contrast=&quot;normal&quot;
+let g:solarized</em>visibility=&quot;normal&quot;
+</br>
+&quot;主题 molokai
+Bundle &#39;tomasr/molokai&#39;
+&quot;let g:molokai<em>original = 1
+</br>
+&quot;###### Python #########
+&quot; python fly check, 弥补syntastic只能打开和保存才检查语法的不足
+Bundle &#39;kevinw/pyflakes-vim&#39;
+let g:pyflakes</em>use<em>quickfix = 0
+</br>
+&quot; for python.vim syntax highlight
+Bundle &#39;hdima/python-syntax&#39;
+let python</em>highlight<em>all = 1
+</br>
+&quot;###### Markdown #########
+Bundle &#39;plasticboy/vim-markdown&#39;
+let g:vim</em>markdown<em>folding</em>disabled=1
+</br>
+&quot;###### HTML/JS/JQUERY/CSS #########
+</br>
+&quot; for javascript
+Bundle &quot;pangloss/vim-javascript&quot;
+let g:html<em>indent</em>inctags = &quot;html,body,head,tbody&quot;
+let g:html<em>indent</em>script1 = &quot;inc&quot;
+let g:html<em>indent</em>style1 = &quot;inc&quot;
+</br>
+&quot;for jquery
+Bundle &#39;nono/jquery.vim&#39;
+</br>
+&quot;###### Jinja2 #########
+Bundle &#39;Glench/Vim-Jinja2-Syntax&#39;
+</br>
+&quot;###### nginx #########
+Bundle &#39;evanmiller/nginx-vim-syntax&#39;
+</br>
+Bundle &#39;SQLComplete.vim&#39;
+let g:sql<em>type</em>default = &#39;mysql&#39;
+&quot;SQLSetType mysql
+</br>
+&quot;the markdown editer
+Bundle &#39;plasticboy/vim-markdown&#39;
+</br>
+&quot;the properties file editor
+Bundle &#39;kamichidu/vim-edit-properties&#39;
+</br>
+&quot;auto input the right ) ] or }
+&quot;Bundle &#39;jiangmiao/auto-pairs&#39;
+</br>
+&quot;undo tree
+Bundle &#39;mbbill/undotree&#39;
+nnoremap &lt;F12&gt; :UndotreeToggle&lt;cr&gt;
+if has(&quot;persistent<em>undo&quot;)
+    set undodir=&#39;~/.vim/undodir/&#39;
+    set undofile
+endif
+&quot;
+&quot; golang
+&quot; &quot; Go
+&quot; We are using cespare&#39;s modification,
+&quot; which uses bradfitz&#39;s goimports instead of gofmt.
+&quot; With goimports, you can add missing imports automatically.
+&quot; To install goimport:
+&quot;   go get github.com/bradfitz/goimports
+&quot; Bundle &#39;cespare/vim-golang&#39;
+&quot; To install godef:
+&quot;   go get code.google.com/p/rog-go/exp/cmd/godef
+&quot; Bundle &#39;dgryski/vim-godef&#39;
+&quot; To install gocode:
+&quot;   go get github.com/nsf/gocode
+&quot; Bundle &#39;Blackrush/vim-gocode&#39;
+&quot; Bundle &#39;bradfitz/goimports&#39;
+&quot; Bundle &#39;UltiSnips&#39;
+&quot;Bundle &#39;AutoClose&#39; -- this plug change the timeout and ttimeout fuck.
+&quot; 代码缩进
+&quot; https://github.com/nathanaelkane/vim-indent-guides
+&quot;Bundle &#39;nathanaelkane/vim-indent-guides&#39;
+&quot;let g:indent</em>guides<em>auto</em>colors = 0
+&quot;autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=red   ctermbg=3
+&quot;autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=green ctermbg=4
+&quot;hi IndentGuidesOdd  guibg=red   ctermbg=3
+&quot;hi IndentGuidesEven guibg=green ctermbg=4
+&quot;hi IndentGuidesOdd  ctermbg=black
+&quot;hi IndentGuidesEven ctermbg=darkgrey
+</br>
+filetype on
+</code></pre>
+</br>
+<pre><code>
+&quot;==========================================
+&quot; HotKey Settings  自定义快捷键设置 keymmaping.vimrc
+&quot;==========================================
+let mapleader = &quot;,&quot;
+nnoremap ; :
+</br>
+&quot; F1 - F6 设置
+&quot; F1 废弃这个键,防止调出系统帮助
+&quot; F2 行号开关，用于鼠标复制代码用
+&quot; F3 显示可打印字符开关
+&quot; F4 换行开关
+&quot; F5 粘贴模式paste<em>mode开关,用于有格式的代码粘贴
+&quot; F6 语法开关，关闭语法可以加快大文件的展示
+</br>
+&quot; I can type :help on my own, thanks.  Protect your fat fingers from the evils of &lt;F1&gt;
+noremap &lt;F1&gt; &lt;Esc&gt;
+&quot;&quot;为方便复制，用&lt;F2&gt;开启/关闭行号显示:
+function! HideNumber()
+  if(&amp;relativenumber == &amp;number)
+    set relativenumber! number!
+  elseif(&amp;number)
+    set number!
+  else
+    set relativenumber!
+  endif
+  set number?
+endfunc
+nnoremap &lt;F2&gt; :call HideNumber()&lt;CR&gt;
+nnoremap &lt;F3&gt; :set list! list?&lt;CR&gt;
+nnoremap &lt;F4&gt; :set wrap! wrap?&lt;CR&gt;
+&quot;set paste
+&quot;when in insert mode, press &lt;F5&gt; to go to
+&quot;paste mode, where you can paste mass data
+&quot;that won&#39;t be autoindented
+set pastetoggle=&lt;F5&gt;
+</br>
+&quot; disbale paste mode when leaving insert mode
+au InsertLeave * set nopaste
+nnoremap &lt;F6&gt; :exec exists(&#39;syntax</em>on&#39;) ? &#39;syn off&#39; : &#39;syn on&#39;&lt;CR&gt;
+</br>
+&quot; 关闭方向键, 强迫自己用 hjkl
+map &lt;Left&gt; &lt;Nop&gt;
+map &lt;Right&gt; &lt;Nop&gt;
+map &lt;Up&gt; &lt;Nop&gt;
+map &lt;Down&gt; &lt;Nop&gt;
+</br>
+&quot;空格即选中当前项
+inoremap &lt;expr&gt; &lt;Space&gt;       pumvisible() ? &quot;&amp;lt;C-y&gt;&amp;lt;Space&gt;&quot; : &quot;&amp;lt;Space&gt;&quot;
+</br>
+&quot;上下左右键的行为 会显示其他信息
+inoremap &lt;expr&gt; &lt;Down&gt;     pumvisible() ? &quot;&amp;lt;C-n&gt;&quot; : &quot;&amp;lt;Down&gt;&quot;
+inoremap &lt;expr&gt; &lt;Up&gt;       pumvisible() ? &quot;&amp;lt;C-p&gt;&quot; : &quot;&amp;lt;Up&gt;&quot;
+inoremap &lt;expr&gt; &lt;PageDown&gt; pumvisible() ? &quot;&amp;lt;PageDown&gt;&amp;lt;C-p&gt;&amp;lt;C-n&gt;&quot; : &quot;&amp;lt;PageDown&gt;&quot;
+inoremap &lt;expr&gt; &lt;PageUp&gt;   pumvisible() ? &quot;&amp;lt;PageUp&gt;&amp;lt;C-p&gt;&amp;lt;C-n&gt;&quot; : &quot;&amp;lt;PageUp&gt;&quot;
+</br>
+&quot;tab 缩进
+:nmap &lt;tab&gt;  v&gt;&lt;esc&gt;
+:nmap &lt;s-tab&gt; v&lt;&lt;esc&gt;
+:vmap &lt;tab&gt; &gt;gv
+:vmap &lt;s-tab&gt; &lt;gv
+&quot;Reselect visual block after indent/outdent.调整缩进后自动选中，方便再次操作
+&quot; 在visual模式下缩进 (无限可重复)
+:vnoremap &lt; &lt;gv
+&quot; 译释：:vnoremap 重定义了visual模式下 &lt; 符号的含义
+&quot; 把它定义成 &lt;gv
+&quot; 即：先&lt;向外缩进，然后gv重新选择上一次选择了的区域
+&quot; 这样在visual模式下就可以实现连续按&lt;而连续缩进了
+:vnoremap &gt; &gt;gv
+&quot; 同里，内缩
+&quot;:vmap &lt;tab&gt; &gt;gv
+&quot;:imap &lt;s-tab&gt; &lt;Left&gt;
+</br>
+&quot;粘贴后剪切版不变
+xnoremap p pgvy
+noremap vp viwpgvy
+noremap vy yiw
+noremap Y y$
+</br>
+&quot;设置复制使用window粘贴板
+:nmap &lt;C-p&gt; &quot;+p
+:vmap &lt;C-y&gt; &quot;+y
+:nmap Y y$
+:vmap Y y$
+&quot; y$ -&gt; Y Make Y behave like other capitals
+map Y y$
+</br>
+&quot;emacs style
+&quot;:set winaltkeys=no
+:imap &lt;C-e&gt; &lt;END&gt;
+:imap &lt;C-a&gt; &lt;HOME&gt;
+:imap &lt;C-b&gt; &lt;Left&gt;
+:imap &lt;C-n&gt; &lt;Down&gt;
+:imap &lt;C-p&gt; &lt;Up&gt;
+:imap &lt;C-f&gt; &lt;Right&gt;
+:imap &lt;C-v&gt; &lt;PageDown&gt;
+:imap &lt;C-u&gt; &lt;PageUp&gt;
+:imap &lt;C-d&gt; &lt;Delete&gt;
+:imap &lt;C-r&gt; &lt;BackSpace&gt;
+:imap &lt;c-w&gt;&lt;c-b&gt; &lt;s-left&gt;
+:imap &lt;c-w&gt; &lt;s-right&gt;
+:imap &lt;c-e&gt;&lt;c-b&gt; &lt;END&gt;&lt;Left&gt;
+</br>
+nmap &lt;leader&gt;w :w!&lt;cr&gt;
+nmap &lt;leader&gt;e :e&lt;SPACE&gt;
+nmap &lt;leader&gt;s i&lt;space&gt;&lt;esc&gt;
+nmap K i&lt;cr&gt;&lt;esc&gt;
+</br>
+&quot;格式化c语言块
+:map &lt;leader&gt;fmt &lt;ESC&gt;=a{
+</br>
+nmap &lt;c-e&gt;i &lt;esc&gt;guiw
+nmap &lt;c-e&gt;u &lt;esc&gt;gUiw
+</br>
+nmap wv     &lt;C-w&gt;v     &quot; 垂直分割当前窗口
+nmap wc     &lt;C-w&gt;c     &quot; 关闭当前窗口
+nmap ws     &lt;C-w&gt;s     &quot; 水平分割当前窗口
+</br>
+&quot;set listchars=tab:./ ,trail:.   &quot; 将制表符显示为&#39;.   &#39;
+</br>
+&quot;范围折叠
+noremap &lt;c-x&gt;z &lt;esc&gt;zf%
+</br>
+&quot; 用空格键来开关折叠
+nmap &lt;space&gt; za
+</br>
+&quot;清除c-x对于数字的按键，为组合键让步
+map &lt;c-x&gt; &lt;ESC&gt;
+</br>
+&quot;the mapping for the cmd-line
+&quot; start of line
+:cnoremap &lt;C-A&gt; &lt;Home&gt;
+&quot; back one character
+:cnoremap &lt;C-B&gt; &lt;Left&gt;
+&quot; delete character under cursor
+:cnoremap &lt;C-D&gt; &lt;Del&gt;
+&quot; end of line
+:cnoremap &lt;C-E&gt; &lt;End&gt;
+&quot; forward one character
+:cnoremap &lt;C-F&gt; &lt;Right&gt;
+&quot; recall newer command-line
+:cnoremap &lt;C-N&gt; &lt;Down&gt;
+&quot; recall previous (older) command-line
+:cnoremap &lt;C-P&gt; &lt;Up&gt;
+&quot; back one word
+:cnoremap &lt;Esc&gt;&lt;C-B&gt; &lt;S-Left&gt;
+&quot; forward one word
+:cnoremap &lt;Esc&gt;&lt;C-F&gt; &lt;S-Right&gt;
+cnoremap &lt;C-j&gt; &lt;t<em>kd&gt;
+cnoremap &lt;C-k&gt; &lt;t</em>ku&gt;
+</br>
+&quot;Treat long lines as break lines (useful when moving around in them)
+&quot;se swap之后，同物理行上线直接跳
+map j gj
+map k gk
+</br>
+&quot; Go to home and end using capitalized directions
+noremap H ^
+noremap L $l
+</br>
+&quot; select all
+map &lt;Leader&gt;sa ggVG&quot;
+</br>
+&quot; select block
+nnoremap &lt;leader&gt;v V<code>}
+&lt;/br&gt;
+&quot; w!! to sudo &amp; write a file
+cmap w!! w !sudo tee &gt;/dev/null %
+&lt;/br&gt;
+&quot; kj 替换 Esc
+inoremap kj &amp;lt;Esc&gt;
+&lt;/br&gt;
+&quot; 滚动Speed up scrolling of the viewport slightly
+nnoremap &amp;lt;C-e&gt; 2&amp;lt;C-e&gt;
+nnoremap &amp;lt;C-y&gt; 2&amp;lt;C-y&gt;
+&lt;/br&gt;
+&quot;Jump to start and end of line using the home row keys
+nmap t o&amp;lt;ESC&gt;k
+nmap T O&amp;lt;ESC&gt;j
+&lt;/br&gt;
+&quot; Swap implementations of</code> and &#39; jump to markers
+&quot; By default, &#39; jumps to the marked line, <code>jumps to the marked line and
+&quot; column, so swap them
+nnoremap &#39;</code>
+nnoremap ` &#39;
+</br>
+&quot; remap U to &lt;C-r&gt; for easier redo
+nnoremap U &lt;C-r&gt;
+</br>
+&quot; Quickly edit/reload the vimrc file
+nmap &lt;silent&gt; &lt;leader&gt;ev :e $MYVIMRC&lt;CR&gt;
+nmap &lt;silent&gt; &lt;leader&gt;sv :so $MYVIMRC&lt;CR&gt;
+</br>
+&quot; 搜索相关
+&quot; 进入搜索Use sane regexes&quot;
+nnoremap / /\v
+vnoremap / /\v
+</br>
+&quot; 去掉搜索高亮
+noremap &lt;silent&gt;&lt;leader&gt;/ :nohls&lt;CR&gt;
+&quot;Keep search pattern at the center of the screen.&quot;
+nnoremap &lt;silent&gt; n nzz
+nnoremap &lt;silent&gt; N Nzz
+nnoremap &lt;silent&gt; * <em>zz
+nnoremap &lt;silent&gt; # #zz
+nnoremap &lt;silent&gt; g</em> g*zz
+</code></pre></p>
+
+<p></br>
+<pre><code>
+&quot;==========================================
+&quot; Function Settings  自定义函数功能 function.vimrc
+&quot;==========================================
+function! RunShell(Msg, Shell)
+    echo a:Msg . &#39;...&#39;
+    call system(a:Shell)
+    echon &#39;done&#39;
+endfunction
+</br>
+function! ReName()
+    let old<em>name = expand(&quot;&lt;cword&gt;&quot;)
+    let old</em>name = input(&quot;old name:&quot;,old<em>name)
+    let new</em>name = input(&quot;new name:&quot;,old<em>name)
+    let exec = input(&quot;are sure to refactor(y/n|Y/N):&quot;)
+    if &#39;y&#39; == exec || &#39;Y&#39; == exec
+        let cmd = printf(&quot;/opt/sys/settings/bin/vim/shell/ref.sh %s %s&quot;,old</em>name,new<em>name)
+        echo cmd
+        :call RunShell(&quot;refactoring&quot;,cmd)
+    endif
+endfunction
+</br>
+let g:spx</em>begin = 0
+</br>
+function! GetCurrentCursor()
+    let g:spx<em>begin = line(&#39;.&#39;)
+    let g:spx</em>begin = g:spx<em>begin + 0
+    echo &quot;get current line idx:&quot;.g:spx</em>begin
+endfunction
+</br>
+function! ClearCurrentCursor()
+    let g:spx<em>begin = 0
+    echo &quot;clear current cursor is success&quot;
+endfunction
+</br>
+function! CopyLinesToSystem()
+    let begin</em>idx = 0
+    if 0 != g:spx<em>begin
+        let begin</em>idx = g:spx<em>begin
+        let g:spx</em>cpy<em>begin = 0
+    else
+        let begin</em>idx = line(&quot;.&quot;)
+        let begin<em>idx = input(&quot;begin line idx:&quot;,begin</em>idx)
+    endif
+    let end<em>idx = line(&quot;.&quot;)
+    let end</em>idx = input(&quot;end line idx:&quot;,end<em>idx)
+    let begin</em>idx = begin<em>idx + 0
+    let end</em>idx = end<em>idx + 0
+    if begin</em>idx &gt; end<em>idx
+        let tmp = begin</em>idx
+        let begin<em>idx = end</em>idx
+        let end<em>idx = tmp
+    endif
+    let list = getline(begin</em>idx,end<em>idx)
+    let lines = join(list,&quot;\n&quot;)
+    call setreg(&quot;+&quot;,lines)
+    echo &quot;copy lines to system begin:&quot; . begin</em>idx . &quot; end:&quot; . end<em>idx
+endfunction
+</br>
+function! DeleteLines()
+    let begin</em>idx = 0
+    if 0 != g:spx<em>begin
+        let begin</em>idx = g:spx<em>begin
+        let g:spx</em>cpy<em>begin = 0
+    else
+        let begin</em>idx = line(&#39;.&#39;)
+        let begin<em>idx = input(&quot;begin line idx:&quot;,begin</em>idx)
+    endif
+    let end<em>idx = line(&#39;.&#39;)
+    let end</em>idx = input(&quot;end line idx:&quot;,end<em>idx)
+    let begin</em>idx = begin<em>idx + 0
+    let end</em>idx = end<em>idx + 0
+    if begin</em>idx &gt; end<em>idx
+        let tmp = begin</em>idx
+        let begin<em>idx = end</em>idx
+        let end<em>idx = tmp
+    endif
+    let cur = getpos(&#39;.&#39;)
+    let cur[1] = begin</em>idx + 0
+    let result = setpos(&#39;.&#39;,cur)
+    if(0 != result)
+        echo &quot;delete lines begin:&quot; . begin<em>idx . &quot; end:&quot; . end</em>idx .&quot; is fail&quot;
+        return
+    endif
+    let lines = abs(begin<em>idx - end</em>idx) + 1 &quot;add the line self
+    &quot;for fold
+    execute &quot;:&quot;. begin<em>idx . &quot;,&quot; . end</em>idx . &quot;de&quot;
+    echo &quot;delete lines begin:&quot; . begin<em>idx . &quot; end:&quot; . end</em>idx
+endfunction
+</br>
+noremap &lt;leader&gt;xg :call GetCurrentCursor()&lt;cr&gt;
+noremap &lt;leader&gt;xc :cal ClearCurrentCursor()&lt;cr&gt;
+noremap &lt;leader&gt;xy :call CopyLinesToSystem()&lt;cr&gt;
+noremap &lt;leader&gt;xd :call DeleteLines()&lt;cr&gt;
+noremap &lt;leader&gt;xr :call ReName()&lt;cr&gt;
+</br>
+nmap &lt;M-g&gt; :call GetCurrentCursor()&lt;cr&gt;
+nmap &lt;M-c&gt; :call ClearCurrentCursor()&lt;cr&gt;
+nmap &lt;M-y&gt; :call CopyLinesToSystem()&lt;cr&gt;
+nmap &lt;M-d&gt; :call DeleteLines()&lt;cr&gt;
+nmap &lt;M-r&gt; :call ReName()&lt;cr&gt;
+</br>
+&quot;设定当前列高亮
+function! SetColorColumn()
+    let col<em>num = virtcol(&quot;.&quot;)
+    let cc</em>list = split(&amp;cc, &#39;,&#39;)
+    if count(cc<em>list, string(col</em>num)) &lt;= 0
+        execute &quot;set cc+=&quot;.col<em>num
+    else
+        execute &quot;set cc-=&quot;.col</em>num
+    endif
+endfunction
+map &lt;leader&gt;ch :call SetColorColumn()&lt;CR&gt;
+</br>
+&quot; 定义函数AutoSetFileHead，自动插入文件头
+autocmd BufNewFile <em>.sh,</em>.py,*.md exec &quot;:call AutoSetFileHead()&quot;
+function! AutoSetFileHead()
+    &quot;如果文件类型为.sh文件
+    if &amp;filetype == &#39;sh&#39;
+        call setline(1, &quot;#!/bin/bash&quot;)
+    endif</p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">&quot;如果文件类型为python
+if &amp;filetype == &#39;python&#39;
+    call setline(1, &quot;\#!/usr/bin/env python&quot;)
+    call append(1, &quot;\# encoding: utf-8&quot;)
+endif
+if &amp;filetype == &#39;mkd&#39; || &amp;filetype == &#39;md&#39;
+    call setline(&#39;.&#39;,&quot;---&quot;)
+    normal ==o
+    call setline(&#39;.&#39;,&quot;layout: post&quot;)
+    normal ==o
+    call setline(&#39;.&#39;,&quot;categories: []&quot;)
+    normal ==o
+    call setline(&#39;.&#39;,&quot;title: \&quot; \&quot;&quot;)
+    normal ==o
+    call setline(&#39;.&#39;,&quot;tags: []&quot;)
+    normal ==o
+    call setline(&#39;.&#39;,&quot;---&quot;)
+    normal ==o
+endif
+
+normal G
+normal o
+normal o
+</code></pre></div>
+<p>endfunc
+</br>
+&quot; 保存文件时删除多余空格
+&quot; Delete trailing white space on save, useful for Python and CoffeeScript ;)
+func! DeleteTrailingWS()
+  exe &quot;normal mz&quot;
+  %s/\s+$//ge
+  exe &quot;normal `z&quot;
+endfunc
+autocmd BufWrite <em>.py :call DeleteTrailingWS()
+autocmd BufWrite *.c :call DeleteTrailingWS()
+autocmd BufWrite *.h :call DeleteTrailingWS()
+autocmd BufWrite *.vimrc :call DeleteTrailingWS()
+</br>
+&quot; 相对行号      行号变成相对，可以用 nj  nk   进行跳转 5j   5k 上下跳5行
+set relativenumber number
+au FocusLost * :set norelativenumber number
+au FocusGained * :set relativenumber
+&quot; 插入模式下用绝对行号, 普通模式下用相对
+autocmd InsertEnter * :set norelativenumber number
+autocmd InsertLeave * :set relativenumber
+function! NumberToggle()
+  if(&amp;relativenumber == 1)
+    set norelativenumber number
+  else
+    set relativenumber
+  endif
+endfunc
+nnoremap &lt;C-t&gt; :call NumberToggle()&lt;cr&gt;
+</br>
+function InsertHeadDef(firstLine, lastLine)
+    if a:firstLine &lt;1 || a:lastLine&gt; line(&#39;$&#39;)
+        echoerr &#39;InsertHeadDef : Range overflow !(FirstLine:&#39;.a:firstLine.&#39;;LastLine:&#39;.a:lastLine.&#39;;ValidRange:1~&#39;.line(&#39;$&#39;).&#39;)&#39;
+        return &#39;&#39;
+    endif
+    let sourcefilename=expand(&quot;%:t&quot;)
+    let definename=substitute(sourcefilename,&#39; &#39;,&#39;&#39;,&#39;g&#39;)
+    let definename=substitute(definename,&#39;.&#39;,&#39;<em>&#39;,&#39;g&#39;)
+    let definename = toupper(definename)
+    exe &#39;normal &#39;.a:firstLine.&#39;GO&#39;
+    call setline(&#39;.&#39;, &#39;#ifndef _&#39;.definename.&quot;</em>&quot;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;#define <em>&#39;.definename.&quot;</em>&quot;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;#ifdef _<em>cplusplus&#39;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;extern &quot;C&quot; {&#39;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;#endif&#39;)
+    normal ==o
+    exe &#39;normal ==&#39;.(a:lastLine-a:firstLine+1).&#39;jo&#39;
+    call setline(&#39;.&#39;, &#39;#ifdef _</em>cplusplus&#39;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;}&#39;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;#endif&#39;)
+    normal ==o
+    call setline(&#39;.&#39;, &#39;#endif&#39;)
+    let goLn = a:firstLine+2
+    exe &#39;normal ==&#39;.goLn.&#39;G&#39;
+endfunction
+function InsertHeadDefN()
+    let firstLine = 1
+    let lastLine = line(&#39;$&#39;)
+    let n=1
+    while n &lt; 20
+        let line = getline(n)
+        if n==1
+            if line =~ &#39;^\/\</em>.<em>$&#39;
+                let n = n + 1
+                continue
+            else
+                break
+            endif
+        endif
+        if line =~ &#39;^.</em>*\/$&#39;
+            let firstLine = n+1
+            break
+        endif
+        let n = n + 1
+    endwhile
+    call InsertHeadDef(firstLine, lastLine)
+endfunction
+nmap ha :call InsertHeadDefN()&lt;CR&gt;
+</code></pre></p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2014/08/29/system.html">
+            系统配置
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2014/08/31/redis-and-rabbitmq.html">
+            redis vs rabbitmq队列功能介绍和测试
+        </a>
+    </span>
+    
+</div>
+<hr>
+
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+        <div class="col-md-4">
+
+          <div class="well">
+            <h4>
+              专题
+            </h4>
+            <ul class="list-unstyled">
+              <li>
+              <a href="/category.html?show=libev">
+                  libev
+                </a>
+              </li>
+              <li>
+              <a href="/category.html?show=albianj">
+                    albianj
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Blog Categories Well -->
+          <div class="well">
+            <h4>
+              分 类
+            </h4>
+            <div class="row">
+              <div class="col-lg-6">
+                <ul class="list-unstyled">
+                  <li>
+              <a href="/category.html?show=c">
+                      C
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=java">
+                      Java
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=net">
+                      .Net
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=script">
+                      Script
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=linux">
+                      Linux
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <!-- /.col-lg-6 -->
+              <div class="col-lg-6">
+                <ul class="list-unstyled">
+                  <li>
+              <a href="/category.html?show=arch">
+                      架构设计
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=network">
+                      网络编程
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=alg">
+                      算法
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=heart">
+                      心得
+                    </a>
+                  </li>
+                  <li>
+              <a href="/category.html?show=other">
+                      其它
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <!-- /.col-lg-6 -->
+            </div>
+            <!-- /.row -->
+          </div>
+          <!-- Blog Links Well -->
+          <div class="well">
+            <h4>
+              相关链接
+            </h4>
+            <ul class="list-unstyled">
+              <li>
+                <a href="https://github.com/xvhfeng" target="_blank">
+                  GitHub
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/xvhfeng/blog" target="_blank">
+                  BlogSource
+                </a>
+              </li>
+              <li>
+                <a href="http://weibo.com/xvhf" target="_blank">
+                  微博
+                </a>
+              </li>
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  给我发邮件
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>
