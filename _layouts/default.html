@@ -15,7 +15,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
 
     <title>
-        94geek.com - by Seapeak.Xu
+        {{ site.title }}
     </title>
     <!-- Bootstrap Core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
@@ -58,7 +58,7 @@
             </span>
           </button>
           <a class="navbar-brand" href="/index.html">
-              94geek.com
+              {{ site.info }}
           </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -80,6 +80,12 @@
                 项 目
               </a>
             </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
             <li>
               <a href="/about.html">
                 关 于
@@ -95,133 +101,12 @@
     <div class="container">
       <div class="row">
         <!-- Blog Entries Column -->
-        <div class="col-md-8">
-          <H1>还没时间整这个玩意......</H1>
-
-<p></br>
-<H1>NO TIME FOR THIS,PLEASE WAITTING...</H1>
-</br></p>
-
+        <div class="col-md-12" >
+            <p align="center">
+          {{ content }}
+            </p>
         </div>
         <!-- Blog Sidebar Widgets Column -->
-        <div class="col-md-4">
-
-          <div class="well">
-            <h4>
-              专题
-            </h4>
-            <ul class="list-unstyled">
-              <li>
-              <a href="/category.html?show=libev">
-                  libev
-                </a>
-              </li>
-              <li>
-              <a href="/category.html?show=albianj">
-                    albianj
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Blog Categories Well -->
-          <div class="well">
-            <h4>
-              分 类
-            </h4>
-            <div class="row">
-              <div class="col-lg-6">
-                <ul class="list-unstyled">
-                  <li>
-              <a href="/category.html?show=c">
-                      C
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=java">
-                      Java
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=net">
-                      .Net
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=script">
-                      Script
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=linux">
-                      Linux
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <!-- /.col-lg-6 -->
-              <div class="col-lg-6">
-                <ul class="list-unstyled">
-                  <li>
-              <a href="/category.html?show=arch">
-                      架构设计
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=network">
-                      网络编程
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=alg">
-                      算法
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=heart">
-                      心得
-                    </a>
-                  </li>
-                  <li>
-              <a href="/category.html?show=other">
-                      其它
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <!-- /.col-lg-6 -->
-            </div>
-            <!-- /.row -->
-          </div>
-          <!-- Blog Links Well -->
-          <div class="well">
-            <h4>
-              相关链接
-            </h4>
-            <ul class="list-unstyled">
-              <li>
-                <a href="https://github.com/xvhfeng" target="_blank">
-                  GitHub
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/xvhfeng/blog" target="_blank">
-                  BlogSource
-                </a>
-              </li>
-              <li>
-                <a href="http://weibo.com/xvhf" target="_blank">
-                  微博
-                </a>
-              </li>
-              <li>
-                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
-                  给我发邮件
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
       <!-- /.row -->
       <hr>
@@ -230,7 +115,7 @@
         <div class="row">
           <div class="col-lg-12">
             <p align="center">
-            Copyright &copy; 94geek.com on GitHub with Jekyll
+            {{ site.copyright }}
 				<br/>
             </p>
           </div>

@@ -1,12 +1,12 @@
 markdown: redcarpet
-permalink: /:year/:month/:day/:title.html
+permalink: /:year/:title.html
 url: 
 lsi: false
 highlighter: pygments
 safe: true
 auto: false 
 
-paginate: 5
+paginate: 10
 paginate_path: "page:num"
 
 excerpt_separator: "<!-- more -->"
