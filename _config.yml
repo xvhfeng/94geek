@@ -5,6 +5,8 @@ lsi: false
 highlighter: pygments
 safe: true
 auto: false 
+timezone: Asia/Shanghai
+encoding: utf-8
 
 paginate: 10
 paginate_path: "page:num"

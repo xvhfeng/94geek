@@ -15,7 +15,7 @@ var dataStr = '{ {% for cat in site.categories %}{% if cat[0] != site.categories
     for( i = 0; i < as.length; i ++){
         a = as[i];
        t +=  "<li><h4><span>" 
-           + a.date + '</span> &raquo; <a href="' + a.url + '">'+ a.title
+           + a.date + '</span>   <a href="' + a.url + '" style="color:black">'+ a.title
            + '</a></h4></li>';
     }
     $("#cate").html(t);
