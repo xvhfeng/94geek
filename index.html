@@ -13,7 +13,7 @@ layout: default
             </li>
 
             <li>
-                <a href="{{ post.url }}">
+                <a href="{{ post.url }}" style="color:black">
                     {{ post.title }}
                 </a> 
             </li>
@@ -26,19 +26,19 @@ layout: default
 <ul class="pager">
     {% if paginator.previous_page %} {% if paginator.previous_page == 1 %}
     <li class="previous">
-        <a href="{{ site.url }}/">
+        <a href="{{ site.url }}/"  style="color:black">
             &larr; Previous
         </a>
     </li>
     {% else %}
     <li class="previous">
-        <a href="{{ site.url }}/page{{ paginator.previous_page }}">
+        <a href="{{ site.url }}/page{{ paginator.previous_page }}" style="color:black">
             &larr; Previous
         </a>
     </li>
     {% endif %} {% endif %} {% if paginator.next_page %}
     <li class="next">
-        <a href="{{ site.url }}/page{{ paginator.next_page }}">
+        <a href="{{ site.url }}/page{{ paginator.next_page }}" style="color:black">
             Next &rarr;
         </a>
     </li>
