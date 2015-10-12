@@ -29,13 +29,17 @@ tracker只负责负载均衡和调度。storage负责数据
 
 ####解决办法
 1. 先看一下fd的数量问题，运行ulimit -a命令看一下：  
+<center>
 ![ulimit](/img/overflow/ulimit.png)
+</center>
 <br/>
 文件fd的数量是1024，算一下进程正常运行需要的fd数量：module之间的pipe数量+线程
 打开的文件数+log+binlog+synclog+marklog+mpstatue 差不多在300左右，远远小于1024
 这样，可以排除这个问题应该不在这里；  
 2. 那么下来就只能用lsof看一下了，用lsof -p pid得到如下：  
+<center>
 ![lsof](/img/overflow/lsof.png)
+</center>
 <br/>
 kao,那么多的文件，而且chunkfile和singlefine都存在。肯定是这里泄漏了。整理思绪，
 在程序中，我们可能打开这些文件的地方是对文件的增删改查，还有一个就是sync。这里文件名
@@ -63,7 +67,9 @@ kao,那么多的文件，而且chunkfile和singlefine都存在。肯定是这里
 检查工具，干扰太多了，也并不是太适合，关键是一直没怎么用过，不熟悉。
 3. 那就只能寻求于系统了。翻一下linux的工具箱，有一个叫pmap的工具可以查看进程的内存
 情况，那就用pmap试试。结果不试不知道，一试吓一跳：  
+<center>
 ![pmap](/img/overflow/pmap.png)
+</center>
 <br/>
 好多的打开文件没有关闭，而且还有大小，挺详细。算了一下，一共泄漏了12g+的内存，幸好
 哥的机器是16g内存。那么现在知道是什么原因了，但是和fd泄露一样，事发地点在那儿？
@@ -76,7 +82,9 @@ pmap的出来的文件名，都是m001的文件，而这个进程的业务就是
 都会通过yssc的fd。mptr和len进行fd的关闭和mmap的释放。应该不存在问题。那么为什么还会
 有内存在进程中呢？再看一下这些值，启动gdb，attach到运行的进程，监听到yssc被free的
 哪个地方，看一下它的值：  
+<center>
 ![gdb](/img/overflow/gdb.png)
+</center>
 <br/>
 len=0？问题找到了，在mmap的时候，没有给yssc的len赋值，导致在free的时候，mmap的内存
 一点都没释放，怪不得pmap的结果上的内存大小正好和upload的大小吻合呢。  
