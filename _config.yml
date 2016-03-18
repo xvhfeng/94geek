@@ -4,13 +4,12 @@ url:
 lsi: false
 highlighter: pygments
 safe: true
-auto: false 
 timezone: Asia/Shanghai
 encoding: utf-8
 
+gems: [jekyll-paginate]
 paginate: 20
 paginate_path: "page:num"
-
 excerpt_separator: "<!-- more -->"
 
 # presonal config
