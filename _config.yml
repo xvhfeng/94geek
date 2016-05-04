@@ -1,4 +1,7 @@
 markdown: redcarpet
+redcarpet:
+    extensions: ["tables","highlight"]
+
 permalink: /:year/:title.html
 url: 
 lsi: false
