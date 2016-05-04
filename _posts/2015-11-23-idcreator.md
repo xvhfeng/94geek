@@ -167,7 +167,7 @@ id生成器已经被部署到我们的内容中心系统中，最初的版本已
 提供负载均衡、状态管理和故障转移。  
 
 <center>
-<img src="/img/idc/idc.png" heigth="60%" width="60%" />
+<img src="../img/idc/idc.png" heigth="60%" width="60%" />
 </center>
 
 但是和别的系统一样，业务总归是千变万化的，很多时候计划是赶不上变化的。没有多久
@@ -181,7 +181,7 @@ id生成器已经被部署到我们的内容中心系统中，最初的版本已
 参考“一致性问题”。  
 
 <center>
-<img src="/img/idc/idc2.png" heigth="60%" width="60%" />
+<img src="../img/idc/idc2.png" heigth="60%" width="60%" />
 </center>
 
 对于一个没有管理节点的集群，我们原定使用的负载均衡的方式很简单，就两种。一种是
@@ -275,7 +275,7 @@ snowflake算法其实是一种偏向计算机的算法。它通过将一个数�
 综上所述：我们目前的两种id增长曲线如图：
 
 <center>
-<img src="/img/idc/4.png" heigth="60%" width="60%" />
+<img src="../img/idc/4.png" heigth="60%" width="60%" />
 </center>
 
 ####简单唯一性算法  
@@ -320,7 +320,7 @@ slave数据库中读取一个编号，这个编号是当时slave数据库中最�
 章节A和章节B的编号就会发生冲突。在我们的系统中，就会出现章节重复的问题。  
 
 <center>
-<img src="/img/idc/7.png" heigth="30%" width="30%" />
+<img src="../img/idc/7.png" heigth="30%" width="30%" />
 </center>
 
 这确实是一个架构上的问题。本质就是写入和读取并不是来自于同一个数据库，所以造成
@@ -364,7 +364,7 @@ master的角色。所以这就给我们提出了新的问题，怎么样在全�
 下图：  
 
 <center>
-<img src="/img/idc/3.png" heigth="60%" width="60%" />
+<img src="../img/idc/3.png" heigth="60%" width="60%" />
 </center>
 
 我们将zookeeper的集群启动选举变成一个常态。将每一次的请求都泛化成选举操作。当然
@@ -431,7 +431,7 @@ int自增、步长为1的方案其实是扩展性最差的方案。首先：它�
 法来进行数据路由。  
 
 <center>
-<img src="/img/idc/9.png" heigth="30%" width="30%" />
+<img src="../img/idc/9.png" heigth="30%" width="30%" />
 </center>
 
 ####和字符串id相比  
@@ -482,7 +482,7 @@ idc生成的id，不管是自增id还是章节唯一id，至少都保证了3个�
 
 
 <center>
-<img src="/img/idc/5.png" heigth="30%" width="30%" />       <img src="/img/idc/6.png" heigth="30%" width="30%" />
+<img src="../img/idc/5.png" heigth="30%" width="30%" />       <img src="../img/idc/6.png" heigth="30%" width="30%" />
 </center>
 
 至于库位。其实就是数据库的编号。这个编号也是经常会被忽视的地方。原因是很多时候
@@ -517,7 +517,7 @@ idc生成的id，不管是自增id还是章节唯一id，至少都保证了3个�
 能达到目的。因为它只要唯一性，只要能和系统内部一一对应起来即可。  
 
 <center>
-<img src="/img/idc/8.png" heigth="50%" width="50%" />
+<img src="../img/idc/8.png" heigth="50%" width="50%" />
 </center>
 
 我们使用这种策略，当发生问题的时候，我们只需要问客户要一个id号，然后使用这个id
