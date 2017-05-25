@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-12" >
+            <p align="center">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    实现无锁队列
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        17 Mar 2016
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<p><br />
+其实我一直不是很感冒lockfree编程，主要的原因有几个：
+1. 适用性不是很广，除了list、stack，queue这些简单的数据结构编程难度相对小一些以外，像hashmap之类的，难度很大；
+2. lockfree也不是免费的，其实从lockfree的代码就知道它让获取locker的时候等待变成了刷cpu时钟；
+3. 维护的成本相对比较高，如果写lockfree算法同事离开后，接手的同事必须要对这一块很熟悉，否则根本就无从下手；
+4. 对于现在的程序来说，个人觉得lockfree比较适合计数器这种累加的操作；</p>
+
+<p>但是这次需要一个无锁队列是因为我想实现一个async的事件对象。async的对象：熟悉libev的同学应该知道，就是ev_async对象。
+它可以通过一个send的方法给这个async对象触发一个通知，然后让loop在下一次running的时候执行async的callback。libev是通过
+pipe来实现的，虽然这种实现对性能的压力和系统的压力也不会产生多大的影响，但是我们还是想改进这个方案，我们想使用queue的
+方式来实现async watcher的通知/未通知状态。而async又很容易做为生产者消费者模型的一个解决方案，所以我们需要一个线程安全，
+但又尽量高效的queue。我想到了lockfree queue。</p>
+
+<p>这里选用lockfree queue而不使用mutex的原因是：
+1. 纯内存操作，lockfree虽然消耗cpu，但是依然能保证性能。因为整个过程中其实没有慢操作（比如io读写），那么如果选用mutex，那么
+mutex将变成最大的性能障碍；
+2. queue相对简单，没有那么复杂的、为了lockfree而变通的办法；</p>
+
+<h4>实现无锁queue</h4>
+
+<p>对于queue的结构，lockfree和non-lockfree的差别仅仅是在queue的结构体中没有一个总体的mutex-locker，别的都是一样的：</p>
+
+<blockquote>
+<div class="highlight"><pre><code class="language-text" data-lang="text">struct queue_node{
+    void *v;
+    struct queue_node *next;
+}
+
+struct queue{
+    struct queue_node *head;
+    struct queue_node *tail;
+    volatile size_t size;
+}
+</code></pre></div></blockquote>
+
+<p>粗看这里的结构体真的和non-lockfree的差不多。但是在实现方法上就不一样了。对于一个queue来说，最难处理的就是临界点的情况。non-lockfree
+的实现之所以要那个mutex locker，就是为了处理临界点的情况。对于queue来说，这个临界点就是当queue中有且只有一个元素的时候，这个元素还要
+被pop，这时候需要同时处理head和tail两个指针。</p>
+
+<p>使用non-lockfree来实现很简单，直接lock被操做的queue的mutex即可。对于实现lockfree queue。难点在于出现临界点的时候怎么处理。所谓的临界点，就是queue中有且只有一个对象，并且这个对象要出列的时候的方法。</p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2016/albianj-user-manual.html" style="color:black">
+            阅文集团分布式统一框架Albianj使用手册
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2016/csdn-staffer.html" style="color:black">
+            关于csdn的采访
+        </a>
+    </span>
+    
+</div>
+<hr>
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//www94geekcom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+            </p>
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>

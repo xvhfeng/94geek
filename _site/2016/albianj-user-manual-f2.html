@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-12" >
+            <p align="center">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    Albianj User Manual--综述
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        15 Jul 2016
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<h1>Albianj 综述与启动</h1>
+
+<h2>Albianj可以做什么？不能做什么</h2>
+
+<p>albianj是一个框架，而且是一个不是那么健全的框架。albianj
+的存在不是为了解决所有的问题，所以它不是那种大包大
+揽的框架。albianj的功能仅仅是我们需要的，也可以说是一
+个互联网公司会使用到得基本的功能。albianj主要解决了互
+联网企业的几个问题：  </p>
+
+<ol>
+<li><p>海量数据。albianj的解决办法是实现一个数据层。是
+的，类似于hbm，而且功能还没hbm多。但是albianj的
+关键就是在于精。albianj的数据层也使用orm来表示数据
+表和编程对象之间的映射关系。但是albianj的数据层较别的
+数据层多了一个数据路由组件，也就是所谓的分库分表。通过
+albianj的分库分表组件，可以解决使用开源数据库存储海量数据的问题；  </p></li>
+<li><p>扩容。albianj的分库分表解决了数据的存储问题。但
+是面对互联网动辄爆炸式的增长，数据的一致性、完整性也是需要解
+决的一个问题。albianj通过使用“二次提交”实现了“伪分
+布式事务”，并且在“伪分布式事务”的基础上，增加了个性化的数
+据一致性的解决方案。这样可以使数据的一致性、完整性得到最大程度的保证；  </p></li>
+<li><p>支持多数据源。albianj在设计的时候就开始注意到互
+联网公司可能会出现的异构性问题。所以在开始的时候，albianj
+就支持数据的异构。albianj支持可以同时支持多个数据
+源，并且这些数据源可能是不同的数据库，比如金融业务使用oracle，
+一般业务使用mysql等等这样的异构系统。并且在多数
+据源之间，也支持分布式事务；  </p></li>
+<li><p>代码统一性。在互联网企业，因为业务的增长非常迅速，导致
+了很多公司都会几乎把所有的精力都放在业务上，而公司的程序架构
+和代码可维护性基本上属于牺牲的阶段。渐渐地，原来的代码不敢改
+，增加的代码不该动，久而久之，恶性循环就这样下去了。而albianj
+从开始设计的时候就开始注意并且杜绝这种问题的发生。
+albianj有一套自己的规则，在这套规则下解决问题的方法有且
+只有一种方法（特例除外）。所以使用albianj写出来的代码
+可读性极强、也没有花哨的小聪明等；  </p></li>
+<li><p>架构统一性。albianj提供了一套可维护的、可扩展的
+对于服务的架构。在albianj中，所有的业务都被看做是service，
+所有的service全部都有albianj进行生成和管理。
+albianj对于service提供了一个完整的生命周期，
+不仅仅是二次开发者，使用开发者也可以通过这个生命周期
+来控制service的生成和管理。  </p></li>
+<li><p>性能。我们对于albianj进行过测试，在开启&quot;补偿性一致性&quot;的情况下，
+在普通的开发机器上（thinkpad t440p），
+每秒的数据操作为13w，如果关闭&quot;补偿性一致性&quot;
+可以达到15w左右。但是我们还是建议大家能把&quot;补偿性一致性&quot;打开。所以albianj完全是可以被用
+来做为互联网企业的开发框架层的；  </p></li>
+<li><p>上手成本和维护代价。在albianj中，有很多功能都是
+被内置的，并且是透明的。开发者可以不知道service在哪里
+，由谁实现，也可以不知道数据库的最终部署是什么样子的，到底是
+分布式数据库还是单机数据库。因为这些东西全部由albianj
+内置完成了，对于开发者都是透明的，都是不需要关心的；  </p></li>
+<li><p>二次开发。这个在albianj中很简单。几乎所有的albianj的
+组件都是遵循一个标准出来的，不管是内置的功能还是
+业务的功能还是后期二期扩展的功能，都遵循albianj
+的service生命周期这一套。对于albianj的元数据，所有的
+元数据都来自于albianj的配置，并且所有的albianj
+的parserservice中都存在元数据的存取接口。
+通过albianj的service我们保证了albianj的二次开
+发将会非常的简单；  </p></li>
+</ol>
+
+<p>说了那么多，那么我们来说说albianj不能完成的工作。  </p>
+
+<ol>
+<li><p>join。albianj禁止多表之间的join操作。不
+要问什么，就是禁止，而且这是我们第一个决定的事情。  </p></li>
+<li><p>多表关系操作。albianj的orm只支持单表的映射，
+并不支持父子表之间的关系。虽然albinaj也提供了多表的操
+作但是这些表之间的关系需要开发者自己来维护。之所以这样做的原
+因是，在互联网的应用中，更多的都是单表操作，表间相互的操作也
+会使用”空间换时间“的做法进行扩展掉，所以很少需要多表之间的
+关系操作。虽然albianj不支持多表关系操作，但是却支持多
+表的无关系操作。albianj支持同时维护多个表的数据一致性
+，但是这些表之间并没有或者说应用中并没有显式的说明他们之间的关系；  </p></li>
+<li><p>还有就没有了。  </p></li>
+</ol>
+
+<p>所以呢，相对来说，albianj更注重的数据的平衡性、一致性
+、容易扩展性，而不是做数据之间的关系。albianj更多的是
+把database当成了一个存储数据的地方，仅仅是存储数据而
+已，没有数据的计算。所以albianj比较适合互联网企业，适
+合哪种有海量数据、爆发增长的环境。  </p>
+
+<p>后来，随着我们在正式的环境中使用，我们将albianj实现的
+更为丰满，目前albianj已经是一套完整的开发框架，可以可
+以实现很多的功能，具体的架构图如下：  </p>
+
+<h2>albianj项目模块概述</h2>
+
+<p>Albianj的开发工程是很多的，也就意味着它的工程项目也会
+很多。这些jar的增多并不是因为albianj的功能复杂，而
+是为了更好的划分各个项目的功能性边界导致的。在albianj
+中，所有的功能都被分为接口和实现两个部分，这在一定程度上导致
+了工程数量的庞大，但是面向接口编程也可以让albianj的开
+发、升级、维护变得简单。  </p>
+
+<p>为了使大家在使用albianj的时候，能明确自己在做什么，
+albianj帮你做了什么，它到底在系统里面干了点啥，我们系统
+性的介绍一下各个工程的功能。  </p>
+
+<ol>
+<li><p>Albianj.Commons albinaj的公共函
+数库，一些经常使用但不属于任何一个albianj的业务性质的
+功能类。主要包括有：用作数据路由或者是string进行hash的
+优化的hash函数、验证方法类，albianj中得日期时
+间转换类、对albianj的AlbianObject的反射util类、
+xml的解析类、方法out参数定义、二进制序列化、
+文件IO的path等工具类；  </p></li>
+<li><p>Albianj.Kernel albianj的IoC核
+心接口。主要定义了整个albianj的框架并且接管整个
+service的管理和albianj的启动工作。
+IAlbianjService是所有albianj服务的唯一接口，
+所有的albianj的service全部派生自这个接口。
+所有的albianj service都有一个生命周期，也是在这个项目中定义的
+。该项目还定义了albianj内置的logicId和logger接口。
+Albianj.Kernel.Impl 是其实现类
+项目，将其所有的定义一并实现；  </p></li>
+<li><p>Albianj.Cached 该项目是albianj中
+使用的缓存客户端定义。目前albianj的缓存支持本地和分布
+式两种。本地的基本上已经被淘汰，分布式缓存服务器端仅支持redis。
+对于redis服务端的模式，支持hash或者是redis内置的集群模式。
+Albianj.Cached.Impl是其实现类项目。albianj cached被albianj的
+persistence集成，也可以根据业务单独的被使用；  </p></li>
+<li><p>Albianj.Persistence 该项目是albianj的数据实现层接口定义。
+是albianj最主要的、最重
+要的一个功能。该项目定义了albianj得orm、数据路由、
+“伪分布式事务”等功能性接口。
+Albianj.Persistence.Impl是其实现类项目。
+该数据层还集成了albianj cached提供的缓存功能，
+直接配置一下就可以无缝的使用cached功能了；  </p></li>
+<li><p>Albianj.UNID 该项目是唯一性id的客户端接
+口定义。使用唯一性id需要id生成器的服务器端支持。id生成
+器的服务器端我们也已经开源：<a href="https://github.com/crosg/idCreator%20%E2%80%9Cid%E7%94%9F%E6%88%90%E5%99%A8%E5%BC%80%0A%E6%BA%90%E5%9C%B0%E5%9D%80%E2%80%9D">连接地址</a>。
+Albianj.UNID.Impl 是其实现类项目。  </p></li>
+<li><p>Albianj.Security albianj的加密
+解密的接口定义。目前，albianj支持MD5, SHA1,SHA256, SHA384, SHA512，DES这些加
+解密算法。Albianj.Security.Impl是其实现
+类项目。使用albianj的安全模块的时候，<strong>请一定、必须
+、确定</strong>使用自己的密匙，虽然albianj内置了各种加解密
+算法需要的密匙，但是albianj是开源的，所有的信息都是公
+开的，密匙也是公开的，所以如果不加修改直接使用将达不到加解密
+的效果；  </p></li>
+<li><p>Albianj.Restful 该模块是我们实现的一个
+简单的对于http的Servlet的封装的接口定义。是一个称
+不上restful的http通讯接口。Albianj.Restful.Impl是其实现类模块。
+我们只要就是重写servlet的get和post方法，实现了类MVC的模式。业务通讯协
+议目前支持json和xml，默认使用json作为传输协议。通
+过albianj的restful通讯接口，开发者可以把精力都
+用在业务逻辑的实现上，不需要关心接口的问题。  </p></li>
+<li><p>Albianj.Configurtion  该模块是albianj提供的一个简单的配置服务。
+所有的系统都应该有一个配置服务，albianj也不例外。
+Albianj.Configurtion.Impl是其实现类模块。
+albinaj的配置是一棵树，最多支持6个层级。因为albianj的配置服务依赖
+于albianj，所以当配置项达到一个瓶颈的时候，可以快速的
+对配置项进行拆分；  </p></li>
+<li><p>Albianj.Loader 该模块是albianj的加载模块，也是albianj的classloader模块。
+albianj所有的service都是通过该模块来进行动态加载
+的。如果开发者需要开发自定义的插件，也需要使用该模块对插件进行注册；  </p></li>
+<li><p>Albianj.Packing 该模块是albianj的打包模块。
+此处的打包不仅仅是将class文件打包成jar，
+而是将jar打包成albianj的模块，以供loader模
+块在运行的时候对其进行解压和加载；  </p></li>
+<li><p>Albianj.Qidian.Test  一个使用albianj的简单例子；  </p></li>
+</ol>
+
+<h2>albianj的jar文件</h2>
+
+<p>每个albianj的模块都是被打包成一个同名的jar，但是因
+为以下的几个问题，我们对albiaj的jar做了一些特殊的处理：  </p>
+
+<ol>
+<li><p>albianj的模块分离的比较细，所以导致albianj的jar数量也比较多，
+加上albianj本来使用的公共的jar库，数量都会超过20了；  </p></li>
+<li><p>我们在真实的环境中发现，我们的同学们每个人的打包方式都
+不一样，有的时候会引起albianj的加载问题，这种问题属于
+环境问题，有过经验的开发者肯定也会有同感：环境问题是很难被排
+查出来了；  </p></li>
+<li><p>在没有想到开源的时候，我们会有一些属于“秘密”级别的信
+息直接写在代码中，所以我们也需要一个自己的“混淆”办法
+（PS：现在已近没有任何的“秘密”级别的代码了，都被重构过了）；
+我们想到的一种特殊处理的办法是我们把核心的实现jar采用自己
+的打包方式来打包。这样就可以解决上述所碰到的问题。我们的方法
+全部由Albianj.Packing模块实现。我们把几个核心
+的jar打包在一起，形成了一个Albianj.spx文件。之
+所以我们只打包实现模块，主要是因为我们使用albianj的方
+式是“面向接口”编程，如果接口都被打包进去，那么我们也就无法
+编译通过了，所以接口必须不能被打包进去，进而可以让我们的应用
+程序编译通过。  </p></li>
+</ol>
+
+<p>所以albianj目前只提供接口jar包和一个spx文件。大
+家不用环境没有实现jar了，其实是全部被采用一种自定义的打包
+方法隐藏起来了。  </p>
+
+<p>在真实的环境中，把所有的albianj的引用文件、
+albianj的接口jar包和spx文件全部放在exts目录中，这样在
+使用albianj的java进程使用的时候会自动的去加载这些jar包。  </p>
+
+<h2>albianj启动方式</h2>
+
+<p>使用albianj的第一步，是先要启动albianj，
+让albianj初始化该进程环境。在启动albinj的过程中，
+albianj会依次做以下几个事情：  </p>
+
+<ol>
+<li><p>找到albianj.spx文件，解开该文件，将该文件中
+得jar全部加载到jvm；  </p></li>
+<li><p>加载albianj的环境启动器transmitter，
+并且执行transmitter启动；  </p></li>
+<li><p>transmitter启动的过程中首先会解析kernel.properties配置文件，
+获取到albianj的kernel参数；  </p></li>
+<li><p>解析service.xml配置文件，根据service.xml中配置的service的顺序加载service，
+目前albianj只支持service无序加载，不支持service交叉引用；  </p></li>
+<li><p>加载完所有的service，albianj启动完毕，可
+以开始使用albianj；   </p></li>
+</ol>
+
+<p>具体在代码中，使用如下的方式启动albianj：  </p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">try {
+        AlbianBootService.start(spx文件的目录路径，
+                                kernel.properties配置文件目录路径，
+                                所有xml配置文件目录路径);
+    }catch(Exception e){
+        e.printStackTrace();
+    }
+</code></pre></div>
+<p>在同一进程中，albianj的启动必须放置在进程启动的时候，
+比如web项目使用listener，一般应用程序直接在main函数中第一个处理。
+同时要注意：albianj的启动<strong>要且只要启动一次</strong>即可。  </p>
+
+<h2>albianj的约定</h2>
+
+<ol>
+<li><p>所有以单字母“I”开头的都表示接口，所有以单词“Free”开头的都是抽象类；  </p></li>
+<li><p>所有的业务类在albianj中都叫做服务service；  </p></li>
+<li><p>所有的信息基本都可以在log文件查到，出现问题请仔细察看日志；  </p></li>
+<li><p>albianj不遵循“约定大于配置原则”，
+所有需要albianj加载的必须都要配置“显式”的配置；  </p></li>
+<li><p>albianj中的元信息优先级：xml配置文件 &gt; annotation &gt; 原始类、属性等信息  </p></li>
+</ol>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2016/sdcc-idcreator.html" style="color:black">
+            SDCC深圳架构场演讲：分布式系统的基石－id生成器中的学问
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2016/albianj-user-manual-f1.html" style="color:black">
+            Albianj User Manual--前言
+        </a>
+    </span>
+    
+</div>
+<hr>
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//www94geekcom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+            </p>
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>

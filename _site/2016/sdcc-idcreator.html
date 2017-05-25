@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-12" >
+            <p align="center">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    SDCC深圳架构场演讲：分布式系统的基石－id生成器中的学问
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        23 Apr 2016
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<p><center>
+<img src="/img/sdcc2016/1.jpg" heigth="60%" width="60%" />
+</center>
+<br/></p>
+
+<h3>摘要</h3>
+
+<p>这次接受csdn的编辑哥哥的邀请，去深圳作为讲师参加sdcc的架构场演讲。这次给大家带
+来的主题是《分布式系统的基石－id生成器中的学问》。  </p>
+
+<p>说起id生成器，应该有很多人都觉得不屑一顾。因为id生成器很简单嘛！这也不能说错，
+id生成器确实很简单，不管你怎么变化，id无非就是一个uint64的值，算算长度，也就是
+20位的样子。你一个这样子的数再怎么复杂还能秀出花来吗？  </p>
+
+<p>然而事实真的是这样吗？在演讲的现场，看反应是很少有人想过id这个事情，这是其一；
+其二，就算想过，也是非常的浅显，根本就没有深层次的去思考id的生成细节，比如规则
+、业务意义等，更不用说去思考在一个业务系统中，到底怎么样去构建一个合理的、可满
+足数据路由并且可快速扩展的id。结果也是挺悲剧的，基本上没有很好的思考id这个事情
+的，都把数据库设计的基本上无法很容易的扩展。  </p>
+
+<p>这里我把我在sdcc深圳场的ppt公布出来，算是对id生成器这个东西的一个抛砖引玉吧！
+<center><embed src="/img/sdcc2016/idc.pdf" width="100%" height="900"></center> <br />
+<a href=/img/albianj.pdf /></p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2016/csdn-staffer.html" style="color:black">
+            关于csdn的采访
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2016/albianj-user-manual-f2.html" style="color:black">
+            Albianj User Manual--综述
+        </a>
+    </span>
+    
+</div>
+<hr>
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//www94geekcom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+            </p>
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>

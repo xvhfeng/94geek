@@ -1,0 +1,90 @@
+/*!
+ * Start Bootstrap - Blog Home HTML Template (http://startbootstrap.com)
+ * Code licensed under the Apache License v2.0.
+ * For details, see http://www.apache.org/licenses/LICENSE-2.0.
+ */
+
+body {
+    padding-top: 70px; /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+
+footer {
+    margin: 50px 0;
+}
+
+.post-date{
+	float:right;
+	padding:5px;
+	font-size:12px
+}
+
+.post-date-list{
+    vertical-align:bottom;
+	padding:5px;
+	font-size:12px
+}
+
+.navb {
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+.navb > li {
+  position: relative;
+  display: block;
+}
+.navb > li > a:hover,
+.navb > li > a:focus {
+  text-decoration: none;
+}
+.navb > li.disabled > a:hover,
+.navb > li.disabled > a:focus {
+  text-decoration: none;
+  cursor: not-allowed;
+}
+.navb .open > a,
+.navb .open > a:hover,
+.navb .open > a:focus {
+}
+.navb > li > a > img {
+  max-width: none;
+}
+
+article code {  
+white-space: normal;  
+word-break: break-all;  
+} 
+
+table {
+  width: 100%;
+  max-width: 65em;
+  border: 1px solid #dedede;
+  margin: 15px auto;
+  border-collapse: collapse;
+  empty-cells: show;
+}
+table th,
+table td {
+  height: 35px;
+  border: 1px solid #dedede;
+  padding: 0 10px;
+}
+table th {
+  font-weight: bold;
+  text-align: center !important;
+  background: rgba(158,188,226,0.2);
+  white-space: nowrap;
+}
+table tbody tr:nth-child(2n) {
+  background: rgba(158,188,226,0.12);
+}
+table td:nth-child(1) {
+  white-space: nowrap;
+}
+table tr:hover {
+  background: #efefef;
+}
+.table-area {
+  overflow: auto;
+}
+

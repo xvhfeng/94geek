@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-12" >
+            <p align="center">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    Albianj User Manual--前言
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        17 Jul 2016
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<h1>前 言</h1>
+
+<p>总算开始写一份还算正式的albianj2的使用指南了。其实这
+个工作我已经考虑过很久很久了，一直以来经常会碰到这个或者是那
+个的问题导致时间被挤压掉。这次我终于可以放下各种原因，一心一
+意的来写这个文档。  </p>
+
+<p>albianj是我在2011年的一个开源的个人项目，所以并不
+是为了现在的阅文集团所写的。2011年的时候，有朋友和我商量
+想让我过去帮忙创业，做一个奢侈品的网站，所以albianj其
+实是为这个电子商务网站所写。后来因为各种原因，我并没有去创业，
+但是项目被留了下来还被放到了googlecode上一直到2014年。
+这3年间我只管了一次，还是因为google要关闭googlecode，
+把albianj从googlecode迁移到github上。 2014年我来到了当时还是创世的腾讯文学，
+因为一个偶然的巧合，准备使用albianj，后来也是因为工
+期的原因，当时选择了php来完成既定功能。就这样又过了1年，
+在2015年，随着阅文集团的战略调整，我们的技术也需要开始调
+整。albianj再次被拿了出来进行论证和测试。结果确实符合
+并且满足了我们的需求，所以albianj被用在了我们的项目中
+。后来又因为我们的一些特殊的需要和环境的限制，我把albanj
+升级到了v2.＊，这就是我们现在开源出来的项目。  </p>
+
+<p>albianj主要的功能还是一个所谓的中间件，说白了重点就是
+一个带数据路由的ORM罢了，中间件这种叫法我也觉得挺奇怪，好
+像只有在java中才那么高B格的叫（反正java也是因为发明
+各种名词著称的），其实就是几个jar的库而已。因为albianj的
+orm自带了数据路由，牵连到了分库分表，所以顺大便的提
+供了一个“伪分布式事务”来解决底层分布式数据库的问题。其实这
+才是albianj的初衷。后来，因为albianj的数据路由
+和orm的实现需要几个配置文件，又因为解析这些配置文件都需要
+在albianj启动的时候完成，所以干脆就把这些需求全部做成
+了service，其实也只是一些java的类，只是具有了共同
+的接口而已。但是将class演变成service之后，一方面
+我可以很方便的管理目前的albianj已经存在的功能了，另一
+方面，我需要增加新的功能也变的非常的方便。这样就实现了albianj
+的service的管理，这也就是IoC功能。只是albianj的
+IoC没有那么的丰满，只是一个非常非常的精简版而 已。  </p>
+
+<p>再后来，随着功能一点一点的增加，然后再将一些原本凑在一起的功
+能因为这样或者是那样的原因，从原来的工程中移出来，渐渐的就形
+成了现在大家看到的这个样子。看上去很庞大，但是统计了一下代码
+，也就5w＋行的样子。所以还是很精简的。  </p>
+
+<p>开发albianj的初衷就是这个样子，没有什么高大上的起步，
+也没有什么高大上的目标。主要还是因为：  </p>
+
+<ol>
+<li><p>好玩。  </p></li>
+<li><p>开源软件现在越来越庞大，功能越来越多，但是实用的越
+来越少；  </p></li>
+<li><p>我想把我从业大概10年＋对于互联网的一个理解和概括
+写下来！  </p></li>
+</ol>
+
+<p>我相信我不会是第一个这样做的人，也不会是最后一个这样做的人。
+每个人工作的时间久了，都会对自己的行业有一个总结。只是我正好
+在那段时间闲的太无聊了，把它记录下来。并且后期因为各种的外加
+动力，把albianj维护成了现在的样子。我希望albianj能给大家带来
+更轻量级的应用，可以让架构师在构建自己系统的时候多一个选择。  </p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2016/albianj-user-manual-f2.html" style="color:black">
+            Albianj User Manual--综述
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2017/idcreator.html" style="color:black">
+            Idcreator
+        </a>
+    </span>
+    
+</div>
+<hr>
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//www94geekcom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+            </p>
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>

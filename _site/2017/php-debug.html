@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-12" >
+            <p align="center">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    记一次上线莫名其妙失败的debug找问题
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        04 May 2017
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<p>时间的起因是因为今天要上线一个DFS的PHP插件，业务方程序其实并没有使用，所以上线只是做一个准备，但是在线上的过程中，起初一切正常，上线后一分钟CPU立刻飙高，PHP的进程也无法kill掉，只能重启机器解决。  </p>
+
+<p>但是重启机器后，不管是使用新的DFS插件还是旧的DFS插件都一切正常。整个过程都相当的诡异。幸好线上开了core，可以使用core进行调试。    </p>
+
+<p>首先把编译的PHP和core文件全部拿下来，这里要注意，一定要线上编译的PHP版本，别的机器上编译的PHP可能会出现符号表对不上之类的问题。使用gdb -c corefile载入core文件，如下图：</p>
+
+<p><img src="/img/php-debug/1.png" alt="gdb载入corefile"></p>
+
+<p>这里要注意红色方框部分，我们首先得到的信息是“无法获取内存”，gdb还给了一个地址，一看这个地址还特别的大，其实这个没关系，这是系统的虚拟内存地址，先放着。但是我们这里得到的信息基本上就已经确定下来是内存的问题导致的，可能是溢出，也可能是野指针之类的问题。    </p>
+
+<p>下面我们看一下stack，如上图，一看stack无法复原，全是？？，肉眼是无法分辨的，那么我们只能看一下运行时的寄存器状态，使用info register命令查看一下，如下图：</p>
+
+<p><img src="/img/php-debug/2.png" alt="查看寄存器信息"></p>
+
+<p>其中rbp和rsp两个寄存器是我们重点关注的：<br>
+rbp：就是当前程序运行到的stack指针；<br>
+rsp：就是当前stack的栈顶指针；<br>
+然后我们通过x/128ag　rbp内的内容，可以获取gdb打印出来的stack信息，如下图：    </p>
+
+<p><img src="/img/php-debug/6.png" alt="stack信息"></p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2017/idcreator.html" style="color:black">
+            Idcreator
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2017/id.html" style="color:black">
+            Id
+        </a>
+    </span>
+    
+</div>
+<hr>
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//www94geekcom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+            </p>
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>

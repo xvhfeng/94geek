@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="94geek.com">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,">
+    <link rel="icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/img/favicon.ico" mce_href="/img/favicon.ico" type="image/x-icon">
+
+    <title>
+        94geek.com - by Seapeak.Xu
+    </title>
+    <!-- Bootstrap Core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/blog.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media
+    queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file://
+    -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js">
+      </script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js">
+      </script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <!-- jQuery Version 1.11.0 -->
+    <script src="/js/jquery-1.11.0.js">
+    </script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/js/bootstrap.min.js">
+    </script>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+            <span class="sr-only">
+              Toggle navigation
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+            <span class="icon-bar">
+            </span>
+          </button>
+          <a class="navbar-brand" href="/index.html">
+              94geek.com
+          </a>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li>
+              <a href="/archives.html">
+                归 档
+              </a>
+            </li>
+            <li>
+              <a href="/categories.html">
+                分 类
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/xvhfeng?tab=repositories"
+                  target="_blank">
+                项 目
+              </a>
+            </li>
+
+              <li>
+                <a href="mailto:xvhfeng@gmail.com?subject=94geek">
+                  邮 件
+                </a>
+              </li>
+            <li>
+              <a href="/about.html">
+                关 于
+              </a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+      </div>
+      <!-- /.container -->
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+      <div class="row">
+        <!-- Blog Entries Column -->
+        <div class="col-md-12" >
+            <p align="center">
+          <!-- Blog Post -->
+<!-- Title -->
+<h2>
+    libev文档中文版--简介
+    <div class="post-date">
+        <span class="glyphicon glyphicon-time"></span>
+        23 Oct 2014
+    </div>
+</h2>
+<!-- Author -->
+<hr>
+<p>libev - a high performance full-featured event loop written in C<br>
+libev-一个用c写成的全功能事件循环库（PS：event loop不知道怎么翻译好）。</p>
+
+<p>SYNOPSIS<br>
+简介<br>
+<code>
+    #include &lt;ev.h&gt;
+</code></p>
+
+<!-- more -->
+
+<p>EXAMPLE PROGRAM<br>
+示例程序
+<code></p>
+<div class="highlight"><pre><code class="language-text" data-lang="text">// a single header file is required
+// 需要包含ev.h头文件
+#include &lt;ev.h&gt;
+#include &lt;stdio.h&gt; // for puts
+// every watcher type has its own typedef&#39;d struct
+// with the name ev_TYPE
+// 每一个观察者（watcher，以下还是用watcher吧，这种名称用中文很别扭）都有一个自己的结构体，
+// 结构体名称形如ev_TYPE
+
+ev_io stdin_watcher;
+ev_timer timeout_watcher;
+
+// all watcher callbacks have a similar signature
+// this callback is called when data is readable on stdin
+//所有的watcher回调函数也都有同样的函数签名
+//当stdin可读的时候，执行回调函数
+static void stdin_cb (EV_P_ ev_io *w, int revents) {
+    puts (&quot;stdin ready&quot;);
+    //for one-shot events, one must manually stop the watcher
+    // with its corresponding stop function.
+    // 对于一次性事件来说，我们必须使用watcher的相应停止函数来手动停止这个watcher
+    //译者注：它的意思是对于一次性的事件，我们必须使用不同类型相应的函数来停止这个watcher在loop中继续被监视（比如，对于IO事件就是ev_io_stop,对于time事件  就是ev_time_stop）
+    ev_io_stop (EV_A_ w);
+
+    // this causes all nested ev_run&#39;s to stop iterating
+    //停止对于EV_A（loop）的所有迭代（其实就是停止loop的运行，释放全部的watcher）
+    ev_break (EV_A_ EVBREAK_ALL);
+}
+
+// another callback, this time for a time-out
+//另外一个回调函数，是事件过期调用的
+static void timeout_cb (EV_P_ ev_timer *w, int revents) {
+    puts (&quot;timeout&quot;);
+    // this causes the innermost ev_run to stop iterating
+    //停止当前loop循环
+    ev_break (EV_A_ EVBREAK_ONE);
+}
+
+int main (void) {
+    // use the default event loop unless you have special needs
+    //使用默认的event loop除非你有特别的需求
+     struct ev_loop *loop = EV_DEFAULT;
+
+     // initialise an io watcher, then start it
+     // this one will watch for stdin to become readable
+    //初始化一个io watcher，将事件和loop关联
+    //这个watcher监视stdin是否可读
+     ev_io_init (&amp;stdin_watcher, stdin_cb, /*STDIN_FILENO*/ 0, EV_READ);
+     ev_io_start (loop, &amp;stdin_watcher);
+
+     // initialise a timer watcher, then start it
+     // simple non-repeating 5.5 second timeout
+    //初始化一个超时watcher，并将事件和loop关联
+    //简单的非重复5.5s超时
+     ev_timer_init (&amp;timeout_watcher, timeout_cb, 5.5, 0.);
+     ev_timer_start (loop, &amp;timeout_watcher);
+
+     // now wait for events to arrive
+    //开始监听事件
+     ev_run (loop, 0);
+
+     // break was called, so exit
+    return 0;
+ }
+</code></pre></div>
+<p></code>
+ABOUT THIS DOCUMENT<br>
+关于这个文档  </p>
+
+<p>This document documents the libev software package.<br>
+这份文档记录了libev这个软件开发包。</p>
+
+<p>The newest version of this document is also available as an html-formatted web page you might find easier to navigate when reading it for the first time: http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod.<br>
+这个文档最新的版本是一个html，你可以在这里找到它：http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod.</p>
+
+<p>While this document tries to be as complete as possible in documenting libev, its usage and the rationale behind its design, it is not a tutorial on event-based programming, nor will it introduce event-based programming with libev.<br>
+尽管这篇文档试着尽可能详细的说明libev，他的使用方法和背后的设计理念，这不是一个基于事件编程的教程，也不会使用libev来引入事件编程（这句话怎么怪怪的？有更好的翻译嘛？）  </p>
+
+<p>Familiarity with event based programming techniques in general is assumed throughout this document.<br>
+这篇文档都假定你熟悉基于事件的编程技术  </p>
+
+<p>WHAT TO READ WHEN IN A HURRY  </p>
+
+<p>This manual tries to be very detailed, but unfortunately, this also makes it very long. If you just want to know the basics of libev, I suggest reading ANATOMY OF A WATCHER, then the EXAMPLE PROGRAM above and look up the missing functions in GLOBAL FUNCTIONS and the ev<em>io and ev</em>timer sections in WATCHER TYPES.<br>
+这个手册试着说明的非常详细，但不幸的是，这也将让它变的很长。如果你只是想了解
+libev的基础知识，我建议读ANATOMY OF A WATCHER章节。示例程序在它上面，缺少的函
+数在GLOBAL FUNCTIONS章节中找，ev_io和ev_timer部分在WATCHER TYPES章节  </p>
+
+<br/>
+<div style="margin-top:10px;margin-bottom:10px">
+    
+    <span class="next">
+        上篇：
+        <a href="/2014/mempool.html" style="color:black">
+            关于内存池的设计思路和实现方法
+        </a>
+    </span>
+     
+    
+    <span class="prev">
+        下篇：
+        <a href="/2015/slove-fd-and-mmap-overfolw.html" style="color:black">
+            使用linux的lsof和pmap解决fd和内存泄漏
+        </a>
+    </span>
+    
+</div>
+<hr>
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//www94geekcom.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+            </p>
+        </div>
+        <!-- Blog Sidebar Widgets Column -->
+      </div>
+      <!-- /.row -->
+      <hr>
+      <!-- Footer -->
+      <footer>
+        <div class="row">
+          <div class="col-lg-12">
+            <p align="center">
+            Copyright &copy; 94geek.com on GitHub with Jekyll
+				<br/>
+            </p>
+          </div>
+          <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+      </footer>
+    </div>
+    <!-- /.container -->
+  </body>
+
+</html>
