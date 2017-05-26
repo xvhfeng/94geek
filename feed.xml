@@ -3,8 +3,8 @@
   <channel>
     <title>94geek.com</title>
     <description>属于大嘴的个人blog</description>
-    <link>http://localhost:4000/</link>
-    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
+    <link>http://www.94geek.comwww.94geek.com/</link>
+    <atom:link href="http://www.94geek.comwww.94geek.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
         <title>关于csdn的采访</title>
@@ -199,8 +199,8 @@ Snowflake，但是都被否决了。最后我决定自己来开发一个。开�
 &lt;img src=&quot;csdn.jpg&quot; alt=&quot;csdn&quot; /&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 16 Apr 2016 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2016/csdn-staffer/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2016/csdn-staffer/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2016/csdn-staffer/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2016/csdn-staffer/</guid>
       </item>
     
       <item>
@@ -774,8 +774,8 @@ int32最大的值来算，基本上我们的idc使用的年限在175年左右。
 异常，可以说我们很好的完成了任务，也更深层次的解决了分布式系统的问题。&lt;/p&gt;
 </description>
         <pubDate>Mon, 23 Nov 2015 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2015/idcreator/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2015/idcreator/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2015/idcreator/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2015/idcreator/</guid>
       </item>
     
       <item>
@@ -1765,8 +1765,8 @@ B： 2天上手，2个小可以正常使用；&lt;/p&gt;
 
 </description>
         <pubDate>Thu, 05 Nov 2015 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2015/albianj/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2015/albianj/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2015/albianj/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2015/albianj/</guid>
       </item>
     
       <item>
@@ -2109,8 +2109,8 @@ pull方式，那么我们必须要进过2次的通讯才能完成一条记录的
 已经是最小化的节省了数据平衡的时间，也不会额外的带来数据迁移带来的压力。在我们的设计中，我们认为这是我们所能接受的最低底限了。&lt;/p&gt;
 </description>
         <pubDate>Thu, 24 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2015/DFS/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2015/DFS/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2015/DFS/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2015/DFS/</guid>
       </item>
     
       <item>
@@ -2217,8 +2217,8 @@ pmap的出来的文件名，都是m001的文件，而这个进程的业务就是
 
 </description>
         <pubDate>Wed, 23 Sep 2015 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2015/slove-fd-and-mmap-overfolw/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2015/slove-fd-and-mmap-overfolw/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2015/slove-fd-and-mmap-overfolw/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2015/slove-fd-and-mmap-overfolw/</guid>
       </item>
     
       <item>
@@ -2332,8 +2332,8 @@ storerooms的最大值。那么也就是说p1,p2是一个int的2个byte(分别�
 
 </description>
         <pubDate>Thu, 04 Sep 2014 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2014/bit-alg/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2014/bit-alg/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2014/bit-alg/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2014/bit-alg/</guid>
       </item>
     
       <item>
@@ -3492,8 +3492,8 @@ nmap ha :call InsertHeadDefN()&amp;lt;CR&amp;gt;
 &lt;/而连续缩进了&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/cr&gt;&lt;/code&gt;&lt;/pre&gt;
 </description>
         <pubDate>Sat, 30 Aug 2014 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2014/vim/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2014/vim/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2014/vim/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2014/vim/</guid>
       </item>
     
       <item>
@@ -4207,8 +4207,8 @@ xinput &lt;span class=&quot;nb&quot;&gt;set&lt;/span&gt;-int-prop &lt;span class
 如。如果还能选择，我想还是ub+awesome来的更适合我一些。&lt;/p&gt;
 </description>
         <pubDate>Fri, 29 Aug 2014 00:00:00 +0800</pubDate>
-        <link>http://localhost:4000/blog/2014/system/</link>
-        <guid isPermaLink="true">http://localhost:4000/blog/2014/system/</guid>
+        <link>http://www.94geek.comwww.94geek.com/blog/2014/system/</link>
+        <guid isPermaLink="true">http://www.94geek.comwww.94geek.com/blog/2014/system/</guid>
       </item>
     
   </channel>
