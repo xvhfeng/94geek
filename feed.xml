@@ -146,7 +146,11 @@ end
 
 &lt;p&gt;将这个文件保存到_plugins目录下，随便给一个文件名即可。再次运行jekyll server就可以看到这个hooks被执行了。&lt;/p&gt;
 
-&lt;p&gt;具体的使用可以看我的blog源码 &lt;a href=&quot;https://github.com/xvhfeng/blog-source&quot;&gt;blog源码&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;具体:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;项目源码: &lt;a href=&quot;https://github.com/xvhfeng/jekyll-markdown-image&quot;&gt;github project&lt;/a&gt;&lt;br /&gt;
+2 如何使用：&lt;a href=&quot;https://github.com/xvhfeng/blog-source&quot;&gt;blog源码&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
 
 &lt;h3 id=&quot;缺点&quot;&gt;缺点&lt;/h3&gt;
 
