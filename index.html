@@ -18,7 +18,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for 94geek.com" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/pixyll.css?201706151604" type="text/css">
+    <link rel="stylesheet" href="/css/pixyll.css?201706281031" type="text/css">
 
     <!-- Fonts -->
     
@@ -91,6 +91,10 @@
     
 
     
+        <a href="/hotlist/">Hotlist</a>
+    
+
+    
 
     
 
@@ -120,6 +124,18 @@
 <div class="home">
   
     <div class="posts">
+      
+        <div class="post py3">
+          <p class="post-meta">2017-06-27</p>
+          <a href="/blog/2017/gdb-stacksize/" class="post-link"><h3 class="h1 post-title">gdb线上crash调试-记一次装逼失败的教训</h3></a>
+          <span class="post-summary">
+            
+              <p>可惜这是一次完完全全的装逼不成反被X的典型例子。</p>
+
+
+            
+          </span>
+        </div>
       
         <div class="post py3">
           <p class="post-meta">2017-06-15</p>
@@ -155,10 +171,10 @@
       
         <div class="post py3">
           <p class="post-meta">2017-05-31</p>
-          <a href="/blog/2017/idcreator-chaos/" class="post-link"><h3 class="h1 post-title">id生成器的前世今生</h3></a>
+          <a href="/blog/2017/idcreator-chaos/" class="post-link"><h3 class="h1 post-title">Chaos-ID生成器的前世今生</h3></a>
           <span class="post-summary">
             
-              <p>从mongodb的objectid到twitter的snowflake，目前国内的几个互联网大厂也开始重视到了分布式系统中数据id，甚至一些大厂已经公开了它们关于id生成器的设计和实现。我们当然也注意到了分布式系统中id的重要性，并且在系统开始开发的时候就设计并且实现了一个id生成器。我们称之为：Chaos。Chaos目前已经在我们内部运行了2年之久，在这2年内故障率为惊人0，可靠性达到不可思议的100%。那么我们为什么要设计Chaos呢？Chaos又和别人家的id生成器有什么不同呢？这些问题，首先得从我们以往的经验开始。</p>
+              <p>从mongodb的objectid到twitter的snowflake，目前国内的几个互联网大厂也开始重视到了分布式系统中数据id，甚至一些大厂已经公开了它们关于id生成器的设计和实现。我们当然也注意到了分布式系统中id的重要性，并且在系统开始开发的时候就设计并且实现了一个id生成器，我们称之为：Chaos。Chaos目前已经在我们内部运行了2年之久，在这2年内故障率为惊人0，可靠性达到不可思议的100%。那么我们为什么要设计Chaos呢？Chaos又和别人家的id生成器有什么不同呢？这些问题，首先得从我们以往的经验开始。</p>
 
 
             
@@ -247,21 +263,6 @@ albian是基于java的（故以下简称albianj）。他主要是面向海量数
 的伸缩性和可定制性。他设计并且运行在简单的
 web容器中，比如tomcat或者是jetty，也可以运行在application类型的应用中，
 但是它依然提供了企业级开发应该具备的一切效能。</p>
-
-
-            
-          </span>
-        </div>
-      
-        <div class="post py3">
-          <p class="post-meta">2015-09-24</p>
-          <a href="/blog/2015/DFS/" class="post-link"><h3 class="h1 post-title">腾讯文学内容中心分布式文件系统的设计和实现</h3></a>
-          <span class="post-summary">
-            
-              <h2 id="关键词解释">关键词解释</h2>
-<ol>
-  <li>逻辑集群：具有相同groupname和syncgroup的storage机器组成的集群。</li>
-</ol>
 
 
             
