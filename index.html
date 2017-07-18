@@ -18,7 +18,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for 94geek.com" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/pixyll.css?201707111402" type="text/css">
+    <link rel="stylesheet" href="/css/pixyll.css?201707181046" type="text/css">
 
     <!-- Fonts -->
     
@@ -124,6 +124,26 @@
 <div class="home">
   
     <div class="posts">
+      
+        <div class="post py3">
+          <p class="post-meta">2017-07-18</p>
+          <a href="/blog/2017/staircase-locker/" class="post-link"><h3 class="h1 post-title">解决锁抢占问题--随机式获取抢占锁</h3></a>
+          <span class="post-summary">
+            
+              <h2 id="背景">背景</h2>
+<p>我们原本的调度系统是由quartz为基准DIY的系统，但因为quartz的很多问题，特别是可扩展设计是在太差、自定义功能太麻烦，我们不得不自行设计了一个调度系统，内部称为：probactr。probactr分为下面几个节点：</p>
+<ul>
+  <li>monitor：监视器，主要负责监视Executor的状态和Executor执行的job状态，如发现Executor出现down机或者job出现问题，会对其进行清理。此节点为可平行扩展集群；</li>
+  <li>Executor：运行器，主要负责从数据库中获取欲执行的job，然后执行job。此节点为可平行扩展集群；</li>
+  <li>LockerServer：分布式锁服务器，为probactr提供一致性功能。目前使用redis替代，有计划将其替换成我们自主研发的lax605；</li>
+  <li>ManagerSite：后台管理系统，可以在这里对job进行添加、删除、暂停等等的管理，也可以查看job的执行状态；</li>
+  <li>database：数据库，所有的job数据全部存入数据库；</li>
+</ul>
+
+
+            
+          </span>
+        </div>
       
         <div class="post py3">
           <p class="post-meta">2017-07-11</p>
@@ -241,21 +261,6 @@
           <span class="post-summary">
             
               <p>使用jekyll搭建github的pages服务已经很多年了，虽然写的blog不是特别多，但在使用的过程中难免还是遇到了很多的问题。在所有这些问题中，几乎所有的问题都被解决了。但有且只有一个问题几乎无解：图片管理。使用jekyll的程序员几乎都搭配markdown，但是markdown对于图片的管理，简直就是可以用一坨屎来形容。</p>
-
-
-            
-          </span>
-        </div>
-      
-        <div class="post py3">
-          <p class="post-meta">2016-04-16</p>
-          <a href="/blog/2016/csdn-staffer/" class="post-link"><h3 class="h1 post-title">关于csdn的采访</h3></a>
-          <span class="post-summary">
-            
-              <p>前几天在csdn的《程序员》杂志上发表了一篇关于我写的<a href="/2015/DFS.html">dfs</a>的文章。借
-着这次机会，csdn的编辑钱兄邀请我上4月份的sdcc深圳场做一个演讲。为此，他们还专门
-采访了我。刚开始他们准备让我在几个主题里面挑一个，后来我和他们说，这些主题我都可
-以，他们可以随便选。钱兄就建议来一个综合的。我觉得这样也可以。然后就有了下文：</p>
 
 
             
