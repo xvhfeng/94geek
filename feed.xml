@@ -78,57 +78,6 @@
       </item>
     
       <item>
-        <title>mysql连接池不能回避的wait timeout问题</title>
-        <description>&lt;p&gt;感谢我们的木木同学给了我写这篇文章的灵感和机会。&lt;/p&gt;
-
-&lt;h2 id=&quot;起因&quot;&gt;起因&lt;/h2&gt;
-&lt;p&gt;我们的项目组一直在使用albianj作为开发框架在开发应用。使用至今倒也是没有出现很大的问题，但最近加过监控的接口基本上都会在使用一段时间后，突然之间执行数据库操作变得很慢。虽然会变慢，但持续的时间比较短，一般1分钟左右，然后会自动恢复正常。但是过了一段时间，这个现象又会出现，周而复始。从监控看，发生的时间点并无规律，有的时候一天发生3次，有的也会有4-5次。虽然从规律上并无法去查找，那就只能从别的地方想办法：增加一些详细的日志，从日志上看一下问题所在。&lt;br /&gt;
-详细日志版本刚刚上去，立刻就发生问题了。如下图：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;3.png&quot; alt=&quot;problem&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;看一下左下角的曲线图，突然飙高，然后在1500ms的高位不下来。经过查找日志（PS：sorry。写文章的时候日志已经被自动清除，没法截图了），发现程序卡在了getConnection这个方法上，并且卡住的时间从60s开始越来越长。&lt;/p&gt;
-
-&lt;h2 id=&quot;分析&quot;&gt;分析&lt;/h2&gt;
-&lt;p&gt;getConnection是一个synchronized方法，主要是从连接池中获取数据连接！卡住时间越来越长这个现象倒是很简单就可以解释：因为getConnection是synchronized的，所以所有的线程到getConnection的时候全部等待，等待的时间越长当然时间越长了。关键在于为啥卡住呢？&lt;br /&gt;
-当时有两种可能的想法：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;连接池设置的太小，连接在使用的时候来不及被返还，导致了积压；&lt;/li&gt;
-  &lt;li&gt;连接池的设置有问题，返回的连接有问题。如果是这个问题，那可能会比较难查；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;第一种情况显然不会存在，查看albianj的数据库配置，所有的配置对于连接池的设置MinSize为5，MaxSize为20.对于我们的应用来说肯定是够用的。那么就是第二个问题了。&lt;/p&gt;
-
-&lt;p&gt;首先检查连接复用问题，对于数据库的连接字符串，我已经增加了重连的设置：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;autoReconnect=true&amp;amp;failOverReadOnly=false&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;maxReconnect=3&amp;amp;autoReconnectForPools=true
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;显然autoReconnect没有起作用。查了一下mysql的客户端说明，后背发凉。基本上的大意翻译过来是这样的&lt;strong&gt;“即使在创建Mysql时url中加入了autoReconnect=true参数,一但这个连接两次访问数据库的时间超出了服务器端wait_timeout的时间限制,还是会CommunicationsException: The last packet successfully received from the server was xxx milliseconds ago. ”&lt;/strong&gt;。赶快去查一下日志，发现并没有报这个错误。那应该不是这个问题。&lt;/p&gt;
-
-&lt;p&gt;既然不能重连接，那么最大的可能就是&lt;strong&gt;“返回的连接本来可能就是有问题的，但是程序确认为没有问题”&lt;/strong&gt;。发生这种问题的最大可能应该就是：&lt;strong&gt;数据库连接池的连接过期时间大于mysql的wait_timeut设置&lt;/strong&gt;。查了一下代码，发现我们默认的数据库连接池连接过期时间是300-30=270s。再去问一下DBA木木，让他查一下线上的数据库wait_timeout设置，被告知是180.瞬间懵逼：连接池的生命周期时间远远参与真实的连接生命周期时间。&lt;/p&gt;
-
-&lt;p&gt;原因是找到了，但是这个问题其实前一段时间已经发现并且已经改过了。因为去年我记得很清楚：又一次我们的probactor（job调度系统）报了上文提到的CommunicationsException异常，后来找到了问题就是因为程序对于连接池中连接的alivetime长于数据库的wait timeout设置，随后我千叮咛万嘱咐这个设置必须要小心小心再小心，但这次还是中招了。因为连接池和网络的问题，我们有同事直接放弃连接池，改用每次连接数据库。放弃连接池确实能解决连接不会出现问题，但是侧面也导致了wait_timeout被设置的过小了。但其实只要把连接池中连接的过期时间设置的比wait_timeout小一些就完全可以了。&lt;/p&gt;
-
-&lt;p&gt;经过更改后的程序终于恢复了正常，看一下更改后的效果：&lt;br /&gt;
-&lt;img src=&quot;2.png&quot; alt=&quot;ok&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;科普&quot;&gt;科普&lt;/h2&gt;
-&lt;p&gt;何为wait_timeout？&lt;br /&gt;
-wait_timeout是mysql的一个设置，主要是用来断开不使用的数据库连接。当连接空闲的时间达到wait_timeout设置的最大值时，mysql会主动切断这个连接，以供别的客户端连接数据库。这个值一般是28800，也就是8小时。在mysql中可以通过：
-&lt;code class=&quot;highlighter-rouge&quot;&gt;show variables like “%timeout%”;&lt;/code&gt;
-获取。&lt;br /&gt;
-另外，当数据库主动切断连接的时候，java的mysql客户端并不知道这个连接已经被切断，所以程序并不知道其已经无效了，然后加上mysql的客户端不支持ReConnect，双重的问题叠加在一起就导致了连接池返回无效连接的可能。这是一个比较扯淡也是一个比较难以发现的问题，但是它确确实实的存在了。大家一定要多加注意。&lt;/p&gt;
-
-&lt;p&gt;这个值可以根据自己网络的环境和业务的并发性来调整。&lt;/p&gt;
-</description>
-        <pubDate>Thu, 03 Aug 2017 00:00:00 +0800</pubDate>
-        <link>http://www.94geek.com/blog/2017/mysql-wait-timeout/</link>
-        <guid isPermaLink="true">http://www.94geek.com/blog/2017/mysql-wait-timeout/</guid>
-      </item>
-    
-      <item>
         <title>解决锁抢占问题--随机式获取抢占锁</title>
         <description>&lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
 &lt;p&gt;我们原本的调度系统是由quartz为基准DIY的系统，但因为quartz的很多问题，特别是可扩展设计是在太差、自定义功能太麻烦，我们不得不自行设计了一个调度系统，内部称为：probactr。probactr分为下面几个节点：&lt;/p&gt;
@@ -4786,6 +4735,86 @@ A data structure that describes interest in certain events. Watchers need to be 
         <pubDate>Mon, 29 May 2017 00:00:00 +0800</pubDate>
         <link>http://www.94geek.com/blog/2017/libev-manual-zh-cn/</link>
         <guid isPermaLink="true">http://www.94geek.com/blog/2017/libev-manual-zh-cn/</guid>
+      </item>
+    
+      <item>
+        <title>我认为更好的管理github pages blog</title>
+        <description>&lt;p&gt;使用jekyll也有好几年了，说实话其实jekyll + markdown的方式真的没有cnblogs等这种专门的平台来的方便。至少纯粹从写blog的角度出发，在目前的互联网用户体验大环境下，冷静思考这种方式，真的挺差。&lt;/p&gt;
+
+&lt;p&gt;以前，在改blog风格之前，因为没有使用jekyll的plugins，所以我还是启用了github pages服务的jekyll服务。但是这次因为图片管理的这个plugin，已经不能再启用github pages的jekyll服务了（因为github禁止第三方的plugins），所以只能启用直接嵌入静态文件的方式来执行。那么问题就来了，整个站点的site是目录和站点的原信息目录，到底怎么解决它们之间的问题？&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;更多的做法&quot;&gt;更多的做法&lt;/h3&gt;
+
+&lt;p&gt;我也搜了一下，更多的做法是这样的：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;在github上开一个project作为pages服务的project；&lt;/li&gt;
+  &lt;li&gt;在这个project上开启一个分支gh-pages，因为这是github默认的blog服务分支；&lt;/li&gt;
+  &lt;li&gt;当你写blog的时候，checkout到master分支，然后开始写，写完后build；&lt;/li&gt;
+  &lt;li&gt;checkout到gh-pages分支，将master中的site目录合并到当前分支；&lt;/li&gt;
+  &lt;li&gt;commit gh-pages分支，再commit master分支；&lt;/li&gt;
+  &lt;li&gt;结束&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这也是一种办法，但是对于我来说受不了的是：一个目录中文件有冲突。一个文件夹存在了多个功能，区分这些功能的办法竟然是我们使用git的分支来达到目的。虽然这样也可以，但并不能有效的去解决一个问题，或者说我一直要check一个问题：就是我当前到底在哪个分支下？显然，对于有神经质的我来说，这种办法明显不切实际。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;我喜欢的办法&quot;&gt;我喜欢的办法&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;一个目录就一个用处，多个功能我宁愿开多个目录；&lt;/li&gt;
+  &lt;li&gt;不要把功能都合并到一起，显然这样在日常维护中很难执行，能分即分开；&lt;/li&gt;
+  &lt;li&gt;做事的流程要分开，比如我写blog的时候，我就只要照顾到写blog就可以了，当我准备发布的时候，我只要照顾到发布就可以了。两者之间不要切换来切换去；&lt;/li&gt;
+  &lt;li&gt;自动化，比如发布，最好是一个脚本直接搞定；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;所以我重新设计了一种办法：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;将上面的一个文件夹管理一个blog的方式直接换成2个文件夹，一个只管source的源信息目录，一个管理静态站点，也就是元信息build后生成的site的文件夹；&lt;/li&gt;
+  &lt;li&gt;因为blog本质上变成了2个文件夹，所以github上也直接申请两个project，一一对应；&lt;/li&gt;
+  &lt;li&gt;调试blog可以在source中进行，source中完成后，cp其中的site目录到我们的静态站点目录；&lt;/li&gt;
+  &lt;li&gt;直接commit两个project到github即可；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;所以有了这样的一个流程脚本：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd 94geek #切换到静态站点proejct
+git checkout gh-pages #确保目前在gh-pages分支，github只支持这个分支
+cd ../source/ #切换到源目录
+rm -rf  _site #删除上一次的site目录
+jekyll build #编译当前的source
+cp -rf _site/* ../94geek/  #cp当前次生成的site到静态project
+git add ./ #加入更新的blog
+git status #查看一下当前的状态对不对
+git commit -am&quot;upload log&quot; #提交，这里信息被写死了，其实你可以使用参数来指定
+git push #同步到github
+cd ../94geek #切换到静态project
+git add ./ #加入新增的blog静态文件
+git status #查看当前静态project的状态
+git commit -am&quot;update blog&quot; #提交
+git push #同步
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;将这个文件放入静态project和source同等级目录下，每次写完blog后只要简单的执行这个脚本即可。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+
+&lt;p&gt;这种方式有几个好处：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;清晰：目录和功能各司其职；&lt;/li&gt;
+  &lt;li&gt;简单：写blog和发布没有任何的确认，其实只要管理好source就可以了，别的都是自动执行；&lt;/li&gt;
+  &lt;li&gt;统一：写blog和发布blog不混乱，各管各的，不需要分心来处理；&lt;/li&gt;
+&lt;/ol&gt;
+
+</description>
+        <pubDate>Sun, 28 May 2017 00:00:00 +0800</pubDate>
+        <link>http://www.94geek.com/blog/2017/mgr-blog/</link>
+        <guid isPermaLink="true">http://www.94geek.com/blog/2017/mgr-blog/</guid>
       </item>
     
   </channel>
