@@ -9,6 +9,148 @@
     
         
             <item>
+                <title>网络read函数未判返回0导致CPU 100%</title>
+                <link>http://www.94geek.com/blog/2017/read-rc-0/</link>
+                <content:encoded>
+                    <![CDATA[
+                    <p>我们的“运维小帅哥”又来烦我们了！没事就在群里给我们post了一张图，如下：</p>
+
+<p><img src="1.png" alt="show" /></p>
+
+<p><strong>新上线的lest系统的CPU使用率很高！</strong>。一看才17%，不是正常吗？小帅哥爆发了，不对。这是多核，被平均的消耗！实际上两个核已经被吃满了！</p>
+<h2 id="检查服务器">检查服务器</h2>
+
+<p>使用top命令看了一下，如下图：<br />
+<img src="2.png" alt="top" /></p>
+
+<p>从上图可以看到，cpu的load负载一直在2左右，也就是说其中的2个核已经被占满。再看下面，是被2个cpu沾满的！看一下CPU的情况，其中系统负载和用户负载几乎是一样的，一个是9.1%，另外一个是7.4%。这就是说可能的问题出在用户态，用户态因为需要调用系统调用，把系统的负载带起来了！那么造成这种疯狂消耗CPU的原因基本上99%都是在循环中干了什么傻事，导致循环出不来，疯狂的消耗CPU！</p>
+
+<p>因为是CPU负载比较高，不是什么内存泄露之类的问题，所以没办法通过core来精确的debug。我们只能靠gcore通过人工的方式强行抓取进程的runtimes碰碰运气，看看是不是能看出来一点蛛丝马迹。</p>
+
+<h2 id="debug看runtimes">debug，看runtimes</h2>
+
+<p>首先，加入core后得到的结果如下图：<br />
+<img src="3.png" alt="gdb core" /></p>
+
+<p>和上面top对应的是两个线程：25128和24130。因为问题就是出在它们身上，我们进入这2个线程看一下它们到底在做什么，首先看一下线程的编号，如下图：<br />
+<img src="4.png" alt="th1" /></p>
+
+<p>当前线程就是28这个，那就直接来吧，运行bt，如下图：<br />
+<img src="7.png" alt="bt" />
+和前面的几次一样都是啥都没有的？，还是使用%rbp来看一下吧，如下图：<br />
+<img src="5.png" alt="rbp" />
+这是在读取数据，这个也是正常的调用，但是它是一个“可能的循环”。看上去没发现什么有价值的东西。那么进入到30这个线程看看，如下图：<br />
+<img src="6.png" alt="th30" />
+这个线程还是在stack的顶端，没在运行。也就是说可能在我们抓取core的一瞬间，此线程正好因为cpu的时间片被让出，啥都没在干。</p>
+
+<p>到目前为止，通过gdb我们没有发现很多有价值的东西，除了那个疑似的可能性循环，但是就这点信息不能确定就是它的问题。也就是说从用户态入手，我们看不太到我们想要的信息，那我们看看系统调用的。</p>
+
+<h2 id="再次求证">再次求证</h2>
+
+<p>使用strace将所有线程的系统调用全部抓取出来，因为线程太多了，容易形成干扰，所以我们使用grep将怀疑有问题的25128线程给抓取出来，如下图：<br />
+<img src="8.png" alt="strace" /></p>
+
+<p>为了明确问题，我已经用红色的标记给标出来了！我们发现在整个的系统调用中，一直在循环的调用read，epoll_ctl，这样的函数。再仔细看一下，每次read都欲获取29长度的值（29是header的buffer长度），但是实际得到的长度是0，表示没有数据。也就是说，我们试图每次都获取数据，但每次都没有获取到数据，事件机制又把这个fd给重新加到了epoll中监听了。回忆上面core在gdb中的表现，28线程一直在read数据。那么问题就在这里了。因为没有给read进行合理的返回值过滤，导致错误的返回值也被按照正确对待，重新加入epoll监听，有因为epoll是一个无线循环，而每次又都触发read，所以轻轻松松的就干掉了CPU。</p>
+
+<h2 id="检查代码">检查代码</h2>
+
+<p>回过头来检查代码，read的网络事件都是被组织在spx（是我们的一个c开发组件）中的，查看nio，如下图：
+<img src="9.png" alt="code" />
+确实没有对read的真实获取长度（就是代码中的&amp;len）为0的情况进行判断，所以发生了这个问题。解决办法也简单，将这个判断加上就可以了。，如下图：<br />
+<img src="10.png" alt="code" /></p>
+
+<h2 id="连带问题及其解决">连带问题及其解决</h2>
+
+<p>解决问题，心里美滋滋的。上uat，观察一会儿！突然，我同事和我说，为什么fixed后的版本上传数据失败率有点高啊？多高？50%以上！我x。马上拿一个日志下来看看，如图：
+<img src="11.png" alt="log" /></p>
+
+<p>哎呀，很多重试的链接都被强行关闭了。仔细看一下上面的代码，也就是说当spx_read_to_msg_once的err为EAGIN的时候，len也是0，但是代码却先判断了0==len，所以就“变向”过滤掉了err == EAGIN的情况。但是err == EAGIN的情况是正常的，应该被再次加入epoll重试，所以调整一下代码，将0 == len的判断移到判断err的后面，先判断err，就不会出现这种情况下了，代码更改如下：<br />
+<img src="12.png" alt="code" /></p>
+
+<p>这样世界终于清静了！上uat，果然畅通，稳定后再上到online，看一下这个cpu的曲线：
+<img src="13.png" alt="cpu" /></p>
+
+<p>在这个40°c的天气终于透心凉了！</p>
+
+<h2 id="问题引申">问题引申</h2>
+
+<p>那么还有问题来了，为什么write数据的时候，如果返回值为0不需要判断呢？<br />
+其实这个和tcpip的api有关。当read的时候，如果返回值是0，就表示对端已经关闭，所以后续没有数据读取了。write的时候，write的是本地的网络缓冲区，也就是滑动窗口，如果你的额client是一个慢client，读取你滑动窗口的数据特别慢，就会导致你write的时候数据写不进去，但是数据写不进去并不是一个错误，只是要你等client读取过后再试一次而已。所以write返回0加入epoll来使用事件触发是正确的。</p>
+
+                    ]]>
+                </content:encoded>
+                <guid isPermaLink="false">/blog/2017/read-rc-0/</guid>
+                <description>
+                    
+                </description>
+                <pubDate>Tue, 08 Aug 2017 00:00:00 +0800</pubDate>
+                <author>94geek.com by Seapeak.Xu</author>
+            </item>
+        
+    
+        
+            <item>
+                <title>mysql连接池不能回避的wait timeout问题</title>
+                <link>http://www.94geek.com/blog/2017/mysql-wait-timeout/</link>
+                <content:encoded>
+                    <![CDATA[
+                    <p>感谢我们的木木同学给了我写这篇文章的灵感和机会。</p>
+
+<h2 id="起因">起因</h2>
+<p>我们的项目组一直在使用albianj作为开发框架在开发应用。使用至今倒也是没有出现很大的问题，但最近加过监控的接口基本上都会在使用一段时间后，突然之间执行数据库操作变得很慢。虽然会变慢，但持续的时间比较短，一般1分钟左右，然后会自动恢复正常。但是过了一段时间，这个现象又会出现，周而复始。从监控看，发生的时间点并无规律，有的时候一天发生3次，有的也会有4-5次。虽然从规律上并无法去查找，那就只能从别的地方想办法：增加一些详细的日志，从日志上看一下问题所在。<br />
+详细日志版本刚刚上去，立刻就发生问题了。如下图：</p>
+
+<p><img src="3.png" alt="problem" /></p>
+
+<p>看一下左下角的曲线图，突然飙高，然后在1500ms的高位不下来。经过查找日志（PS：sorry。写文章的时候日志已经被自动清除，没法截图了），发现程序卡在了getConnection这个方法上，并且卡住的时间从60s开始越来越长。</p>
+
+<h2 id="分析">分析</h2>
+<p>getConnection是一个synchronized方法，主要是从连接池中获取数据连接！卡住时间越来越长这个现象倒是很简单就可以解释：因为getConnection是synchronized的，所以所有的线程到getConnection的时候全部等待，等待的时间越长当然时间越长了。关键在于为啥卡住呢？<br />
+当时有两种可能的想法：</p>
+<ol>
+  <li>连接池设置的太小，连接在使用的时候来不及被返还，导致了积压；</li>
+  <li>连接池的设置有问题，返回的连接有问题。如果是这个问题，那可能会比较难查；</li>
+</ol>
+
+<p>第一种情况显然不会存在，查看albianj的数据库配置，所有的配置对于连接池的设置MinSize为5，MaxSize为20.对于我们的应用来说肯定是够用的。那么就是第二个问题了。</p>
+
+<p>首先检查连接复用问题，对于数据库的连接字符串，我已经增加了重连的设置：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>autoReconnect=true&amp;failOverReadOnly=false&amp;zeroDateTimeBehavior=convertToNull&amp;maxReconnect=3&amp;autoReconnectForPools=true
+</code></pre>
+</div>
+
+<p>显然autoReconnect没有起作用。查了一下mysql的客户端说明，后背发凉。基本上的大意翻译过来是这样的<strong>“即使在创建Mysql时url中加入了autoReconnect=true参数,一但这个连接两次访问数据库的时间超出了服务器端wait_timeout的时间限制,还是会CommunicationsException: The last packet successfully received from the server was xxx milliseconds ago. ”</strong>。赶快去查一下日志，发现并没有报这个错误。那应该不是这个问题。</p>
+
+<p>既然不能重连接，那么最大的可能就是<strong>“返回的连接本来可能就是有问题的，但是程序确认为没有问题”</strong>。发生这种问题的最大可能应该就是：<strong>数据库连接池的连接过期时间大于mysql的wait_timeut设置</strong>。查了一下代码，发现我们默认的数据库连接池连接过期时间是300-30=270s。再去问一下DBA木木，让他查一下线上的数据库wait_timeout设置，被告知是180.瞬间懵逼：连接池的生命周期时间远远参与真实的连接生命周期时间。</p>
+
+<p>原因是找到了，但是这个问题其实前一段时间已经发现并且已经改过了。因为去年我记得很清楚：又一次我们的probactor（job调度系统）报了上文提到的CommunicationsException异常，后来找到了问题就是因为程序对于连接池中连接的alivetime长于数据库的wait timeout设置，随后我千叮咛万嘱咐这个设置必须要小心小心再小心，但这次还是中招了。因为连接池和网络的问题，我们有同事直接放弃连接池，改用每次连接数据库。放弃连接池确实能解决连接不会出现问题，但是侧面也导致了wait_timeout被设置的过小了。但其实只要把连接池中连接的过期时间设置的比wait_timeout小一些就完全可以了。</p>
+
+<p>经过更改后的程序终于恢复了正常，看一下更改后的效果：<br />
+<img src="2.png" alt="ok" /></p>
+
+<h2 id="科普">科普</h2>
+<p>何为wait_timeout？<br />
+wait_timeout是mysql的一个设置，主要是用来断开不使用的数据库连接。当连接空闲的时间达到wait_timeout设置的最大值时，mysql会主动切断这个连接，以供别的客户端连接数据库。这个值一般是28800，也就是8小时。在mysql中可以通过：
+<code class="highlighter-rouge">show variables like “%timeout%”;</code>
+获取。<br />
+另外，当数据库主动切断连接的时候，java的mysql客户端并不知道这个连接已经被切断，所以程序并不知道其已经无效了，然后加上mysql的客户端不支持ReConnect，双重的问题叠加在一起就导致了连接池返回无效连接的可能。这是一个比较扯淡也是一个比较难以发现的问题，但是它确确实实的存在了。大家一定要多加注意。</p>
+
+<p>这个值可以根据自己网络的环境和业务的并发性来调整。</p>
+
+                    ]]>
+                </content:encoded>
+                <guid isPermaLink="false">/blog/2017/mysql-wait-timeout/</guid>
+                <description>
+                    
+                </description>
+                <pubDate>Thu, 03 Aug 2017 00:00:00 +0800</pubDate>
+                <author>94geek.com by Seapeak.Xu</author>
+            </item>
+        
+    
+        
+            <item>
                 <title>解决锁抢占问题--随机式获取抢占锁</title>
                 <link>http://www.94geek.com/blog/2017/staircase-locker/</link>
                 <content:encoded>

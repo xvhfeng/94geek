@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>mysql连接池不能回避的wait timeout问题 &#8211; 94geek.com</title>
+    <link rel="dns-prefetch" href="//maxcdn.bootstrapcdn.com">
+    <link rel="dns-prefetch" href="//cdn.mathjax.org">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="属于大嘴的个人blog">
+    <meta name="robots" content="all">
+    <meta name="author" content="94geek.com by Seapeak.Xu">
+    
+    <meta name="keywords" content="">
+    <link rel="canonical" href="http://www.94geek.com/blog/2017/mysql-wait-timeout/">
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed for 94geek.com" href="/feed.xml" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/pixyll.css?201708092329" type="text/css">
+
+    <!-- Fonts -->
+    
+    <link href='//fonts.googleapis.com/css?family=Merriweather:900,900italic,300,300italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Lato:900,300' rel='stylesheet' type='text/css'>
+    
+    
+
+    <!-- MathJax -->
+    
+
+    <!-- Verifications -->
+    
+    
+
+    <!-- Open Graph -->
+    <!-- From: https://github.com/mmistakes/hpstr-jekyll-theme/blob/master/_includes/head.html -->
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="mysql连接池不能回避的wait timeout问题">
+    <meta property="og:description" content="属于大嘴的个人blog">
+    <meta property="og:url" content="http://www.94geek.com/blog/2017/mysql-wait-timeout/">
+    <meta property="og:site_name" content="94geek.com">
+    
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary" />
+    
+    <meta name="twitter:title" content="mysql连接池不能回避的wait timeout问题" />
+    <meta name="twitter:description" content="属于大嘴的个人blog" />
+    <meta name="twitter:url" content="http://www.94geek.com/blog/2017/mysql-wait-timeout/" />
+    
+
+    <meta name="keywords"
+    context="94geek,geek,geeker,seapeak,linux,c,java,c#,albian,albianj,libev,
+    算法,libev中文文档,编程,极客,架构设计,架构师,就是极客,94极客
+    ,script,dfs,event,event loop,libevent,84年的徐大嘴,94geeker,
+    分布式，id生成器，分布式文件系统，web，server，service，
+    restful，操作系统，汇编，编译器，链接器，解释器，jvm
+    加载器">
+
+    <!-- Icons -->
+    <link rel="icon" href="/images/favicon.ico" mce_href="/images/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/images/favicon.ico" mce_href="/images/favicon.ico" type="image/x-icon">
+
+    
+</head>
+
+<body class="site">
+  
+	
+
+  <div class="site-wrap">
+    <header class="site-header px2 px-responsive">
+  <div class="mt2 wrap">
+    <div class="measure">
+      <a href="http://www.94geek.com" class="site-title">94geek.com</a>
+      <nav class="site-nav">
+        
+    
+
+    
+        <a href="/about/">About</a>
+    
+
+    
+
+    
+
+    
+
+    
+        <a href="/hotlist/">Hotlist</a>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+      </nav>
+      <div class="clearfix"></div>
+      
+    </div>
+  </div>
+</header>
+
+
+    <div class="post p2 p-responsive wrap" role="main">
+      <div class="measure">
+        
+
+
+<div class="post-header mb2">
+    <h1>mysql连接池不能回避的wait timeout问题</h1>
+    <!-- 
+        <span class="post-meta">2017-08-03</span><br>
+        
+        <span class="post-meta small">
+        
+        1 minute read
+        
+        </span>
+    -->
+</div>
+
+<article class="post-content">
+    <p>感谢我们的木木同学给了我写这篇文章的灵感和机会。</p>
+
+<h2 id="起因">起因</h2>
+<p>我们的项目组一直在使用albianj作为开发框架在开发应用。使用至今倒也是没有出现很大的问题，但最近加过监控的接口基本上都会在使用一段时间后，突然之间执行数据库操作变得很慢。虽然会变慢，但持续的时间比较短，一般1分钟左右，然后会自动恢复正常。但是过了一段时间，这个现象又会出现，周而复始。从监控看，发生的时间点并无规律，有的时候一天发生3次，有的也会有4-5次。虽然从规律上并无法去查找，那就只能从别的地方想办法：增加一些详细的日志，从日志上看一下问题所在。<br />
+详细日志版本刚刚上去，立刻就发生问题了。如下图：</p>
+
+<p><img src="3.png" alt="problem" /></p>
+
+<p>看一下左下角的曲线图，突然飙高，然后在1500ms的高位不下来。经过查找日志（PS：sorry。写文章的时候日志已经被自动清除，没法截图了），发现程序卡在了getConnection这个方法上，并且卡住的时间从60s开始越来越长。</p>
+
+<h2 id="分析">分析</h2>
+<p>getConnection是一个synchronized方法，主要是从连接池中获取数据连接！卡住时间越来越长这个现象倒是很简单就可以解释：因为getConnection是synchronized的，所以所有的线程到getConnection的时候全部等待，等待的时间越长当然时间越长了。关键在于为啥卡住呢？<br />
+当时有两种可能的想法：</p>
+<ol>
+  <li>连接池设置的太小，连接在使用的时候来不及被返还，导致了积压；</li>
+  <li>连接池的设置有问题，返回的连接有问题。如果是这个问题，那可能会比较难查；</li>
+</ol>
+
+<p>第一种情况显然不会存在，查看albianj的数据库配置，所有的配置对于连接池的设置MinSize为5，MaxSize为20.对于我们的应用来说肯定是够用的。那么就是第二个问题了。</p>
+
+<p>首先检查连接复用问题，对于数据库的连接字符串，我已经增加了重连的设置：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>autoReconnect=true&amp;failOverReadOnly=false&amp;zeroDateTimeBehavior=convertToNull&amp;maxReconnect=3&amp;autoReconnectForPools=true
+</code></pre>
+</div>
+
+<p>显然autoReconnect没有起作用。查了一下mysql的客户端说明，后背发凉。基本上的大意翻译过来是这样的<strong>“即使在创建Mysql时url中加入了autoReconnect=true参数,一但这个连接两次访问数据库的时间超出了服务器端wait_timeout的时间限制,还是会CommunicationsException: The last packet successfully received from the server was xxx milliseconds ago. ”</strong>。赶快去查一下日志，发现并没有报这个错误。那应该不是这个问题。</p>
+
+<p>既然不能重连接，那么最大的可能就是<strong>“返回的连接本来可能就是有问题的，但是程序确认为没有问题”</strong>。发生这种问题的最大可能应该就是：<strong>数据库连接池的连接过期时间大于mysql的wait_timeut设置</strong>。查了一下代码，发现我们默认的数据库连接池连接过期时间是300-30=270s。再去问一下DBA木木，让他查一下线上的数据库wait_timeout设置，被告知是180.瞬间懵逼：连接池的生命周期时间远远参与真实的连接生命周期时间。</p>
+
+<p>原因是找到了，但是这个问题其实前一段时间已经发现并且已经改过了。因为去年我记得很清楚：又一次我们的probactor（job调度系统）报了上文提到的CommunicationsException异常，后来找到了问题就是因为程序对于连接池中连接的alivetime长于数据库的wait timeout设置，随后我千叮咛万嘱咐这个设置必须要小心小心再小心，但这次还是中招了。因为连接池和网络的问题，我们有同事直接放弃连接池，改用每次连接数据库。放弃连接池确实能解决连接不会出现问题，但是侧面也导致了wait_timeout被设置的过小了。但其实只要把连接池中连接的过期时间设置的比wait_timeout小一些就完全可以了。</p>
+
+<p>经过更改后的程序终于恢复了正常，看一下更改后的效果：<br />
+<img src="2.png" alt="ok" /></p>
+
+<h2 id="科普">科普</h2>
+<p>何为wait_timeout？<br />
+wait_timeout是mysql的一个设置，主要是用来断开不使用的数据库连接。当连接空闲的时间达到wait_timeout设置的最大值时，mysql会主动切断这个连接，以供别的客户端连接数据库。这个值一般是28800，也就是8小时。在mysql中可以通过：
+<code class="highlighter-rouge">show variables like “%timeout%”;</code>
+获取。<br />
+另外，当数据库主动切断连接的时候，java的mysql客户端并不知道这个连接已经被切断，所以程序并不知道其已经无效了，然后加上mysql的客户端不支持ReConnect，双重的问题叠加在一起就导致了连接池返回无效连接的可能。这是一个比较扯淡也是一个比较难以发现的问题，但是它确确实实的存在了。大家一定要多加注意。</p>
+
+<p>这个值可以根据自己网络的环境和业务的并发性来调整。</p>
+
+</article>
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+  <header class="site-header px2 px-responsive">
+      <div class="mt2 wrap">
+          <div class="measure">
+              
+              <span class="prev">
+                  <a href="/blog/2017/staircase-locker/" style="color:black">
+                      <--
+                  </a>
+              </span>
+               
+              <nav class="site-nav">
+                  
+                  <span class="next">
+                      <a href="/blog/2017/read-rc-0/" style="color:black">
+                          -->
+                      </a>
+                  </span>
+                  
+              </nav>
+              <div class="clearfix"></div>
+          </div>
+      </div>
+  </header>
+
+
+
+      </div>
+    </div>
+  </div>
+
+  
+</body>
+</html>

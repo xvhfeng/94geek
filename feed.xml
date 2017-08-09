@@ -7,6 +7,128 @@
     <atom:link href="http://www.94geek.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>网络read函数未判返回0导致CPU 100%</title>
+        <description>&lt;p&gt;我们的“运维小帅哥”又来烦我们了！没事就在群里给我们post了一张图，如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;1.png&quot; alt=&quot;show&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;新上线的lest系统的CPU使用率很高！&lt;/strong&gt;。一看才17%，不是正常吗？小帅哥爆发了，不对。这是多核，被平均的消耗！实际上两个核已经被吃满了！&lt;/p&gt;
+&lt;h2 id=&quot;检查服务器&quot;&gt;检查服务器&lt;/h2&gt;
+
+&lt;p&gt;使用top命令看了一下，如下图：&lt;br /&gt;
+&lt;img src=&quot;2.png&quot; alt=&quot;top&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;从上图可以看到，cpu的load负载一直在2左右，也就是说其中的2个核已经被占满。再看下面，是被2个cpu沾满的！看一下CPU的情况，其中系统负载和用户负载几乎是一样的，一个是9.1%，另外一个是7.4%。这就是说可能的问题出在用户态，用户态因为需要调用系统调用，把系统的负载带起来了！那么造成这种疯狂消耗CPU的原因基本上99%都是在循环中干了什么傻事，导致循环出不来，疯狂的消耗CPU！&lt;/p&gt;
+
+&lt;p&gt;因为是CPU负载比较高，不是什么内存泄露之类的问题，所以没办法通过core来精确的debug。我们只能靠gcore通过人工的方式强行抓取进程的runtimes碰碰运气，看看是不是能看出来一点蛛丝马迹。&lt;/p&gt;
+
+&lt;h2 id=&quot;debug看runtimes&quot;&gt;debug，看runtimes&lt;/h2&gt;
+
+&lt;p&gt;首先，加入core后得到的结果如下图：&lt;br /&gt;
+&lt;img src=&quot;3.png&quot; alt=&quot;gdb core&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;和上面top对应的是两个线程：25128和24130。因为问题就是出在它们身上，我们进入这2个线程看一下它们到底在做什么，首先看一下线程的编号，如下图：&lt;br /&gt;
+&lt;img src=&quot;4.png&quot; alt=&quot;th1&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当前线程就是28这个，那就直接来吧，运行bt，如下图：&lt;br /&gt;
+&lt;img src=&quot;7.png&quot; alt=&quot;bt&quot; /&gt;
+和前面的几次一样都是啥都没有的？，还是使用%rbp来看一下吧，如下图：&lt;br /&gt;
+&lt;img src=&quot;5.png&quot; alt=&quot;rbp&quot; /&gt;
+这是在读取数据，这个也是正常的调用，但是它是一个“可能的循环”。看上去没发现什么有价值的东西。那么进入到30这个线程看看，如下图：&lt;br /&gt;
+&lt;img src=&quot;6.png&quot; alt=&quot;th30&quot; /&gt;
+这个线程还是在stack的顶端，没在运行。也就是说可能在我们抓取core的一瞬间，此线程正好因为cpu的时间片被让出，啥都没在干。&lt;/p&gt;
+
+&lt;p&gt;到目前为止，通过gdb我们没有发现很多有价值的东西，除了那个疑似的可能性循环，但是就这点信息不能确定就是它的问题。也就是说从用户态入手，我们看不太到我们想要的信息，那我们看看系统调用的。&lt;/p&gt;
+
+&lt;h2 id=&quot;再次求证&quot;&gt;再次求证&lt;/h2&gt;
+
+&lt;p&gt;使用strace将所有线程的系统调用全部抓取出来，因为线程太多了，容易形成干扰，所以我们使用grep将怀疑有问题的25128线程给抓取出来，如下图：&lt;br /&gt;
+&lt;img src=&quot;8.png&quot; alt=&quot;strace&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;为了明确问题，我已经用红色的标记给标出来了！我们发现在整个的系统调用中，一直在循环的调用read，epoll_ctl，这样的函数。再仔细看一下，每次read都欲获取29长度的值（29是header的buffer长度），但是实际得到的长度是0，表示没有数据。也就是说，我们试图每次都获取数据，但每次都没有获取到数据，事件机制又把这个fd给重新加到了epoll中监听了。回忆上面core在gdb中的表现，28线程一直在read数据。那么问题就在这里了。因为没有给read进行合理的返回值过滤，导致错误的返回值也被按照正确对待，重新加入epoll监听，有因为epoll是一个无线循环，而每次又都触发read，所以轻轻松松的就干掉了CPU。&lt;/p&gt;
+
+&lt;h2 id=&quot;检查代码&quot;&gt;检查代码&lt;/h2&gt;
+
+&lt;p&gt;回过头来检查代码，read的网络事件都是被组织在spx（是我们的一个c开发组件）中的，查看nio，如下图：
+&lt;img src=&quot;9.png&quot; alt=&quot;code&quot; /&gt;
+确实没有对read的真实获取长度（就是代码中的&amp;amp;len）为0的情况进行判断，所以发生了这个问题。解决办法也简单，将这个判断加上就可以了。，如下图：&lt;br /&gt;
+&lt;img src=&quot;10.png&quot; alt=&quot;code&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;连带问题及其解决&quot;&gt;连带问题及其解决&lt;/h2&gt;
+
+&lt;p&gt;解决问题，心里美滋滋的。上uat，观察一会儿！突然，我同事和我说，为什么fixed后的版本上传数据失败率有点高啊？多高？50%以上！我x。马上拿一个日志下来看看，如图：
+&lt;img src=&quot;11.png&quot; alt=&quot;log&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;哎呀，很多重试的链接都被强行关闭了。仔细看一下上面的代码，也就是说当spx_read_to_msg_once的err为EAGIN的时候，len也是0，但是代码却先判断了0==len，所以就“变向”过滤掉了err == EAGIN的情况。但是err == EAGIN的情况是正常的，应该被再次加入epoll重试，所以调整一下代码，将0 == len的判断移到判断err的后面，先判断err，就不会出现这种情况下了，代码更改如下：&lt;br /&gt;
+&lt;img src=&quot;12.png&quot; alt=&quot;code&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这样世界终于清静了！上uat，果然畅通，稳定后再上到online，看一下这个cpu的曲线：
+&lt;img src=&quot;13.png&quot; alt=&quot;cpu&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在这个40°c的天气终于透心凉了！&lt;/p&gt;
+
+&lt;h2 id=&quot;问题引申&quot;&gt;问题引申&lt;/h2&gt;
+
+&lt;p&gt;那么还有问题来了，为什么write数据的时候，如果返回值为0不需要判断呢？&lt;br /&gt;
+其实这个和tcpip的api有关。当read的时候，如果返回值是0，就表示对端已经关闭，所以后续没有数据读取了。write的时候，write的是本地的网络缓冲区，也就是滑动窗口，如果你的额client是一个慢client，读取你滑动窗口的数据特别慢，就会导致你write的时候数据写不进去，但是数据写不进去并不是一个错误，只是要你等client读取过后再试一次而已。所以write返回0加入epoll来使用事件触发是正确的。&lt;/p&gt;
+</description>
+        <pubDate>Tue, 08 Aug 2017 00:00:00 +0800</pubDate>
+        <link>http://www.94geek.com/blog/2017/read-rc-0/</link>
+        <guid isPermaLink="true">http://www.94geek.com/blog/2017/read-rc-0/</guid>
+      </item>
+    
+      <item>
+        <title>mysql连接池不能回避的wait timeout问题</title>
+        <description>&lt;p&gt;感谢我们的木木同学给了我写这篇文章的灵感和机会。&lt;/p&gt;
+
+&lt;h2 id=&quot;起因&quot;&gt;起因&lt;/h2&gt;
+&lt;p&gt;我们的项目组一直在使用albianj作为开发框架在开发应用。使用至今倒也是没有出现很大的问题，但最近加过监控的接口基本上都会在使用一段时间后，突然之间执行数据库操作变得很慢。虽然会变慢，但持续的时间比较短，一般1分钟左右，然后会自动恢复正常。但是过了一段时间，这个现象又会出现，周而复始。从监控看，发生的时间点并无规律，有的时候一天发生3次，有的也会有4-5次。虽然从规律上并无法去查找，那就只能从别的地方想办法：增加一些详细的日志，从日志上看一下问题所在。&lt;br /&gt;
+详细日志版本刚刚上去，立刻就发生问题了。如下图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;3.png&quot; alt=&quot;problem&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;看一下左下角的曲线图，突然飙高，然后在1500ms的高位不下来。经过查找日志（PS：sorry。写文章的时候日志已经被自动清除，没法截图了），发现程序卡在了getConnection这个方法上，并且卡住的时间从60s开始越来越长。&lt;/p&gt;
+
+&lt;h2 id=&quot;分析&quot;&gt;分析&lt;/h2&gt;
+&lt;p&gt;getConnection是一个synchronized方法，主要是从连接池中获取数据连接！卡住时间越来越长这个现象倒是很简单就可以解释：因为getConnection是synchronized的，所以所有的线程到getConnection的时候全部等待，等待的时间越长当然时间越长了。关键在于为啥卡住呢？&lt;br /&gt;
+当时有两种可能的想法：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;连接池设置的太小，连接在使用的时候来不及被返还，导致了积压；&lt;/li&gt;
+  &lt;li&gt;连接池的设置有问题，返回的连接有问题。如果是这个问题，那可能会比较难查；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;第一种情况显然不会存在，查看albianj的数据库配置，所有的配置对于连接池的设置MinSize为5，MaxSize为20.对于我们的应用来说肯定是够用的。那么就是第二个问题了。&lt;/p&gt;
+
+&lt;p&gt;首先检查连接复用问题，对于数据库的连接字符串，我已经增加了重连的设置：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;autoReconnect=true&amp;amp;failOverReadOnly=false&amp;amp;zeroDateTimeBehavior=convertToNull&amp;amp;maxReconnect=3&amp;amp;autoReconnectForPools=true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;显然autoReconnect没有起作用。查了一下mysql的客户端说明，后背发凉。基本上的大意翻译过来是这样的&lt;strong&gt;“即使在创建Mysql时url中加入了autoReconnect=true参数,一但这个连接两次访问数据库的时间超出了服务器端wait_timeout的时间限制,还是会CommunicationsException: The last packet successfully received from the server was xxx milliseconds ago. ”&lt;/strong&gt;。赶快去查一下日志，发现并没有报这个错误。那应该不是这个问题。&lt;/p&gt;
+
+&lt;p&gt;既然不能重连接，那么最大的可能就是&lt;strong&gt;“返回的连接本来可能就是有问题的，但是程序确认为没有问题”&lt;/strong&gt;。发生这种问题的最大可能应该就是：&lt;strong&gt;数据库连接池的连接过期时间大于mysql的wait_timeut设置&lt;/strong&gt;。查了一下代码，发现我们默认的数据库连接池连接过期时间是300-30=270s。再去问一下DBA木木，让他查一下线上的数据库wait_timeout设置，被告知是180.瞬间懵逼：连接池的生命周期时间远远参与真实的连接生命周期时间。&lt;/p&gt;
+
+&lt;p&gt;原因是找到了，但是这个问题其实前一段时间已经发现并且已经改过了。因为去年我记得很清楚：又一次我们的probactor（job调度系统）报了上文提到的CommunicationsException异常，后来找到了问题就是因为程序对于连接池中连接的alivetime长于数据库的wait timeout设置，随后我千叮咛万嘱咐这个设置必须要小心小心再小心，但这次还是中招了。因为连接池和网络的问题，我们有同事直接放弃连接池，改用每次连接数据库。放弃连接池确实能解决连接不会出现问题，但是侧面也导致了wait_timeout被设置的过小了。但其实只要把连接池中连接的过期时间设置的比wait_timeout小一些就完全可以了。&lt;/p&gt;
+
+&lt;p&gt;经过更改后的程序终于恢复了正常，看一下更改后的效果：&lt;br /&gt;
+&lt;img src=&quot;2.png&quot; alt=&quot;ok&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;科普&quot;&gt;科普&lt;/h2&gt;
+&lt;p&gt;何为wait_timeout？&lt;br /&gt;
+wait_timeout是mysql的一个设置，主要是用来断开不使用的数据库连接。当连接空闲的时间达到wait_timeout设置的最大值时，mysql会主动切断这个连接，以供别的客户端连接数据库。这个值一般是28800，也就是8小时。在mysql中可以通过：
+&lt;code class=&quot;highlighter-rouge&quot;&gt;show variables like “%timeout%”;&lt;/code&gt;
+获取。&lt;br /&gt;
+另外，当数据库主动切断连接的时候，java的mysql客户端并不知道这个连接已经被切断，所以程序并不知道其已经无效了，然后加上mysql的客户端不支持ReConnect，双重的问题叠加在一起就导致了连接池返回无效连接的可能。这是一个比较扯淡也是一个比较难以发现的问题，但是它确确实实的存在了。大家一定要多加注意。&lt;/p&gt;
+
+&lt;p&gt;这个值可以根据自己网络的环境和业务的并发性来调整。&lt;/p&gt;
+</description>
+        <pubDate>Thu, 03 Aug 2017 00:00:00 +0800</pubDate>
+        <link>http://www.94geek.com/blog/2017/mysql-wait-timeout/</link>
+        <guid isPermaLink="true">http://www.94geek.com/blog/2017/mysql-wait-timeout/</guid>
+      </item>
+    
+      <item>
         <title>解决锁抢占问题--随机式获取抢占锁</title>
         <description>&lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
 &lt;p&gt;我们原本的调度系统是由quartz为基准DIY的系统，但因为quartz的很多问题，特别是可扩展设计是在太差、自定义功能太麻烦，我们不得不自行设计了一个调度系统，内部称为：probactr。probactr分为下面几个节点：&lt;/p&gt;
@@ -4664,169 +4786,6 @@ A data structure that describes interest in certain events. Watchers need to be 
         <pubDate>Mon, 29 May 2017 00:00:00 +0800</pubDate>
         <link>http://www.94geek.com/blog/2017/libev-manual-zh-cn/</link>
         <guid isPermaLink="true">http://www.94geek.com/blog/2017/libev-manual-zh-cn/</guid>
-      </item>
-    
-      <item>
-        <title>我认为更好的管理github pages blog</title>
-        <description>&lt;p&gt;使用jekyll也有好几年了，说实话其实jekyll + markdown的方式真的没有cnblogs等这种专门的平台来的方便。至少纯粹从写blog的角度出发，在目前的互联网用户体验大环境下，冷静思考这种方式，真的挺差。&lt;/p&gt;
-
-&lt;p&gt;以前，在改blog风格之前，因为没有使用jekyll的plugins，所以我还是启用了github pages服务的jekyll服务。但是这次因为图片管理的这个plugin，已经不能再启用github pages的jekyll服务了（因为github禁止第三方的plugins），所以只能启用直接嵌入静态文件的方式来执行。那么问题就来了，整个站点的site是目录和站点的原信息目录，到底怎么解决它们之间的问题？&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;更多的做法&quot;&gt;更多的做法&lt;/h3&gt;
-
-&lt;p&gt;我也搜了一下，更多的做法是这样的：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;在github上开一个project作为pages服务的project；&lt;/li&gt;
-  &lt;li&gt;在这个project上开启一个分支gh-pages，因为这是github默认的blog服务分支；&lt;/li&gt;
-  &lt;li&gt;当你写blog的时候，checkout到master分支，然后开始写，写完后build；&lt;/li&gt;
-  &lt;li&gt;checkout到gh-pages分支，将master中的site目录合并到当前分支；&lt;/li&gt;
-  &lt;li&gt;commit gh-pages分支，再commit master分支；&lt;/li&gt;
-  &lt;li&gt;结束&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;这也是一种办法，但是对于我来说受不了的是：一个目录中文件有冲突。一个文件夹存在了多个功能，区分这些功能的办法竟然是我们使用git的分支来达到目的。虽然这样也可以，但并不能有效的去解决一个问题，或者说我一直要check一个问题：就是我当前到底在哪个分支下？显然，对于有神经质的我来说，这种办法明显不切实际。&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;我喜欢的办法&quot;&gt;我喜欢的办法&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;一个目录就一个用处，多个功能我宁愿开多个目录；&lt;/li&gt;
-  &lt;li&gt;不要把功能都合并到一起，显然这样在日常维护中很难执行，能分即分开；&lt;/li&gt;
-  &lt;li&gt;做事的流程要分开，比如我写blog的时候，我就只要照顾到写blog就可以了，当我准备发布的时候，我只要照顾到发布就可以了。两者之间不要切换来切换去；&lt;/li&gt;
-  &lt;li&gt;自动化，比如发布，最好是一个脚本直接搞定；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;所以我重新设计了一种办法：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;将上面的一个文件夹管理一个blog的方式直接换成2个文件夹，一个只管source的源信息目录，一个管理静态站点，也就是元信息build后生成的site的文件夹；&lt;/li&gt;
-  &lt;li&gt;因为blog本质上变成了2个文件夹，所以github上也直接申请两个project，一一对应；&lt;/li&gt;
-  &lt;li&gt;调试blog可以在source中进行，source中完成后，cp其中的site目录到我们的静态站点目录；&lt;/li&gt;
-  &lt;li&gt;直接commit两个project到github即可；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;所以有了这样的一个流程脚本：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd 94geek #切换到静态站点proejct
-git checkout gh-pages #确保目前在gh-pages分支，github只支持这个分支
-cd ../source/ #切换到源目录
-rm -rf  _site #删除上一次的site目录
-jekyll build #编译当前的source
-cp -rf _site/* ../94geek/  #cp当前次生成的site到静态project
-git add ./ #加入更新的blog
-git status #查看一下当前的状态对不对
-git commit -am&quot;upload log&quot; #提交，这里信息被写死了，其实你可以使用参数来指定
-git push #同步到github
-cd ../94geek #切换到静态project
-git add ./ #加入新增的blog静态文件
-git status #查看当前静态project的状态
-git commit -am&quot;update blog&quot; #提交
-git push #同步
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;将这个文件放入静态project和source同等级目录下，每次写完blog后只要简单的执行这个脚本即可。&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
-
-&lt;p&gt;这种方式有几个好处：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;清晰：目录和功能各司其职；&lt;/li&gt;
-  &lt;li&gt;简单：写blog和发布没有任何的确认，其实只要管理好source就可以了，别的都是自动执行；&lt;/li&gt;
-  &lt;li&gt;统一：写blog和发布blog不混乱，各管各的，不需要分心来处理；&lt;/li&gt;
-&lt;/ol&gt;
-
-</description>
-        <pubDate>Sun, 28 May 2017 00:00:00 +0800</pubDate>
-        <link>http://www.94geek.com/blog/2017/mgr-blog/</link>
-        <guid isPermaLink="true">http://www.94geek.com/blog/2017/mgr-blog/</guid>
-      </item>
-    
-      <item>
-        <title>jekyll图片管理插件</title>
-        <description>&lt;p&gt;使用jekyll搭建github的pages服务已经很多年了，虽然写的blog不是特别多，但在使用的过程中难免还是遇到了很多的问题。在所有这些问题中，几乎所有的问题都被解决了。但有且只有一个问题几乎无解：图片管理。使用jekyll的程序员几乎都搭配markdown，但是markdown对于图片的管理，简直就是可以用一坨屎来形容。&lt;/p&gt;
-
-&lt;h3 id=&quot;以前问题&quot;&gt;以前问题&lt;/h3&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;通常在markdown中，引用图片都是使用标记来进行。但是引用的图片路径往往是一个问题。优先了jekyll，那么本地的编辑器可能就无法显示和预览；优先了本地预览，那么markdown上传到jekyll后路径是一个问题。&lt;/p&gt;
-
-&lt;p&gt;那么我们最常用的就是这种办法：因为markdown引用图片最常用的就是http形式的地址引用。所以前提就是你必须先有一个稳定的图床，然后上传图片，获取地址，再把地址贴入markdown中。这种方式我受不了的地方在于中间插入图片或者修改图片多次的话，往往需要长时间的停下来先弄图片，再写markdown，整个思路会受到很多的影响。有时候弄完图片已经没心情再写东西了。&lt;/p&gt;
-
-&lt;p&gt;那么有没有一种办法来解决这个问题呢？&lt;/p&gt;
-
-&lt;p&gt;首先我们想到了一种办法，把图片直接放到某个文件夹里面，上传到github，但是这样的做法还是会在本地编辑器和jekyll中满足一个。另外一个办法，就是把图片和markdown放在同一个文件夹，这样就没有路径问题了，直接用文件名就可以引用图片。但是这种办法满足了编辑器，在jekyll build的时候，jekyll对于_post目录下的文件只处理markdown文件，不会处理别的文件。看上去这条路也不通了。&lt;/p&gt;
-
-&lt;p&gt;那么到底有没有别的办法呢？&lt;/p&gt;
-
-&lt;h3 id=&quot;我的解决方案&quot;&gt;我的解决方案&lt;/h3&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;其实能想到的方案上面都已经全部想到了，但是不管怎么去解决，在jekyll和本地编辑器中往往只能满足一个，两个能同时兼顾的就没有。但是对比上面的几种方案，最靠谱的貌似还是最后一种** markdown和图片同目录 ** 但是在同目录jekyll又不管，幸好jekyll提供了插件功能。&lt;/p&gt;
-
-&lt;p&gt;jekyll的插件有很多种，具体的请查看 &lt;a href=&quot;http://jekyllcn.com/docs/plugins/&quot;&gt;jekyll插件科普&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;回到我们的问题，我们的问题其实已经很清楚了，就是在jekyll解析markdown到html的同时，将同目录的静态文件全部cp到生成的html的目录。这样markdown文件生成的html和静态资源文件又在一个目录下了，这样就可以避免目录的问题了。&lt;/p&gt;
-
-&lt;p&gt;在这些插件的hooks中，我们选择了 :posts :post_write 这个hooks，因为这个hooks是在markdown已经被解析，并且被写入磁盘以后发生的。这个时间点正好就是我们想要的这个时间点。那么我们现在就是只要实现这个hooks就可以了。所以就有了下面的代码：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Jekyll::Hooks.register :posts, :post_write do |doc|
-# Minify HTML files after site build
-#  gulp = File.join(site.source, 'node_modules', '.bin', 'gulp')
-#  system &quot;#{gulp} minifyHTML --silent&quot;
-#
-#Kernel.puts &quot;11111111111111111111&quot;
-#Kernel.puts doc.path
-
-pn = Pathname.new(doc.path)
-basedir  = pn.dirname 
-dest_path =File.join(doc.site.config[&quot;destination&quot;] , doc.url)
-Dir.foreach(basedir) {|x| 
-    if !(x.start_with?(&quot;.&quot;))
-        if !(x.end_with?(&quot;md&quot;) || x.end_with?(&quot;markdown&quot;))
-            stmp = File.join(basedir,x)
-            dtmp = File.join(dest_path,x)
-            Kernel.puts stmp
-            Kernel.puts dtmp
-            FileUtils.cp(stmp,dtmp)
-            Kernel.puts &quot;copy static file from #{stmp} to #{dtmp}&quot;
-        end
-    end
-}
-
-end
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;将这个文件保存到_plugins目录下，随便给一个文件名即可。再次运行jekyll server就可以看到这个hooks被执行了。&lt;/p&gt;
-
-&lt;p&gt;具体:&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;项目源码: &lt;a href=&quot;https://github.com/xvhfeng/jekyll-markdown-image&quot;&gt;github project&lt;/a&gt;&lt;br /&gt;
-2 如何使用：&lt;a href=&quot;https://github.com/xvhfeng/blog-source&quot;&gt;blog源码&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;缺点&quot;&gt;缺点&lt;/h3&gt;
-
-&lt;hr /&gt;
-
-&lt;p&gt;这个解决方案并不是万能的，它也有自己的缺点。目前使用下来，缺点有几个：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;只支持markdown和静态文件同目录的情况；&lt;/li&gt;
-  &lt;li&gt;对于jekyll的permalink的配置一定要正确，千奇百怪的配置不一定可用，我的配置是/blog/:year/:title/，注意，最后那个目录分隔符 “/” 一定要带;&lt;/li&gt;
-  &lt;li&gt;对于post中的markdown转html的时候，列表页的显示也有问题，如果列表页上会显示摘要或者是文章的一部分内容，而恰巧这部分在列表上显示的内容中有图片的引用，这样这个图片也会有显示问题。因为图片其实是在markdown生成的html目录，而列表页是一个单独的目录，所以图片路径是取不到的。这部分其实是可以完善的，但是对于我来说，这部分几乎很少用到，我也就没管了；&lt;/li&gt;
-  &lt;li&gt;因为你使用了自定义的plugin，而github为了安全考虑是不支持自定义plugin的，所以对于使用自定义的用户来说，只能在本地build完了站点后，把_site目录下的文件签入github，使用静态文件的方式来提供blog的服务；（PS，好处时自定义的插件可以让你为所欲为，有失必有得）&lt;/li&gt;
-&lt;/ol&gt;
-</description>
-        <pubDate>Fri, 26 May 2017 00:00:00 +0800</pubDate>
-        <link>http://www.94geek.com/blog/2017/blog-image/</link>
-        <guid isPermaLink="true">http://www.94geek.com/blog/2017/blog-image/</guid>
       </item>
     
   </channel>
