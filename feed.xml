@@ -7,6 +7,93 @@
     <atom:link href="http://www.94geek.com/feed.xml" rel="self" type="application/rss+xml" />
     
       <item>
+        <title>台湾技术交流见闻与感想</title>
+        <description>&lt;h2 id=&quot;前言&quot;&gt;前言&lt;/h2&gt;
+
+&lt;p&gt;这几天有幸因为台湾主办方和国内著名出品人史海峰的邀请前去台湾进行了技术交流。这次技术交流一方面让台湾那边了解目前国内互联网行业的一些技术和状态，另外一方面也让我们可以更加了解台湾互联网技术方面的情况。&lt;/p&gt;
+
+&lt;p&gt;毕竟是来交流技术的，所以先说一下我们这次两岸技术交流的情况和我对于这次交流的一些心得和体会。&lt;/p&gt;
+
+&lt;h2 id=&quot;技术交流&quot;&gt;技术交流&lt;/h2&gt;
+
+&lt;p&gt;从技术交流的现场来说，台湾的技术交流场面很火爆。基本上座无虚席，还有没有抢到主会场的只能看直播。但架构场相对就没有那么理想了，原因后面会讲到。火爆的会场如图：
+&lt;img src=&quot;7.jpeg&quot; alt=&quot;交流现场&quot; /&gt;
+台湾目前的互联网技术水平和国内相比，说句实话：相差的有点远。在台湾，大多数的工程师都是FullStack类型，并不像是国内的互联网行业：不想当架构师的程序员不是好程序员。而且台湾的技术工作分工也没有国内细分的详细。在台湾最受欢迎的是前端，并不是架构师等后端职位。我们在架构场开讲的时候做过几个调查：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;在座的有多少个是写后端的？举手的只有3个左右，当然我们说的是纯后端。&lt;/li&gt;
+  &lt;li&gt;这里有多少个title或者日常工作是架构师？ 举手的只有1个。追问：用什么语言？答：python。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;而我在交流的时候也问了几个问题，有技术也有业务：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;看网络小说的有多少？大概有20个人左右，人还是挺多的；&lt;/li&gt;
+  &lt;li&gt;知道阅文集团/起点/腾讯文学任何一家的？前面举手的大概都知道。这里有个情况，其实我们的一些作品有在台湾播放电视剧，我注意一下台湾的电视台，我至少看见有3部：花千骨，芈月传，甄嬛传在播出。后来打听了一下，甄嬛传几乎被当成了“当时内地的还珠格格那种热度”在台湾播出。对我们来说，这个市场还是很大的；&lt;/li&gt;
+  &lt;li&gt;技术上就又不一样了，比如讲分库分表和数据路由的时候，基本上下面是一片懵逼。在讲到后面调度系统的时候，quartz这个东西只有3个人听过，cron表达式也只有5个人听过；我调查了一下，写过定时任务的一个都没有。我就有点纳闷：他们的网站难道没有定时任务需要处理吗？&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我们几个讲师其实也挺费劲，会前讨论应该怎么样让他们听的懂我们在讲什么？会后我们还是在讨论为什么出现这个情况，后来我们总结了一下，主要归结如下：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;用户。台湾一共2200w人，内地15亿。没有用户量爆发式增长，所以很多问题都碰不到，他们也就不用解决，像我们陈老师演讲的时候说，我们一开始规划下来需要26个数据库，马上下面的留言板上说，26个数据库，太庞大了，囧；&lt;/li&gt;
+  &lt;li&gt;必要性。按照目前的机器硬件配置，在没有爆发式增长的情况下，没有架构也好，不要后端也罢，只要会写代码，拉几个开源的就可以上了。可能缓存都用不了，不要说什么读写分离、分库分表这些东西了；&lt;/li&gt;
+  &lt;li&gt;国外的冲击。米国的互联网台湾都可以用，想fb，google这些都可以，畅通无阻，那么社交他们也主要用line，所以台湾根本没有自主的互联网企业和软件。在“5分钟演讲”环节，有个台湾本地哥们提出来一个问题：台湾有名的软件公司有哪个？只回答了一个“趋势科技”就没了，互联网技术公司一个都没有；&lt;/li&gt;
+  &lt;li&gt;重视前端。因为碰不到用户量和数据量的关系，又因为大部分东西都是用国外的，所以剩下的能做的就没几样了。你不做前端做什么呢？&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;台湾的互联网技术除了这些之外，还有几个特点：&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;脚本语言占大多数。我们在场内看到的最多的开发者是用nodejs，再下面就是go之类的新兴语言，也有python之类的脚本。但是国内很多互联网公司喜欢用的java，c/cxx这些语言在这里已经绝迹；&lt;/li&gt;
+  &lt;li&gt;拼凑。几乎所有的开发都是用了开源的组件拼拼凑凑起来的。印象比较深的是一个哥们讲微服务，然而他并没有去讲微服务怎么怎么实现，而是讲了用了什么什么框架，什么什么组件，在什么什么上，搭起来了。就是那种纯粹的堆积木。我不知道如果这要是放在内地，会不会出去了要挨揍；&lt;/li&gt;
+  &lt;li&gt;追新。什么新用什么，不会管这个新的东西到底怎么样，是不是适合，这些好像他们不太会去考虑。上面说到的开源使用，有一些就是觉得为了使用而使用，为了体现我们这个东西是多么的新潮，使用了多么cool的新技术就去使用了，而不会去规划和思考底层的问题；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这次的技术交流，对于我们内地来的讲师来说，最感同身受的是：&lt;strong&gt;我们的互联网技术确实已经起来了。说句大话，对手可能只有一个了，剩下的都是渣渣！&lt;/strong&gt;&lt;br /&gt;
+对于台湾技术来说，要想真的提高，必须也要从商业模式和底层技术开始寻找出路，有了良好的商业模式，有用户开始喜欢使用你们的产品了，自然而然的对一些后端的技术会有更高的要求。技术自然就会跟着起来了。但就从现阶段来看，目前的台湾就像我们在10年前、20年前看硅谷一样：一切都是那么的新奇、牛逼闪闪而高高在上。&lt;/p&gt;
+
+&lt;h2 id=&quot;台大&quot;&gt;台大&lt;/h2&gt;
+
+&lt;p&gt;说完演讲正事，再说一下这次的举办场地。主办发选择了台湾大学的社科院作为举办场地让我受宠若惊。第一次站在学术氛围浓厚的大学进行演讲，难免还是有点紧张。演讲之余我们几个大陆来台的讲师也在台大转了一下，我有几个体会：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;台大的校门很低调，低调到如果是在路上走，你可能会根本没在意它的存在。
+&lt;img src=&quot;2.jpeg&quot; alt=&quot;台大校门&quot; /&gt;
+只有走进了看，才能看清楚上面的字。
+&lt;img src=&quot;1.jpeg&quot; alt=&quot;台大校门详细&quot; /&gt;
+怎么说台大也是出了很多名人的地方，不管是政治届、娱乐圈、工商界、科技界还是学术界，名人都是大把大把的不缺。但是这个校门真的太低调；&lt;/li&gt;
+  &lt;li&gt;台大内部给我的感觉就像是一个缩小版的东京大学，不管是建筑风格、院系设置还是人文情怀，几乎都是照搬东大而来（PS：后来认识了一个导游哥们，他说台大以前叫帝国大学，是在日本占据台湾的时候兴建的，后来国军入台后才改名台大。回去一查，果然前几任校长都是日本人）。
+&lt;img src=&quot;3.jpeg&quot; alt=&quot;图书馆&quot; /&gt;
+&lt;img src=&quot;4.jpeg&quot; alt=&quot;台大校门详细&quot; /&gt;
+这是国内的电子信息工程系，这里的名字叫什么来着，忘记了，反正挺长而且挺繁琐。
+&lt;img src=&quot;5.jpeg&quot; alt=&quot;电子信息工程系&quot; /&gt;
+没记错的话应该是日本留学生或者是日本留学生留下的一个雕塑作品（PS：这里可能记不太清了。这个雕塑还有一个是草地上的建筑模型，这两个不知道哪个的作者是日本人了。有点健忘，不好意思）
+&lt;img src=&quot;6.jpeg&quot; alt=&quot;地标：阅读的小女孩&quot; /&gt;
+这个是台大的图腾。一个钟。上面写着：一天其实只有21个小时，另外3个小时是用来……
+&lt;img src=&quot;8.jpeg&quot; alt=&quot;台大的图腾&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;彩蛋&quot;&gt;彩蛋&lt;/h2&gt;
+&lt;p&gt;程序员就是程序员，会后主办方安排我们去领略了一下台湾当地的风俗人情。其中有个放天灯的环节，一般人在天灯上无非都留下些什么“身体健康”，“全家幸福”，“xxx爱你一辈子”这种的话。只有我们程序员的天灯是那么的与众不同：&lt;/p&gt;
+
+&lt;p&gt;hello world。其实这个不是我写的，虽然拍的是我。我写的是 root#:rm -rf /
+&lt;img src=&quot;9.jpeg&quot; alt=&quot;hello world&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;来自前端兄弟的javascript是世界上最好的语言。其实我是想用c反驳的，但是家伙狡猾狡猾的，全写满了，不给机会！
+&lt;img src=&quot;10.jpeg&quot; alt=&quot;javascript是世界上最好的语言&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;58沈大师的“当场面试”–快排算法。可惜最后“一致不怀好意的”判定有两个问题：第一个，函数没写全，编译不通过；第二个，递归漏写了退出条件，CPU100%。
+&lt;img src=&quot;11.jpeg&quot; alt=&quot;快排&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;主办方和我们架构场的讲师们
+&lt;img src=&quot;12.jpeg&quot; alt=&quot;我们架构场的讲师&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这是我们大陆的所有讲师在101大楼，101大楼发生了很多故事，但是只能发这一张了。大陆讲师就缺钟恒了，家伙跑出去单独行动了，目的比较可疑。
+&lt;img src=&quot;13.jpeg&quot; alt=&quot;我们讲师&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 13 Aug 2017 00:00:00 +0800</pubDate>
+        <link>http://www.94geek.com/blog/2017/taiwan-ithome/</link>
+        <guid isPermaLink="true">http://www.94geek.com/blog/2017/taiwan-ithome/</guid>
+      </item>
+    
+      <item>
         <title>网络read函数未判返回0导致CPU 100%</title>
         <description>&lt;p&gt;我们的“运维小帅哥”又来烦我们了！没事就在群里给我们post了一张图，如下：&lt;/p&gt;
 
@@ -4735,86 +4822,6 @@ A data structure that describes interest in certain events. Watchers need to be 
         <pubDate>Mon, 29 May 2017 00:00:00 +0800</pubDate>
         <link>http://www.94geek.com/blog/2017/libev-manual-zh-cn/</link>
         <guid isPermaLink="true">http://www.94geek.com/blog/2017/libev-manual-zh-cn/</guid>
-      </item>
-    
-      <item>
-        <title>我认为更好的管理github pages blog</title>
-        <description>&lt;p&gt;使用jekyll也有好几年了，说实话其实jekyll + markdown的方式真的没有cnblogs等这种专门的平台来的方便。至少纯粹从写blog的角度出发，在目前的互联网用户体验大环境下，冷静思考这种方式，真的挺差。&lt;/p&gt;
-
-&lt;p&gt;以前，在改blog风格之前，因为没有使用jekyll的plugins，所以我还是启用了github pages服务的jekyll服务。但是这次因为图片管理的这个plugin，已经不能再启用github pages的jekyll服务了（因为github禁止第三方的plugins），所以只能启用直接嵌入静态文件的方式来执行。那么问题就来了，整个站点的site是目录和站点的原信息目录，到底怎么解决它们之间的问题？&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;更多的做法&quot;&gt;更多的做法&lt;/h3&gt;
-
-&lt;p&gt;我也搜了一下，更多的做法是这样的：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;在github上开一个project作为pages服务的project；&lt;/li&gt;
-  &lt;li&gt;在这个project上开启一个分支gh-pages，因为这是github默认的blog服务分支；&lt;/li&gt;
-  &lt;li&gt;当你写blog的时候，checkout到master分支，然后开始写，写完后build；&lt;/li&gt;
-  &lt;li&gt;checkout到gh-pages分支，将master中的site目录合并到当前分支；&lt;/li&gt;
-  &lt;li&gt;commit gh-pages分支，再commit master分支；&lt;/li&gt;
-  &lt;li&gt;结束&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;这也是一种办法，但是对于我来说受不了的是：一个目录中文件有冲突。一个文件夹存在了多个功能，区分这些功能的办法竟然是我们使用git的分支来达到目的。虽然这样也可以，但并不能有效的去解决一个问题，或者说我一直要check一个问题：就是我当前到底在哪个分支下？显然，对于有神经质的我来说，这种办法明显不切实际。&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;我喜欢的办法&quot;&gt;我喜欢的办法&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;一个目录就一个用处，多个功能我宁愿开多个目录；&lt;/li&gt;
-  &lt;li&gt;不要把功能都合并到一起，显然这样在日常维护中很难执行，能分即分开；&lt;/li&gt;
-  &lt;li&gt;做事的流程要分开，比如我写blog的时候，我就只要照顾到写blog就可以了，当我准备发布的时候，我只要照顾到发布就可以了。两者之间不要切换来切换去；&lt;/li&gt;
-  &lt;li&gt;自动化，比如发布，最好是一个脚本直接搞定；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;所以我重新设计了一种办法：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;将上面的一个文件夹管理一个blog的方式直接换成2个文件夹，一个只管source的源信息目录，一个管理静态站点，也就是元信息build后生成的site的文件夹；&lt;/li&gt;
-  &lt;li&gt;因为blog本质上变成了2个文件夹，所以github上也直接申请两个project，一一对应；&lt;/li&gt;
-  &lt;li&gt;调试blog可以在source中进行，source中完成后，cp其中的site目录到我们的静态站点目录；&lt;/li&gt;
-  &lt;li&gt;直接commit两个project到github即可；&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;所以有了这样的一个流程脚本：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd 94geek #切换到静态站点proejct
-git checkout gh-pages #确保目前在gh-pages分支，github只支持这个分支
-cd ../source/ #切换到源目录
-rm -rf  _site #删除上一次的site目录
-jekyll build #编译当前的source
-cp -rf _site/* ../94geek/  #cp当前次生成的site到静态project
-git add ./ #加入更新的blog
-git status #查看一下当前的状态对不对
-git commit -am&quot;upload log&quot; #提交，这里信息被写死了，其实你可以使用参数来指定
-git push #同步到github
-cd ../94geek #切换到静态project
-git add ./ #加入新增的blog静态文件
-git status #查看当前静态project的状态
-git commit -am&quot;update blog&quot; #提交
-git push #同步
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;将这个文件放入静态project和source同等级目录下，每次写完blog后只要简单的执行这个脚本即可。&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
-
-&lt;p&gt;这种方式有几个好处：&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;清晰：目录和功能各司其职；&lt;/li&gt;
-  &lt;li&gt;简单：写blog和发布没有任何的确认，其实只要管理好source就可以了，别的都是自动执行；&lt;/li&gt;
-  &lt;li&gt;统一：写blog和发布blog不混乱，各管各的，不需要分心来处理；&lt;/li&gt;
-&lt;/ol&gt;
-
-</description>
-        <pubDate>Sun, 28 May 2017 00:00:00 +0800</pubDate>
-        <link>http://www.94geek.com/blog/2017/mgr-blog/</link>
-        <guid isPermaLink="true">http://www.94geek.com/blog/2017/mgr-blog/</guid>
       </item>
     
   </channel>
