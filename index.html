@@ -18,7 +18,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS Feed for 94geek.com" href="/feed.xml" />
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="/css/pixyll.css?201712241014" type="text/css">
+    <link rel="stylesheet" href="/css/pixyll.css?201803101540" type="text/css">
 
     <!-- Fonts -->
     
@@ -132,6 +132,23 @@
     <div class="posts">
       
         <div class="post py3">
+          <p class="post-meta">2018-03-10</p>
+          <a href="/blog/2018/vagrant-disk/" class="post-link"><h3 class="h1 post-title"> 扩展vagrant磁盘映像</h3></a>
+          <span class="post-summary">
+            
+              <p>事情的起因是安装llvm+clang的时候一直不成功。提示说没有磁盘空间了。因为制作vagrant的box的时候，我选择的是自动扩展虚拟磁盘，所以也没有往磁盘真的没有了这个问题上想。还以为编译的时候有些operation没有选对，捣鼓了一阵子。后来执行了一下df才发现vagrant中的虚拟磁盘竟然真的不够用了。这至少告诉我们2个问题：</p>
+<ol>
+  <li>vagrant不能自动扩展磁盘；</li>
+  <li>使用vagrant制作的vbox的映像不能继承原来vbox中的设置；      <br />
+那怎么样才能让vagrant中的磁盘映像扩大呢？</li>
+</ol>
+
+
+            
+          </span>
+        </div>
+      
+        <div class="post py3">
           <p class="post-meta">2017-12-23</p>
           <a href="/blog/2017/wechat-image/" class="post-link"><h3 class="h1 post-title"> 全自动无手工干预实现“朋友圈@微信官方头像添加圣诞帽”的解决方案</h3></a>
           <span class="post-summary">
@@ -241,18 +258,6 @@
           <span class="post-summary">
             
               <p>随着上一篇介绍Chaos的文章推送，最近有好几家公司或者项目负责人联系我，准备在生产环境中使用Chaos，所以也会经常被问到一些问题。这里我总结了一下经常会被问到的几个问题，给大家做一个统一的回答吧！</p>
-
-
-            
-          </span>
-        </div>
-      
-        <div class="post py3">
-          <p class="post-meta">2017-06-27</p>
-          <a href="/blog/2017/gdb-stacksize/" class="post-link"><h3 class="h1 post-title">gdb线上crash调试-记一次装逼失败的教训</h3></a>
-          <span class="post-summary">
-            
-              <p>可惜这是一次完完全全的装逼不成反被X的典型例子。</p>
 
 
             
