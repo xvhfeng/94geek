@@ -37,7 +37,7 @@
   </li>
   <li>
     <p>报错提示“格式不支持执行的操作”。但是找了半天，都说vmdk格式也可以动态扩展大小，但是不知道为什么VBoxManage不支持（HEI：难道是因为vmdk是vmware标准格式？）。但是VBoxManage命令支持vdi格式(HEI：vdi是vbox私有的格式。)。那就把vmdk格式转换成vdi吧！还是使用VBoxManage命令：
- <code class="highlighter-rouge">VBoxManage clonehd /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vmdk /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vdi --format VDI</code>  <br />
+ <code class="highlighter-rouge">VBoxManage clonehd /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vmdk   /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vdi --format VDI</code>  <br />
  转换成功，结果如图所示：  <br />
   <img src="vbox-disk-cast.png" alt="box-disk-cast" /></p>
   </li>
@@ -67,14 +67,21 @@
     <p>把新扩展的磁盘大小给加上去。还是使用fdisk命令：
  <code class="highlighter-rouge">fdisk /dev/sda</code>  <br />
  沿着命令，一路根据提示，输入：
- <code class="highlighter-rouge">n </code>{new partition}   <br />
-` p<code class="highlighter-rouge"><span class="w"> </span><span class="p">{</span><span class="err">primary</span><span class="w"> </span><span class="err">partition</span><span class="p">}</span><span class="w">
- </span></code>3<code class="highlighter-rouge"><span class="w"> </span><span class="p">{</span><span class="err">partition</span><span class="w"> </span><span class="err">number</span><span class="p">}</span><span class="w">
- </span><span class="p">[</span><span class="err">提示修改大小，默认直接回车</span><span class="p">]</span><span class="w">
- </span></code>t <code class="highlighter-rouge"><span class="p">{</span><span class="err">change</span><span class="w"> </span><span class="err">partition</span><span class="w"> </span><span class="err">id</span><span class="p">}</span><span class="w">
-</span></code> 3<code class="highlighter-rouge"><span class="w"> </span><span class="p">{</span><span class="err">partition</span><span class="w"> </span><span class="err">number</span><span class="p">}</span><span class="w">
- </span></code>8e<code class="highlighter-rouge"><span class="w"> </span><span class="p">{</span><span class="err">Linux</span><span class="w"> </span><span class="err">LVM</span><span class="w"> </span><span class="err">partition</span><span class="p">}</span><span class="w">
- </span></code>w`
+ <code class="highlighter-rouge">n </code>{new partition}</p>
+
+    <p><code class="highlighter-rouge"> p</code> {primary partition}</p>
+
+    <p><code class="highlighter-rouge">3</code> {partition number}</p>
+
+    <p>[提示修改大小，默认直接回车]</p>
+
+    <p><code class="highlighter-rouge">t</code>{change partition id}</p>
+
+    <p><code class="highlighter-rouge"> 3</code> {partition number}</p>
+
+    <p><code class="highlighter-rouge">8e</code> {Linux LVM partition}</p>
+
+    <p><code class="highlighter-rouge">w</code>     <br />
  如图所示：
   <img src="fdisk-operator.png" alt="fdisk-operator" /></p>
   </li>
