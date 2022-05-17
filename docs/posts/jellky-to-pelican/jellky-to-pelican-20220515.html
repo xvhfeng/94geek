@@ -321,6 +321,12 @@ pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</sp
 
 <p>来看一下具有主题,能实现文件管理的blog了.</p>
 <h2>与github page服务结合</h2>
+<p>与github page的结合就就相对简单了.只要在github上开一个pages的服务,然后把我们的文章签入就可以了.这里要说一下,以前的pages服务也不知道是我没注意呢?还是没有相对的功能.原来的pages服务只能是从gh-pages这个分支下去支持服务,所以就搞的很麻烦.要先在本地通过blog的source生成一遍html,然后再把生成的html签入github,但是因为分支的原因,你的source和生成的html文件还得分开处理.所以像我怕麻烦的就是直接索性开了两个仓库,一个存放blog的source一个用来做pages服务.但是这次去看了一下设置,发现pages可以通过gh-pages(也有可以选择master分支的,没试,也行也可以)分支的docs目录来提供服务.这样就方便多了,可以把source放在仓库的根目录下,本机生成的html定位到docs目录,这样只要一次提交就可以把所有的东西全部提交到github,方便多了!</p>
+<h2>总结</h2>
+<p>至此,我们的blog迁移完成了,总体来说不难,中间碰到的问题也不多.而且就算是碰到了,也是很方便快速的解决了.pelican用了几次发现比jekyll方便多了,并且得益于python具有的venv功能,环境也干净了很多,目前在迁移和使用的过程中并没有发生像jekyll这样需要花很长时间去处理环境的问题.所以这一点还是比较满意的.</p>
+<p>虽然整个blog的写作和处理的方式和以前差不多,当pelican提供了还是相比jekyll更符合我的某些特殊爱好的功能,所以也个适合我一点吧!以后blog应该会一直使用pelican管理下去了,jekyll应该是不会再用了!</p>
+<p>Bye Bye,Jekyll!
+Hello, Pelican!</p>
     </article>
 
         <div class="tags">
