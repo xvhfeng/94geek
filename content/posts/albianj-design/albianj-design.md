@@ -1,11 +1,16 @@
 Title: 腾讯文学内容中心分布式统一框架的设计与实现
-Date: 2022-05-14
+Date: 2015-11-05
 Category: 架构设计
 Tags: 架构设计 java
 Slug: albianj-design
 Author: spk xu
 Status: published
-
+Summary: 我们设计并开发了内容中心统一的分布式开发框架。我们把它取名为albian，
+albian是基于java的（故以下简称albianj）。他主要是面向海量数据处理、海
+量数据访问、并解决互联网开发中经常会碰到的数据海量增长问题，也一并解决
+互联网开发团队中，开发人员的水平参差不齐的问题。albianj还应当具有良好
+的伸缩性和可定制性。他设计并且运行在简单的web容器中，比如tomcat或者是jetty，也可以运行在application类型的应用中，
+但是它依然提供了企业级开发应该具备的一切效能。
 
 ### 摘要  
 我们设计并开发了内容中心统一的分布式开发框架。我们把它取名为albian，

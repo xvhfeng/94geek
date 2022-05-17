@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>使用bit解决跳位问题</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="/theme/css/code_blocks/github.css" rel="stylesheet">
+
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="使用二进制的玩法来解决目录的问题,觉得挺有意思,记录一下!">
+
+        <meta name="author" content="spk xu">
+
+        <meta name="tags" content="技术">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="大嘴的嘴bu大">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="/author/spk-xu.html">
+	<meta property="og:url" content="/posts/bit/bit-20140904.html">
+	<meta property="og:title" content="使用bit解决跳位问题">
+	<meta property="article:published_time" content="2014-09-04 00:00:00+08:00">
+            <meta property="og:description" content="使用二进制的玩法来解决目录的问题,觉得挺有意思,记录一下!">
+
+            <meta property="og:image" content="/theme/images/post-bg.jpg">
+</head>
+
+<body class="article-bit">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">94geek.com</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/pages/about.html">About</a></li>
+                        <li><a href="/pages/sharing.html">Sharing</a></li>
+                        <li><a href="/pages/follow.html">Follow</a></li>
+                        <li><a href="/files/linuxc/main.htm" target="_blank">Linux C函数</a></li>
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('/theme/images/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>使用bit解决跳位问题</h1>
+                        <span class="meta">Posted by
+                                <a href="/author/spk-xu.html">spk xu</a>
+                             on Thu 04 September 2014
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <h4>背景</h4>
+<p>近期一直在做DFS的开发工作，在开发工作中碰到一个"跳目录"的问题。其实就是递增目录
+的情况.  </p>
+<p>具体是这样的，
+首先我们的DFS（名字叫ydb，一下就称ydb吧。）也就是ydb会对每个配置的挂载点进行格
+式化。这个格式化其实就是建立文件夹。文件夹的数量(一下简称storerooms）是可配置的，比如你可以配置成64
+也可以配置成128或者任何一个你想要的数，但是最大不能超过256(其实是255，0-FF）.那么ydb就会对每个挂
+载点进行一次storeromes*storerooms的文件夹建立，最后文件夹的呈现这样一个情况：<br>
+<img alt="dirs-style" src="dirs.png"><br>
+在ydb中，每个文件夹保存的文件数也是可以配置的（配置项为storecount），只要文件
+夹内的文件存储量达到storecount，那么下一个文件将会存入下一个文件夹，比如当前存
+储在00/03文件夹，那么下一次就会存储到00/04，如果storerooms为256，那么如果当前
+文件夹为00/FF，那么下一次将会01/00（其实就是会跳母文件夹）。<br>
+其实就是这个跳文件夹的功能，怎么样才能解决问题？  </p>
+<h4>解决方案</h4>
+<p>为了方便里面，我们把前面的p1设成母文件夹，p2设成子文件夹，就是这样p1/p2。  </p>
+<h5>人类的代码</h5>
+<p>人类能理解的代码呢，基本上就是按部就班的解决这个问题，思路是这样的：<br>
+1. 判断p2+1 是不是等于storerooms，如果没有，那就+1；<br>
+2. 如果等于storerooms，那么p2归零，p1+1；<br>
+3. 判断p1+1后是不是等于storerooms，如果不是，那么正常执行，如果是，那么p1，p2.<br>
+全部归零，从头开始；或者根据mp的负载均衡配置，决定存储的mp。<br>
+代码大概就是这样的；<br>
+{% highlight c linenos %}
+if(storerooms == p2 + 1){
+    p2 = 0;
+    if(storerooms == p1 + 1){
+        p1 = 0 ;
+        //insert get mp by storemode
+    } else {
+        p1 += 1;
+    }
+}else{
+    p2 += 1;
+}
+    {% endhighlight %}
+这样勉强还算能看的下去，是吧？但是总归让人感觉不是很舒服，层级太多，判断太多了
+，那么我们来一种计算机喜欢的方式。  </p>
+<h5>计算机喜欢的代码</h5>
+<p>这里我们使用了一个技巧，就是char和int之间的关系。<br>
+<img alt="int" src="int.jpg"><br>
+如上图，一个int在内存中是4个byte，一个byte的最大值正好是255.完全符合我们的
+storerooms的最大值。那么也就是说p1,p2是一个int的2个byte(分别为
+        p2-&gt;byte0,p1-&gt;byte1,flag-&gt;byte2)，而且如果我们的最大值
+正好设定为255，那么我们连跳级都不用了，直接就已经内置了（因为p2达到255，再加1
+，正好向p1加1，p2归0）。所以我们就有如下的算法：<br>
+{% highlight c linenos %}
+u32_t total = 0;
+u8_t flag = 0;
+total = p1 &lt;&lt; 8 | p2;
+total++;
+flag = total &gt;&gt; 16 &amp; 0xFF;
+p1 = total &gt;&gt; 8 &amp; 0xFF;
+p2 = total &amp; 0xFF;
+if(c-&gt;storerooms == p2){
+    p1++;
+    p2 = 0;
+}
+if(c-&gt;storerooms == p1){
+    flag = 1;
+    p1 = 0;
+}
+    {% endhighlight %}
+解释一下：<br>
+1. 首先，我们需要一个u32的临时变量，所有的数据都是在它内部变的；<br>
+2. flag就是是不是需要重新获取mp或者说该mp下所有的目录都放满的标志；<br>
+3. 把p1和p2根据位置压入u32的临时变量，然后直接对这个变量+1；<br>
+4. 再把u32的变量分解成flag，p1和p2；<br>
+5. 然后判断母子目录要不要跳；<br>
+6. 最后根据flag，决定是否需要重新确定存储mp。</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="/tag/ji-zhu.html">技术</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://github.com/xvhfeng" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:xvhfeng@126.com">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  spk xu
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="/theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
