@@ -138,317 +138,331 @@ ub的root环境下，chrome无法启动，所以必须得给它加一个脚本�
 参数，就可以了。<br>
 <code># /bin/bash
     google-chrome \-\-user-data-dir=/root/.config/google-chrome &amp;</code></li>
-<li>
-<p>awesome<br>
+<li>awesome<br>
 安装awesome<br>
 <code>bash
     apt-get install awesome</code>
 awesome在/etc/下有一个文件夹是有它的配置文件的，awesome的配置文件使用lua写的，
-个人的配置文件如下：  </p>
-<p>:::lua
--- Standard awesome library
-require("awful")
-require("awful.autofocus")
-require("awful.rules")
--- Theme handling library
-require("beautiful")
--- Notification library
-require("naughty")
--- Load Debian menu entries
-require("debian.menu")</p>
-<p>-- Themes define colours, icons, and wallpapers
-beautiful.init("/usr/share/awesome/themes/default/theme.lua")</p>
-<p>-- This is used later as the default terminal and editor to run.
-terminal = "x-terminal-emulator"
-editor = os.getenv("EDITOR") or "editor"
-editor_cmd = terminal .. " -e " .. editor</p>
-<p>-- Default modkey.
--- Usually, Mod4 is the key with a logo between Control and Alt.
--- If you do not like this or do not have such a key,
--- I suggest you to remap Mod4 to another key using xmodmap or other tools.
--- However, you can use another modifier like Mod1, but it may interact with others.</p>
-<p>modkey = "Mod4"
---modkey = "alt"</p>
-<p>-- Table of layouts to cover with awful.layout.inc, order matters.
-layouts =
-{
-    awful.layout.suit.floating,
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
-    awful.layout.suit.max,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier
-}</p>
-<p>-- Define a tag table which hold all screen tags.
-tags = {}
-for s = 1, screen.count() do
-    -- Each screen has its own tag table.
-    tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[2])
-end</p>
-<p>-- Create a laucher widget and a main menu
-myawesomemenu = {
-    { "manual", terminal .. " -e man awesome" },
-    { "edit config", editor_cmd .. " " .. awful.util.getdir("config") .. "/rc.lua" },
-    { "restart", awesome.restart },
-    { "quit", awesome.quit }
-}</p>
-<p>mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-{ "Linux", debian.menu.Debian_menu.Debian },
-{ "shell", terminal },
-                }
-            })
-mylauncher = awful.widget.launcher({ image = image(beautiful.awesome_icon),
-menu = mymainmenu })</p>
-<p>-- Create a textclock widget
-mytextclock = awful.widget.textclock({ align = "right" })
--- Create a systray
-mysystray = widget({ type = "systray" })
--- Create a wibox for each screen and add it
-mywibox = {}
-mypromptbox = {}
-mylayoutbox = {}
-mytaglist = {}
-mytaglist.buttons = awful.util.table.join(
-awful.button({ }, 1, awful.tag.viewonly),
-awful.button({ modkey }, 1, awful.client.movetotag),
-awful.button({ }, 3, awful.tag.viewtoggle),
-awful.button({ modkey }, 3, awful.client.toggletag),
-awful.button({ }, 4, awful.tag.viewnext),
-awful.button({ }, 5, awful.tag.viewprev)
-)
-mytasklist = {}
-mytasklist.buttons = awful.util.table.join(
-awful.button({ }, 1, function (c)
-    if not c:isvisible() then
-        awful.tag.viewonly(c:tags()[1])
-    end
-    client.focus = c
-    c:raise()
-end),
-awful.button({ }, 3, function ()
-    if instance then
-        instance:hide()
-        instance = nil
-    else
-        instance = awful.menu.clients({ width=250 })
-    end
-end),
-awful.button({ }, 4, function ()
-    awful.client.focus.byidx(1)
-    if client.focus then client.focus:raise() end
-end),
-awful.button({ }, 5, function ()
-    awful.client.focus.byidx(-1)
-    if client.focus then client.focus:raise() end
-end))</p>
-<p>for s = 1, screen.count() do
-    -- Create a promptbox for each screen
-    mypromptbox[s] = awful.widget.prompt({ layout = awful.widget.layout.horizontal.leftright })
-    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
-    mylayoutbox[s] = awful.widget.layoutbox(s)
-    mylayoutbox[s]:buttons(awful.util.table.join(
-    awful.button({ }, 1, function () awful.layout.inc(layouts, 1) end),
-    awful.button({ }, 3, function () awful.layout.inc(layouts, -1) end),
-    awful.button({ }, 4, function () awful.layout.inc(layouts, 1) end),
-    awful.button({ }, 5, function () awful.layout.inc(layouts, -1) end)))
-    -- Create a taglist widget
-    mytaglist[s] = awful.widget.taglist(s, awful.widget.taglist.label.all, mytaglist.buttons)
-    -- Create a tasklist widget
-    mytasklist[s] = awful.widget.tasklist(function(c)
-        return awful.widget.tasklist.label.currenttags(c, s)
-    end, mytasklist.buttons)
-    -- Create the wibox
-    mywibox[s] = awful.wibox({ position = "top", screen = s })
-    -- Add widgets to the wibox - order matters
-    mywibox[s].widgets = {
-        {
-            mylauncher,
-            mytaglist[s],
-            mypromptbox[s],
-            layout = awful.widget.layout.horizontal.leftright
-        },
-        mylayoutbox[s],
-        mytextclock,
-        s == 1 and mysystray or nil,
-        mytasklist[s],
-        layout = awful.widget.layout.horizontal.rightleft
-    }
-end</p>
-<p>root.buttons(awful.util.table.join(
-awful.button({ }, 3, function () mymainmenu:toggle() end),
-awful.button({ }, 4, awful.tag.viewnext),
-awful.button({ }, 5, awful.tag.viewprev)
-))</p>
-<p>globalkeys = awful.util.table.join(
-awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
-awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
-awful.key({ modkey,           }, "Escape", awful.tag.history.restore),
-awful.key({ modkey,           }, "j",
-function ()
-    awful.client.focus.byidx( 1)
-    if client.focus then client.focus:raise() end
-end),
-awful.key({ modkey,           }, "k",
-function ()
-    awful.client.focus.byidx(-1)
-    if client.focus then client.focus:raise() end
-end),
-awful.key({ modkey,           }, "w", function () mymainmenu:show(true)        end),
--- Layout manipulation
-awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end),
-awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end),
-awful.key({ modkey,           }, ",", function () awful.screen.focus_relative( 1) end),
-awful.key({ modkey,           }, ".", function () awful.screen.focus_relative(-1) end),
-awful.key({ modkey,           }, "u", awful.client.urgent.jumpto),
-awful.key({ modkey,           }, "Tab",
-function ()
-    awful.client.focus.history.previous()
-    if client.focus then
-        client.focus:raise()
-    end
-end),
--- Standard program
-awful.key({ modkey,           }, "Return", function () awful.util.spawn(terminal) end),
-awful.key({ }, "XF86AudioRaiseVolume",    function () awful.util.spawn("amixer set Master 3+") end),
-awful.key({ }, "XF86AudioLowerVolume",    function () awful.util.spawn("amixer set Master 3-") end),
---define by myself
---              awful.key({ modkey,           }, "F11", function () awful.util.spawn("dmenu_run") end),
---awful.key({ modkey,           }, "v", function () awful.util.spawn("gnome-volume-control-applet") end),
---awful.key({ modkey,"Control"  }, "n", function () awful.util.spawn("nm-applet") end),
-awful.key({ modkey,         }, "x", function () awful.util.spawn("xlock") end),
-awful.key({ modkey, "Control" }, "r", awesome.restart),
-awful.key({ modkey, "Shift"   }, "q", awesome.quit),
-awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)    end),
-awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)    end),
-awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1)      end),
-awful.key({ modkey, "Shift"   }, "l",     function () awful.tag.incnmaster(-1)      end),
-awful.key({ modkey, "Control" }, "h",     function () awful.tag.incncol( 1)         end),
-awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1)         end),
-awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
-awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
--- Prompt
-awful.key({ modkey },            "r",     function () awful.util.spawn("dmenu_run") end)
-)</p>
-<p>clientkeys = awful.util.table.join(
-awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
-awful.key({ modkey,       }, "c",      function (c) c:kill()                         end),
-awful.key({ modkey, "Control" }, "space",  awful.client.floating.toggle                     ),
-awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
-awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
-awful.key({ modkey, "Shift"   }, "r",      function (c) c:redraw()                       end),
-awful.key({ modkey,           }, "n",      function (c) c.minimized = not c.minimized    end),
-awful.key({ modkey,           }, "m",
-function (c)
-    c.maximized_horizontal = not c.maximized_horizontal
-    c.maximized_vertical   = not c.maximized_vertical
-end)
-)</p>
-<p>-- Compute the maximum number of digit we need, limited to 9
-keynumber = 0
-for s = 1, screen.count() do
-    keynumber = math.min(9, math.max(#tags[s], keynumber));
-end
--- Bind all key numbers to tags.
--- Be careful: we use keycodes to make it works on any keyboard layout.
--- This should map on the top row of your keyboard, usually 1 to 9.
-for i = 1, keynumber do
-    globalkeys = awful.util.table.join(globalkeys,
-    awful.key({ modkey }, "#" .. i + 9,
-    function ()
-        local screen = mouse.screen
-        if tags[screen][i] then
-            awful.tag.viewonly(tags[screen][i])
-        end
-    end),
-    awful.key({ modkey, "Control" }, "#" .. i + 9,
-    function ()
-        local screen = mouse.screen
-        if tags[screen][i] then
-            awful.tag.viewtoggle(tags[screen][i])
-        end
-    end),
-    awful.key({"Control",       }, "#" .. i + 9,
-    function ()
-        if client.focus and tags[client.focus.screen][i] then
-            awful.client.movetotag(tags[client.focus.screen][i])
-        end
-    end),
-    awful.key({ modkey, "Control", "Shift" }, "#" .. i + 9,
-    function ()
-        if client.focus and tags[client.focus.screen][i] then
-            awful.client.toggletag(tags[client.focus.screen][i])
-        end
-    end))
-end
-clientbuttons = awful.util.table.join(
-awful.button({ }, 1, function (c) client.focus = c; c:raise() end),
-awful.button({ modkey }, 1, awful.mouse.client.move),
-awful.button({ modkey }, 3, awful.mouse.client.resize))
--- Set keys
-root.keys(globalkeys)</p>
-<p>awful.rules.rules = {
-    -- All clients will match this rule.
-    { rule = { },
-    properties = { border_width = beautiful.border_width,
-    border_color = beautiful.border_normal,
-    focus = true,
-    keys = clientkeys,
-    buttons = clientbuttons } },
-    { rule = { class = "MPlayer" },
-    properties = { floating = true } },
-    { rule = { class = "pinentry" },
-    properties = { floating = true } },
-    { rule = { class = "gimp" },
-    properties = { floating = true } },
-    -- Set Firefox to always map on tags number 2 of screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { tag = tags[1][2] } },
-}</p>
-<p>-- Signal function to execute when a new client appears.
-client.add_signal("manage", function (c, startup)
-    -- Add a titlebar
-    -- awful.titlebar.add(c, { modkey = modkey })
-    -- Enable sloppy focus
-    c:add_signal("mouse::enter", function(c)
-        if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-            and awful.client.focus.filter(c) then
-            client.focus = c
-        end
-    end)
-    if not startup then
-        -- Set the windows at the slave,
-        -- i.e. put it at the end of others instead of setting it master.
-        -- awful.client.setslave(c)
-        -- Put windows in a smart way, only if they does not set an initial position.
-        if not c.size_hints.user_position and not c.size_hints.program_position then
-            awful.placement.no_overlap(c)
-            awful.placement.no_offscreen(c)
-        end
-    end
-end)</p>
-<p>client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)</p>
-<p>awful.util.spawn_with_shell("nm-applet")
-awful.util.spawn_with_shell("gnome-sound-applet") --sine ubuntu 12.04.02
---awful.util.spawn_with_shell("gnome-volume-control-applet")
---            awful.util.spawn_with_shell("xautolock -time 10 -locker 'xlock -lockdelay 10'")
---                awful.util.run_once("xautolock -time 1 -locker 'xlock -lockdelay 1'")
-function run_once(cmd)
-    findme = cmd
-    firstspace = cmd:find(" ")
-    if firstspace then
-        findme = cmd:sub(0, firstspace-1)
-    end
-    awful.util.spawn_with_shell("pgrep -u $USER -x " .. findme .. " &gt; /dev/null || (" .. cmd .. ")")
-end
-run_once("xautolock -time 30 -locker 'xlock -lockdelay 30'");</p>
+个人的配置文件如下：  <div class="highlight"><pre><span></span><code><span class="c1">-- Standard awesome library</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;awful&quot;</span><span class="p">)</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;awful.autofocus&quot;</span><span class="p">)</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;awful.rules&quot;</span><span class="p">)</span>
+<span class="c1">-- Theme handling library</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;beautiful&quot;</span><span class="p">)</span>
+<span class="c1">-- Notification library</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;naughty&quot;</span><span class="p">)</span>
+<span class="c1">-- Load Debian menu entries</span>
+<span class="nb">require</span><span class="p">(</span><span class="s2">&quot;debian.menu&quot;</span><span class="p">)</span>
+
+<span class="c1">-- Themes define colours, icons, and wallpapers</span>
+<span class="n">beautiful</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;/usr/share/awesome/themes/default/theme.lua&quot;</span><span class="p">)</span>
+<span class="c1">-- This is used later as the default terminal and editor to run.</span>
+<span class="n">terminal</span> <span class="o">=</span> <span class="s2">&quot;x-terminal-emulator&quot;</span>
+<span class="n">editor</span> <span class="o">=</span> <span class="nb">os.getenv</span><span class="p">(</span><span class="s2">&quot;EDITOR&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;editor&quot;</span>
+<span class="n">editor_cmd</span> <span class="o">=</span> <span class="n">terminal</span> <span class="o">..</span> <span class="s2">&quot; -e &quot;</span> <span class="o">..</span> <span class="n">editor</span>
+
+<span class="c1">-- Default modkey.</span>
+<span class="c1">-- Usually, Mod4 is the key with a logo between Control and Alt.</span>
+<span class="c1">-- If you do not like this or do not have such a key,</span>
+<span class="c1">-- I suggest you to remap Mod4 to another key using xmodmap or other tools.</span>
+<span class="c1">-- However, you can use another modifier like Mod1, but it may interact with others.</span>
+<span class="n">modkey</span> <span class="o">=</span> <span class="s2">&quot;Mod4&quot;</span>
+<span class="c1">--modkey = &quot;alt&quot;</span>
+
+<span class="c1">-- Table of layouts to cover with awful.layout.inc, order matters.</span>
+<span class="n">layouts</span> <span class="o">=</span>
+<span class="p">{</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">floating</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">tile</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">tile</span><span class="p">.</span><span class="n">left</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">tile</span><span class="p">.</span><span class="n">bottom</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">tile</span><span class="p">.</span><span class="n">top</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">fair</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">fair</span><span class="p">.</span><span class="n">horizontal</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">spiral</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">spiral</span><span class="p">.</span><span class="n">dwindle</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">max</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">max</span><span class="p">.</span><span class="n">fullscreen</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">magnifier</span>
+<span class="p">}</span>
+<span class="c1">-- Define a tag table which hold all screen tags.</span>
+<span class="n">tags</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="kr">for</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">screen</span><span class="p">.</span><span class="n">count</span><span class="p">()</span> <span class="kr">do</span>
+    <span class="c1">-- Each screen has its own tag table.</span>
+    <span class="n">tags</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">({</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span> <span class="p">},</span> <span class="n">s</span><span class="p">,</span> <span class="n">layouts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="kr">end</span>
+
+<span class="c1">-- Create a laucher widget and a main menu</span>
+<span class="n">myawesomemenu</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span> <span class="s2">&quot;manual&quot;</span><span class="p">,</span> <span class="n">terminal</span> <span class="o">..</span> <span class="s2">&quot; -e man awesome&quot;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s2">&quot;edit config&quot;</span><span class="p">,</span> <span class="n">editor_cmd</span> <span class="o">..</span> <span class="s2">&quot; &quot;</span> <span class="o">..</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">getdir</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">)</span> <span class="o">..</span> <span class="s2">&quot;/rc.lua&quot;</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s2">&quot;restart&quot;</span><span class="p">,</span> <span class="n">awesome</span><span class="p">.</span><span class="n">restart</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span> <span class="n">awesome</span><span class="p">.</span><span class="n">quit</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">mymainmenu</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">menu</span><span class="p">({</span> <span class="n">items</span> <span class="o">=</span> <span class="p">{</span> <span class="p">{</span> <span class="s2">&quot;awesome&quot;</span><span class="p">,</span> <span class="n">myawesomemenu</span><span class="p">,</span> <span class="n">beautiful</span><span class="p">.</span><span class="n">awesome_icon</span> <span class="p">},</span>
+<span class="p">{</span> <span class="s2">&quot;Linux&quot;</span><span class="p">,</span> <span class="n">debian</span><span class="p">.</span><span class="n">menu</span><span class="p">.</span><span class="n">Debian_menu</span><span class="p">.</span><span class="n">Debian</span> <span class="p">},</span>
+<span class="p">{</span> <span class="s2">&quot;shell&quot;</span><span class="p">,</span> <span class="n">terminal</span> <span class="p">},</span>
+                <span class="p">}</span>
+            <span class="p">})</span>
+<span class="n">mylauncher</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">launcher</span><span class="p">({</span> <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="p">(</span><span class="n">beautiful</span><span class="p">.</span><span class="n">awesome_icon</span><span class="p">),</span>
+<span class="n">menu</span> <span class="o">=</span> <span class="n">mymainmenu</span> <span class="p">})</span>
+
+<span class="c1">-- Create a textclock widget</span>
+<span class="n">mytextclock</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">textclock</span><span class="p">({</span> <span class="n">align</span> <span class="o">=</span> <span class="s2">&quot;right&quot;</span> <span class="p">})</span>
+<span class="c1">-- Create a systray</span>
+<span class="n">mysystray</span> <span class="o">=</span> <span class="n">widget</span><span class="p">({</span> <span class="nb">type</span> <span class="o">=</span> <span class="s2">&quot;systray&quot;</span> <span class="p">})</span>
+<span class="c1">-- Create a wibox for each screen and add it</span>
+<span class="n">mywibox</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">mypromptbox</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">mylayoutbox</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">mytaglist</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">mytaglist</span><span class="p">.</span><span class="n">buttons</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewonly</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="n">modkey</span> <span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">movetotag</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewtoggle</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="n">modkey</span> <span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">toggletag</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">4</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewnext</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">5</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewprev</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">mytasklist</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">mytasklist</span><span class="p">.</span><span class="n">buttons</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">:</span><span class="n">isvisible</span><span class="p">()</span> <span class="kr">then</span>
+        <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewonly</span><span class="p">(</span><span class="n">c</span><span class="p">:</span><span class="n">tags</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="kr">end</span>
+    <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="n">c</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span>
+<span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span>
+    <span class="kr">if</span> <span class="n">instance</span> <span class="kr">then</span>
+        <span class="n">instance</span><span class="p">:</span><span class="n">hide</span><span class="p">()</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="kc">nil</span>
+    <span class="kr">else</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">menu</span><span class="p">.</span><span class="n">clients</span><span class="p">({</span> <span class="n">width</span><span class="o">=</span><span class="mi">250</span> <span class="p">})</span>
+    <span class="kr">end</span>
+<span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">4</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">byidx</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="kr">then</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span> <span class="kr">end</span>
+<span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">5</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">byidx</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="kr">then</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span> <span class="kr">end</span>
+<span class="kr">end</span><span class="p">))</span>
+
+<span class="kr">for</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">screen</span><span class="p">.</span><span class="n">count</span><span class="p">()</span> <span class="kr">do</span>
+    <span class="c1">-- Create a promptbox for each screen</span>
+    <span class="n">mypromptbox</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">prompt</span><span class="p">({</span> <span class="n">layout</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">horizontal</span><span class="p">.</span><span class="n">leftright</span> <span class="p">})</span>
+    <span class="c1">-- Create an imagebox widget which will contains an icon indicating which layout we&#39;re using.</span>
+    <span class="c1">-- We need one layoutbox per screen.</span>
+    <span class="n">mylayoutbox</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">layoutbox</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">mylayoutbox</span><span class="p">[</span><span class="n">s</span><span class="p">]:</span><span class="n">buttons</span><span class="p">(</span><span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">inc</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">inc</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">4</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">inc</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">5</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">inc</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">)))</span>
+    <span class="c1">-- Create a taglist widget</span>
+    <span class="n">mytaglist</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">taglist</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">taglist</span><span class="p">.</span><span class="n">label</span><span class="p">.</span><span class="n">all</span><span class="p">,</span> <span class="n">mytaglist</span><span class="p">.</span><span class="n">buttons</span><span class="p">)</span>
+    <span class="c1">-- Create a tasklist widget</span>
+    <span class="n">mytasklist</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">tasklist</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="kr">return</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">tasklist</span><span class="p">.</span><span class="n">label</span><span class="p">.</span><span class="n">currenttags</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+    <span class="kr">end</span><span class="p">,</span> <span class="n">mytasklist</span><span class="p">.</span><span class="n">buttons</span><span class="p">)</span>
+    <span class="c1">-- Create the wibox</span>
+    <span class="n">mywibox</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">wibox</span><span class="p">({</span> <span class="n">position</span> <span class="o">=</span> <span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="n">screen</span> <span class="o">=</span> <span class="n">s</span> <span class="p">})</span>
+    <span class="c1">-- Add widgets to the wibox - order matters</span>
+    <span class="n">mywibox</span><span class="p">[</span><span class="n">s</span><span class="p">].</span><span class="n">widgets</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">{</span>
+            <span class="n">mylauncher</span><span class="p">,</span>
+            <span class="n">mytaglist</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+            <span class="n">mypromptbox</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">horizontal</span><span class="p">.</span><span class="n">leftright</span>
+        <span class="p">},</span>
+        <span class="n">mylayoutbox</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+        <span class="n">mytextclock</span><span class="p">,</span>
+        <span class="n">s</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">mysystray</span> <span class="ow">or</span> <span class="kc">nil</span><span class="p">,</span>
+        <span class="n">mytasklist</span><span class="p">[</span><span class="n">s</span><span class="p">],</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">widget</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">horizontal</span><span class="p">.</span><span class="n">rightleft</span>
+    <span class="p">}</span>
+<span class="kr">end</span>
+
+<span class="n">root</span><span class="p">.</span><span class="n">buttons</span><span class="p">(</span><span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">mymainmenu</span><span class="p">:</span><span class="n">toggle</span><span class="p">()</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">4</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewnext</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">5</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewprev</span><span class="p">)</span>
+<span class="p">))</span>
+
+<span class="n">globalkeys</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;Left&quot;</span><span class="p">,</span>   <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewprev</span>       <span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;Right&quot;</span><span class="p">,</span>  <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewnext</span>       <span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;Escape&quot;</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">history</span><span class="p">.</span><span class="n">restore</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;j&quot;</span><span class="p">,</span>
+<span class="kr">function</span> <span class="p">()</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">byidx</span><span class="p">(</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="kr">then</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span> <span class="kr">end</span>
+<span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+<span class="kr">function</span> <span class="p">()</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">byidx</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="kr">then</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span> <span class="kr">end</span>
+<span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">mymainmenu</span><span class="p">:</span><span class="n">show</span><span class="p">(</span><span class="kc">true</span><span class="p">)</span>        <span class="kr">end</span><span class="p">),</span>
+<span class="c1">-- Layout manipulation</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;j&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">swap</span><span class="p">.</span><span class="n">byidx</span><span class="p">(</span>  <span class="mi">1</span><span class="p">)</span>    <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">swap</span><span class="p">.</span><span class="n">byidx</span><span class="p">(</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>    <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">screen</span><span class="p">.</span><span class="n">focus_relative</span><span class="p">(</span> <span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">screen</span><span class="p">.</span><span class="n">focus_relative</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">urgent</span><span class="p">.</span><span class="n">jumpto</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;Tab&quot;</span><span class="p">,</span>
+<span class="kr">function</span> <span class="p">()</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">history</span><span class="p">.</span><span class="n">previous</span><span class="p">()</span>
+    <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="kr">then</span>
+        <span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span>
+    <span class="kr">end</span>
+<span class="kr">end</span><span class="p">),</span>
+<span class="c1">-- Standard program</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;Return&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">terminal</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="p">},</span> <span class="s2">&quot;XF86AudioRaiseVolume&quot;</span><span class="p">,</span>    <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="s2">&quot;amixer set Master 3+&quot;</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="p">},</span> <span class="s2">&quot;XF86AudioLowerVolume&quot;</span><span class="p">,</span>    <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="s2">&quot;amixer set Master 3-&quot;</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="c1">--define by myself</span>
+<span class="c1">--              awful.key({ modkey,           }, &quot;F11&quot;, function () awful.util.spawn(&quot;dmenu_run&quot;) end),</span>
+<span class="c1">--awful.key({ modkey,           }, &quot;v&quot;, function () awful.util.spawn(&quot;gnome-volume-control-applet&quot;) end),</span>
+<span class="c1">--awful.key({ modkey,&quot;Control&quot;  }, &quot;n&quot;, function () awful.util.spawn(&quot;nm-applet&quot;) end),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>         <span class="p">},</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="s2">&quot;xlock&quot;</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span> <span class="p">},</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">awesome</span><span class="p">.</span><span class="n">restart</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;q&quot;</span><span class="p">,</span> <span class="n">awesome</span><span class="p">.</span><span class="n">quit</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">incmwfact</span><span class="p">(</span> <span class="mf">0.05</span><span class="p">)</span>    <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">incmwfact</span><span class="p">(</span><span class="o">-</span><span class="mf">0.05</span><span class="p">)</span>    <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">incnmaster</span><span class="p">(</span> <span class="mi">1</span><span class="p">)</span>      <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">incnmaster</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>      <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span> <span class="p">},</span> <span class="s2">&quot;h&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">incncol</span><span class="p">(</span> <span class="mi">1</span><span class="p">)</span>         <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span> <span class="p">},</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">incncol</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>         <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;space&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">inc</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span>  <span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;space&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">inc</span><span class="p">(</span><span class="n">layouts</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="kr">end</span><span class="p">),</span>
+<span class="c1">-- Prompt</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span> <span class="p">},</span>            <span class="s2">&quot;r&quot;</span><span class="p">,</span>     <span class="kr">function</span> <span class="p">()</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="s2">&quot;dmenu_run&quot;</span><span class="p">)</span> <span class="kr">end</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">clientkeys</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;f&quot;</span><span class="p">,</span>      <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">.</span><span class="n">fullscreen</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">c</span><span class="p">.</span><span class="n">fullscreen</span>  <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>       <span class="p">},</span> <span class="s2">&quot;c&quot;</span><span class="p">,</span>      <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">:</span><span class="n">kill</span><span class="p">()</span>                         <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span> <span class="p">},</span> <span class="s2">&quot;space&quot;</span><span class="p">,</span>  <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">floating</span><span class="p">.</span><span class="n">toggle</span>                     <span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span> <span class="p">},</span> <span class="s2">&quot;Return&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">:</span><span class="n">swap</span><span class="p">(</span><span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">getmaster</span><span class="p">())</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;o&quot;</span><span class="p">,</span>      <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">movetoscreen</span>                        <span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span>   <span class="p">},</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span>      <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">:</span><span class="n">redraw</span><span class="p">()</span>                       <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>      <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">.</span><span class="n">minimized</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">c</span><span class="p">.</span><span class="n">minimized</span>    <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span>           <span class="p">},</span> <span class="s2">&quot;m&quot;</span><span class="p">,</span>
+<span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span>
+    <span class="n">c</span><span class="p">.</span><span class="n">maximized_horizontal</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">c</span><span class="p">.</span><span class="n">maximized_horizontal</span>
+    <span class="n">c</span><span class="p">.</span><span class="n">maximized_vertical</span>   <span class="o">=</span> <span class="ow">not</span> <span class="n">c</span><span class="p">.</span><span class="n">maximized_vertical</span>
+<span class="kr">end</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1">-- Compute the maximum number of digit we need, limited to 9</span>
+<span class="n">keynumber</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="kr">for</span> <span class="n">s</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">screen</span><span class="p">.</span><span class="n">count</span><span class="p">()</span> <span class="kr">do</span>
+    <span class="n">keynumber</span> <span class="o">=</span> <span class="nb">math.min</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="nb">math.max</span><span class="p">(</span><span class="o">#</span><span class="n">tags</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">keynumber</span><span class="p">));</span>
+<span class="kr">end</span>
+<span class="c1">-- Bind all key numbers to tags.</span>
+<span class="c1">-- Be careful: we use keycodes to make it works on any keyboard layout.</span>
+<span class="c1">-- This should map on the top row of your keyboard, usually 1 to 9.</span>
+<span class="kr">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">keynumber</span> <span class="kr">do</span>
+    <span class="n">globalkeys</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">globalkeys</span><span class="p">,</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span> <span class="p">},</span> <span class="s2">&quot;#&quot;</span> <span class="o">..</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="kr">function</span> <span class="p">()</span>
+        <span class="kd">local</span> <span class="n">screen</span> <span class="o">=</span> <span class="n">mouse</span><span class="p">.</span><span class="n">screen</span>
+        <span class="kr">if</span> <span class="n">tags</span><span class="p">[</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="kr">then</span>
+            <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewonly</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="kr">end</span>
+    <span class="kr">end</span><span class="p">),</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span> <span class="p">},</span> <span class="s2">&quot;#&quot;</span> <span class="o">..</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="kr">function</span> <span class="p">()</span>
+        <span class="kd">local</span> <span class="n">screen</span> <span class="o">=</span> <span class="n">mouse</span><span class="p">.</span><span class="n">screen</span>
+        <span class="kr">if</span> <span class="n">tags</span><span class="p">[</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="kr">then</span>
+            <span class="n">awful</span><span class="p">.</span><span class="n">tag</span><span class="p">.</span><span class="n">viewtoggle</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="kr">end</span>
+    <span class="kr">end</span><span class="p">),</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span>       <span class="p">},</span> <span class="s2">&quot;#&quot;</span> <span class="o">..</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="kr">function</span> <span class="p">()</span>
+        <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="ow">and</span> <span class="n">tags</span><span class="p">[</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="kr">then</span>
+            <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">movetotag</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="kr">end</span>
+    <span class="kr">end</span><span class="p">),</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">key</span><span class="p">({</span> <span class="n">modkey</span><span class="p">,</span> <span class="s2">&quot;Control&quot;</span><span class="p">,</span> <span class="s2">&quot;Shift&quot;</span> <span class="p">},</span> <span class="s2">&quot;#&quot;</span> <span class="o">..</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="kr">function</span> <span class="p">()</span>
+        <span class="kr">if</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="ow">and</span> <span class="n">tags</span><span class="p">[</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="kr">then</span>
+            <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">toggletag</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">screen</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
+        <span class="kr">end</span>
+    <span class="kr">end</span><span class="p">))</span>
+<span class="kr">end</span>
+<span class="n">clientbuttons</span> <span class="o">=</span> <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">table</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="o">=</span> <span class="n">c</span><span class="p">;</span> <span class="n">c</span><span class="p">:</span><span class="n">raise</span><span class="p">()</span> <span class="kr">end</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="n">modkey</span> <span class="p">},</span> <span class="mi">1</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">mouse</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">move</span><span class="p">),</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">button</span><span class="p">({</span> <span class="n">modkey</span> <span class="p">},</span> <span class="mi">3</span><span class="p">,</span> <span class="n">awful</span><span class="p">.</span><span class="n">mouse</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">resize</span><span class="p">))</span>
+<span class="c1">-- Set keys</span>
+<span class="n">root</span><span class="p">.</span><span class="n">keys</span><span class="p">(</span><span class="n">globalkeys</span><span class="p">)</span>
+
+<span class="n">awful</span><span class="p">.</span><span class="n">rules</span><span class="p">.</span><span class="n">rules</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1">-- All clients will match this rule.</span>
+    <span class="p">{</span> <span class="n">rule</span> <span class="o">=</span> <span class="p">{</span> <span class="p">},</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span> <span class="n">border_width</span> <span class="o">=</span> <span class="n">beautiful</span><span class="p">.</span><span class="n">border_width</span><span class="p">,</span>
+    <span class="n">border_color</span> <span class="o">=</span> <span class="n">beautiful</span><span class="p">.</span><span class="n">border_normal</span><span class="p">,</span>
+    <span class="n">focus</span> <span class="o">=</span> <span class="kc">true</span><span class="p">,</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">clientkeys</span><span class="p">,</span>
+    <span class="n">buttons</span> <span class="o">=</span> <span class="n">clientbuttons</span> <span class="p">}</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="n">rule</span> <span class="o">=</span> <span class="p">{</span> <span class="n">class</span> <span class="o">=</span> <span class="s2">&quot;MPlayer&quot;</span> <span class="p">},</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span> <span class="n">floating</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="n">rule</span> <span class="o">=</span> <span class="p">{</span> <span class="n">class</span> <span class="o">=</span> <span class="s2">&quot;pinentry&quot;</span> <span class="p">},</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span> <span class="n">floating</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">},</span>
+    <span class="p">{</span> <span class="n">rule</span> <span class="o">=</span> <span class="p">{</span> <span class="n">class</span> <span class="o">=</span> <span class="s2">&quot;gimp&quot;</span> <span class="p">},</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span> <span class="n">floating</span> <span class="o">=</span> <span class="kc">true</span> <span class="p">}</span> <span class="p">},</span>
+    <span class="c1">-- Set Firefox to always map on tags number 2 of screen 1.</span>
+    <span class="c1">-- { rule = { class = &quot;Firefox&quot; },</span>
+    <span class="c1">--   properties = { tag = tags[1][2] } },</span>
+<span class="p">}</span>
+
+<span class="c1">-- Signal function to execute when a new client appears.</span>
+<span class="n">client</span><span class="p">.</span><span class="n">add_signal</span><span class="p">(</span><span class="s2">&quot;manage&quot;</span><span class="p">,</span> <span class="kr">function</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">startup</span><span class="p">)</span>
+    <span class="c1">-- Add a titlebar</span>
+    <span class="c1">-- awful.titlebar.add(c, { modkey = modkey })</span>
+    <span class="c1">-- Enable sloppy focus</span>
+    <span class="n">c</span><span class="p">:</span><span class="n">add_signal</span><span class="p">(</span><span class="s2">&quot;mouse::enter&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="kr">if</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">screen</span><span class="p">)</span> <span class="o">~=</span> <span class="n">awful</span><span class="p">.</span><span class="n">layout</span><span class="p">.</span><span class="n">suit</span><span class="p">.</span><span class="n">magnifier</span>
+            <span class="ow">and</span> <span class="n">awful</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">focus</span><span class="p">.</span><span class="n">filter</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="kr">then</span>
+            <span class="n">client</span><span class="p">.</span><span class="n">focus</span> <span class="o">=</span> <span class="n">c</span>
+        <span class="kr">end</span>
+    <span class="kr">end</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="ow">not</span> <span class="n">startup</span> <span class="kr">then</span>
+        <span class="c1">-- Set the windows at the slave,</span>
+        <span class="c1">-- i.e. put it at the end of others instead of setting it master.</span>
+        <span class="c1">-- awful.client.setslave(c)</span>
+        <span class="c1">-- Put windows in a smart way, only if they does not set an initial position.</span>
+        <span class="kr">if</span> <span class="ow">not</span> <span class="n">c</span><span class="p">.</span><span class="n">size_hints</span><span class="p">.</span><span class="n">user_position</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c</span><span class="p">.</span><span class="n">size_hints</span><span class="p">.</span><span class="n">program_position</span> <span class="kr">then</span>
+            <span class="n">awful</span><span class="p">.</span><span class="n">placement</span><span class="p">.</span><span class="n">no_overlap</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">awful</span><span class="p">.</span><span class="n">placement</span><span class="p">.</span><span class="n">no_offscreen</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="kr">end</span>
+    <span class="kr">end</span>
+<span class="kr">end</span><span class="p">)</span>
+
+<span class="n">client</span><span class="p">.</span><span class="n">add_signal</span><span class="p">(</span><span class="s2">&quot;focus&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">.</span><span class="n">border_color</span> <span class="o">=</span> <span class="n">beautiful</span><span class="p">.</span><span class="n">border_focus</span> <span class="kr">end</span><span class="p">)</span>
+<span class="n">client</span><span class="p">.</span><span class="n">add_signal</span><span class="p">(</span><span class="s2">&quot;unfocus&quot;</span><span class="p">,</span> <span class="kr">function</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="n">c</span><span class="p">.</span><span class="n">border_color</span> <span class="o">=</span> <span class="n">beautiful</span><span class="p">.</span><span class="n">border_normal</span> <span class="kr">end</span><span class="p">)</span>
+
+<span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn_with_shell</span><span class="p">(</span><span class="s2">&quot;nm-applet&quot;</span><span class="p">)</span>
+<span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn_with_shell</span><span class="p">(</span><span class="s2">&quot;gnome-sound-applet&quot;</span><span class="p">)</span> <span class="c1">--sine ubuntu 12.04.02</span>
+<span class="c1">--awful.util.spawn_with_shell(&quot;gnome-volume-control-applet&quot;)</span>
+<span class="c1">--            awful.util.spawn_with_shell(&quot;xautolock -time 10 -locker &#39;xlock -lockdelay 10&#39;&quot;)</span>
+<span class="c1">--                awful.util.run_once(&quot;xautolock -time 1 -locker &#39;xlock -lockdelay 1&#39;&quot;)</span>
+<span class="kr">function</span> <span class="nf">run_once</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="n">findme</span> <span class="o">=</span> <span class="n">cmd</span>
+    <span class="n">firstspace</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">:</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="kr">if</span> <span class="n">firstspace</span> <span class="kr">then</span>
+        <span class="n">findme</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">:</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">firstspace</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="kr">end</span>
+    <span class="n">awful</span><span class="p">.</span><span class="n">util</span><span class="p">.</span><span class="n">spawn_with_shell</span><span class="p">(</span><span class="s2">&quot;pgrep -u $USER -x &quot;</span> <span class="o">..</span> <span class="n">findme</span> <span class="o">..</span> <span class="s2">&quot; &gt; /dev/null || (&quot;</span> <span class="o">..</span> <span class="n">cmd</span> <span class="o">..</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+<span class="kr">end</span>
+<span class="n">run_once</span><span class="p">(</span><span class="s2">&quot;xautolock -time 30 -locker &#39;xlock -lockdelay 30&#39;&quot;</span><span class="p">);</span>
+</code></pre></div>
+
 </li>
 </ol>
 <p>在使用awesome的过程中，需要dmenu加以配合，这样你的CUI才能真正的用起来，算起来。  </p>
@@ -458,65 +472,69 @@ run_once("xautolock -time 30 -locker 'xlock -lockdelay 30'");</p>
 关机需要xlockmore和xautolock两个软件进行配合，使用apt-get就可以。<br>
 xlockmore是锁屏和关机的，xautolock是自动启动屏保啥的。<br>
 然后在增加一个shutdown的bash文件，你就可以使用这个文件来关机或者休眠了。  </p>
-<p>```bash </p>
-<h1>! /bin/sh</h1>
-<p>ACTION=<code>zenity --width=90 --height=200 --list --radiolist --text="Select logout action" --title="Logout" --column "Choice" --column "Action" TRUE Shutdown FALSE Reboot FALSE LockScreen FALSE Suspend</code></p>
-<p>if [ -n "${ACTION}" ];then
-    case $ACTION in
-        Shutdown)
+<div class="highlight"><pre><span></span><code><span class="ch">#! /bin/sh</span>
+<span class="nv">ACTION</span><span class="o">=</span><span class="sb">`</span>zenity --width<span class="o">=</span><span class="m">90</span> --height<span class="o">=</span><span class="m">200</span> --list --radiolist --text<span class="o">=</span><span class="s2">&quot;Select logout action&quot;</span> --title<span class="o">=</span><span class="s2">&quot;Logout&quot;</span> --column <span class="s2">&quot;Choice&quot;</span> --column <span class="s2">&quot;Action&quot;</span> TRUE Shutdown FALSE Reboot FALSE LockScreen FALSE Suspend<span class="sb">`</span>
+
+<span class="k">if</span> <span class="o">[</span> -n <span class="s2">&quot;</span><span class="si">${</span><span class="nv">ACTION</span><span class="si">}</span><span class="s2">&quot;</span> <span class="o">]</span><span class="p">;</span><span class="k">then</span>
+    <span class="k">case</span> <span class="nv">$ACTION</span> <span class="k">in</span>
+        Shutdown<span class="o">)</span>
         shutdown -h now
-        ## or via ConsoleKit
-        # dbus-send --system --dest=org.freedesktop.ConsoleKit.Manager 
-        # /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop
-        ;;
-        Reboot)
+        <span class="c1">## or via ConsoleKit</span>
+        <span class="c1"># dbus-send --system --dest=org.freedesktop.ConsoleKit.Manager </span>
+        <span class="c1"># /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Stop</span>
+        <span class="p">;;</span>
+        Reboot<span class="o">)</span>
         reboot
-        ## Or via ConsoleKit
-        # dbus-send --system --dest=org.freedesktop.ConsoleKit.Manager 
-        # /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart
-        ;;
-        Suspend)
-        #gksudo pm-suspend
-        dbus-send --system --print-reply --dest=org.freedesktop.Hal 
+        <span class="c1">## Or via ConsoleKit</span>
+        <span class="c1"># dbus-send --system --dest=org.freedesktop.ConsoleKit.Manager </span>
+        <span class="c1"># /org/freedesktop/ConsoleKit/Manager org.freedesktop.ConsoleKit.Manager.Restart</span>
+        <span class="p">;;</span>
+        Suspend<span class="o">)</span>
+        <span class="c1">#gksudo pm-suspend</span>
+        dbus-send --system --print-reply --dest<span class="o">=</span>org.freedesktop.Hal 
         /org/freedesktop/Hal/devices/computer 
         org.freedesktop.Hal.Device.SystemPowerManagement.Suspend int32:0
-        # HAL is deprecated in newer systems in favor of UPower etc.
-        # dbus-send --system --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.Suspend
-        ;;
-        LockScreen)
+        <span class="c1"># HAL is deprecated in newer systems in favor of UPower etc.</span>
+        <span class="c1"># dbus-send --system --dest=org.freedesktop.UPower /org/freedesktop/UPower org.freedesktop.UPower.Suspend</span>
+        <span class="p">;;</span>
+        LockScreen<span class="o">)</span>
             slock
-            # Or gnome-screensaver-command -l
-            ;;
-    esac
-fi
-```
-6. 小红点<br>
+            <span class="c1"># Or gnome-screensaver-command -l</span>
+            <span class="p">;;</span>
+    <span class="k">esac</span>
+<span class="k">fi</span>
+</code></pre></div>
+
+</li>
+<li>
+<p>小红点<br>
 因为一直使用Thinkpad的笔记本，但是ub对于小红点的支持貌似不是太好，刚刚开始的几
 个ub的版本好像还不支持小红点，所以就使用一个第三方的软件来加以支持，这个软件叫
 gpointing-device-settings,安装以后还是相当好用的，但是你还需要加一个配置文件。
 当然，后来的ub好像已经开始支持小红点了，具体忘了，很久没用Thinkpad了。</p>
-<p>```bash</p>
-<h1>!/bin/sh</h1>
-<h1>close touch</h1>
-<p>synclient TouchpadOff=1</p>
-<h1>开启小红帽+中键</h1>
-<p _="%" endhighlight>xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 8 1
-xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 8 2
-xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Y Axis" 8 4 5
-xinput set-int-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation X Axis" 8 6 7
-```
-7. CUI中文件夹的颜色<br>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/sh</span>
+<span class="c1">#close touch</span>
+synclient <span class="nv">TouchpadOff</span><span class="o">=</span><span class="m">1</span>
+<span class="c1">#开启小红帽+中键</span>
+xinput set-int-prop <span class="s2">&quot;TPPS/2 IBM TrackPoint&quot;</span> <span class="s2">&quot;Evdev Wheel Emulation&quot;</span> <span class="m">8</span> <span class="m">1</span>
+xinput set-int-prop <span class="s2">&quot;TPPS/2 IBM TrackPoint&quot;</span> <span class="s2">&quot;Evdev Wheel Emulation Button&quot;</span> <span class="m">8</span> <span class="m">2</span>
+xinput set-int-prop <span class="s2">&quot;TPPS/2 IBM TrackPoint&quot;</span> <span class="s2">&quot;Evdev Wheel Emulation Y Axis&quot;</span> <span class="m">8</span> <span class="m">4</span> <span class="m">5</span>
+xinput set-int-prop <span class="s2">&quot;TPPS/2 IBM TrackPoint&quot;</span> <span class="s2">&quot;Evdev Wheel Emulation X Axis&quot;</span> <span class="m">8</span> <span class="m">6</span> <span class="m">7</span>
+</code></pre></div>
+
+</li>
+<li>
+<p>CUI中文件夹的颜色<br>
 当你使用CUI的时候，使用ls列出来的文件和文件夹都是一样的颜色，你也不能很好的辨
-认出来，所以，你增加一个dircolors文件，并且做一个软连接到这个文件就可以：
-{% highlight properties %}
-# Configuration file for dircolors, a utility to help you set the
-# LS_COLORS environment variable used by GNU ls with the --color option.
-# Copyright (C) 1996, 1999-2011 Free Software Foundation, Inc.
-# Copying and distribution of this file, with or without modification,
-# are permitted provided the copyright notice and this notice are preserved.
-# The keywords COLOR, OPTIONS, and EIGHTBIT (honored by the
-# slackware version of dircolors) are recognized but ignored.
-# Below, there should be one TERM entry for each termtype that is colorizable
+认出来，所以，你增加一个dircolors文件，并且做一个软连接到这个文件就可以：</p>
+<div class="highlight"><pre><span></span><code><span class="se">\#</span> Configuration file <span class="k">for</span> dircolors, a utility to <span class="nb">help</span> you <span class="nb">set</span> the
+<span class="se">\#</span> LS_COLORS environment variable used by GNU ls with the --color option.
+<span class="se">\#</span> Copyright <span class="o">(</span>C<span class="o">)</span> <span class="m">1996</span>, <span class="m">1999</span>-2011 Free Software Foundation, Inc.
+<span class="se">\#</span> Copying and distribution of this file, with or without modification,
+<span class="se">\#</span> are permitted provided the copyright notice and this notice are preserved.
+<span class="se">\#</span> The keywords COLOR, OPTIONS, and EIGHTBIT <span class="o">(</span>honored by the
+<span class="se">\#</span> slackware version of dircolors<span class="o">)</span> are recognized but ignored.
+<span class="se">\#</span> Below, there should be one TERM entry <span class="k">for</span> each termtype that is colorizable
 TERM Eterm
 TERM ansi
 TERM color-xterm
@@ -568,213 +586,215 @@ TERM xterm-256color
 TERM xterm-88color
 TERM xterm-color
 TERM xterm-debian
-# Below are the color init strings for the basic file types. A color init
-# string consists of one or more of the following numeric codes:
-# Attribute codes:
-# 00=none 01=bold 04=underscore 05=blink 07=reverse 08=concealed
-# Text color codes:
-# 30=black 31=red 32=green 33=yellow 34=blue 35=magenta 36=cyan 37=white
-# Background color codes:
-# 40=black 41=red 42=green 43=yellow 44=blue 45=magenta 46=cyan 47=white
-#NORMAL 00 # no color code at all
-#FILE 00 # regular file: use no color at all
-RESET 0 # reset to "normal" color
-DIR 01;34 # directory
-LINK 01;36 # symbolic link. (If you set this to 'target' instead of a
-# numerical value, the color is as for the file pointed to.)
-MULTIHARDLINK 00 # regular file with more than one link
-FIFO 40;33 # pipe
-SOCK 01;35 # socket
-DOOR 01;35 # door
-BLK 40;33;01 # block device driver
-CHR 40;33;01 # character device driver
-ORPHAN 40;31;01 # symlink to nonexistent file, or non-stat'able file
-SETUID 37;41 # file that is setuid (u+s)
-SETGID 30;43 # file that is setgid (g+s)
-CAPABILITY 30;41 # file with capability
-STICKY_OTHER_WRITABLE 01;34 # dir that is sticky and other-writable (+t,o+w)
-OTHER_WRITABLE 01;34 # dir that is other-writable (o+w) and not sticky
-STICKY 01;34 # dir with the sticky bit set (+t) and not other-writable
-# This is for files with execute permission:
-EXEC 01;32
-# List any file extensions like '.gz' or '.tar' that you would like ls
-# to colorize below. Put the extension, a space, and the color init string.
-# (and any comments you want to add after a '#')
-# If you use DOS-style suffixes, you may want to uncomment the following:
-#.cmd 01;32 # executables (bright green)
-#.exe 01;32
-#.com 01;32
-#.btm 01;32
-#.bat 01;32
-# Or if you want to colorize scripts even if they do not have the
-# executable bit actually set.
-#.sh 01;32
-#.csh 01;32
-# archives or compressed (bright red)
-.tar 01;31
-.tgz 01;31
-.arj 01;31
-.taz 01;31
-.lzh 01;31
-.lzma 01;31
-.tlz 01;31
-.txz 01;31
-.zip 01;31
-.z 01;31
-.Z 01;31
-.dz 01;31
-.gz 01;31
-.lz 01;31
-.xz 01;31
-.bz2 01;31
-.bz 01;31
-.tbz 01;31
-.tbz2 01;31
-.tz 01;31
-.deb 01;31
-.rpm 01;31
-.jar 01;31
-.war 01;31
-.ear 01;31
-.sar 01;31
-.rar 01;31
-.ace 01;31
-.zoo 01;31
-.cpio 01;31
-.7z 01;31
-.rz 01;31
-# image formats
-.jpg 01;35
-.jpeg 01;35
-.gif 01;35
-.bmp 01;35
-.pbm 01;35
-.pgm 01;35
-.ppm 01;35
-.tga 01;35
-.xbm 01;35
-.xpm 01;35
-.tif 01;35
-.tiff 01;35
-.png 01;35
-.svg 01;35
-.svgz 01;35
-.mng 01;35
-.pcx 01;35
-.mov 01;35
-.mpg 01;35
-.mpeg 01;35
-.m2v 01;35
-.mkv 01;35
-.webm 01;35
-.ogm 01;35
-.mp4 01;35
-.m4v 01;35
-.mp4v 01;35
-.vob 01;35
-.qt 01;35
-.nuv 01;35
-.wmv 01;35
-.asf 01;35
-.rm 01;35
-.rmvb 01;35
-.flc 01;35
-.avi 01;35
-.fli 01;35
-.flv 01;35
-.gl 01;35
-.dl 01;35
-.xcf 01;35
-.xwd 01;35
-.yuv 01;35
-.cgm 01;35
-.emf 01;35
-# http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-.axv 01;35
-.anx 01;35
-.ogv 01;35
-.ogx 01;35
-# audio formats
-.aac 00;36
-.au 00;36
-.flac 00;36
-.mid 00;36
-.midi 00;36
-.mka 00;36
-.mp3 00;36
-.mpc 00;36
-.ogg 00;36
-.ra 00;36
-.wav 00;36
-# http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
-.axa 00;36
-.oga 00;36
-.spx 00;36
-.xspf 00;36</p>
+<span class="se">\#</span> Below are the color init strings <span class="k">for</span> the basic file types. A color init
+<span class="se">\#</span> string consists of one or more of the following numeric codes:
+<span class="se">\#</span> Attribute codes:
+<span class="se">\#</span> <span class="nv">00</span><span class="o">=</span>none <span class="nv">01</span><span class="o">=</span>bold <span class="nv">04</span><span class="o">=</span>underscore <span class="nv">05</span><span class="o">=</span>blink <span class="nv">07</span><span class="o">=</span>reverse <span class="nv">08</span><span class="o">=</span>concealed
+<span class="se">\#</span> Text color codes:
+<span class="se">\#</span> <span class="nv">30</span><span class="o">=</span>black <span class="nv">31</span><span class="o">=</span>red <span class="nv">32</span><span class="o">=</span>green <span class="nv">33</span><span class="o">=</span>yellow <span class="nv">34</span><span class="o">=</span>blue <span class="nv">35</span><span class="o">=</span>magenta <span class="nv">36</span><span class="o">=</span>cyan <span class="nv">37</span><span class="o">=</span>white
+<span class="se">\#</span> Background color codes:
+<span class="se">\#</span> <span class="nv">40</span><span class="o">=</span>black <span class="nv">41</span><span class="o">=</span>red <span class="nv">42</span><span class="o">=</span>green <span class="nv">43</span><span class="o">=</span>yellow <span class="nv">44</span><span class="o">=</span>blue <span class="nv">45</span><span class="o">=</span>magenta <span class="nv">46</span><span class="o">=</span>cyan <span class="nv">47</span><span class="o">=</span>white
+<span class="se">\#</span>NORMAL <span class="m">00</span> <span class="c1"># no color code at all</span>
+<span class="se">\#</span>FILE <span class="m">00</span> <span class="c1"># regular file: use no color at all</span>
+RESET <span class="m">0</span> <span class="c1"># reset to &quot;normal&quot; color</span>
+DIR <span class="m">01</span><span class="p">;</span><span class="m">34</span> <span class="c1"># directory</span>
+LINK <span class="m">01</span><span class="p">;</span><span class="m">36</span> <span class="c1"># symbolic link. (If you set this to &#39;target&#39; instead of a</span>
+<span class="se">\#</span> numerical value, the color is as <span class="k">for</span> the file pointed to.<span class="o">)</span>
+MULTIHARDLINK <span class="m">00</span> <span class="c1"># regular file with more than one link</span>
+FIFO <span class="m">40</span><span class="p">;</span><span class="m">33</span> <span class="c1"># pipe</span>
+SOCK <span class="m">01</span><span class="p">;</span><span class="m">35</span> <span class="c1"># socket</span>
+DOOR <span class="m">01</span><span class="p">;</span><span class="m">35</span> <span class="c1"># door</span>
+BLK <span class="m">40</span><span class="p">;</span><span class="m">33</span><span class="p">;</span><span class="m">01</span> <span class="c1"># block device driver</span>
+CHR <span class="m">40</span><span class="p">;</span><span class="m">33</span><span class="p">;</span><span class="m">01</span> <span class="c1"># character device driver</span>
+ORPHAN <span class="m">40</span><span class="p">;</span><span class="m">31</span><span class="p">;</span><span class="m">01</span> <span class="c1"># symlink to nonexistent file, or non-stat&#39;able file</span>
+SETUID <span class="m">37</span><span class="p">;</span><span class="m">41</span> <span class="c1"># file that is setuid (u+s)</span>
+SETGID <span class="m">30</span><span class="p">;</span><span class="m">43</span> <span class="c1"># file that is setgid (g+s)</span>
+CAPABILITY <span class="m">30</span><span class="p">;</span><span class="m">41</span> <span class="c1"># file with capability</span>
+STICKY_OTHER_WRITABLE <span class="m">01</span><span class="p">;</span><span class="m">34</span> <span class="c1"># dir that is sticky and other-writable (+t,o+w)</span>
+OTHER_WRITABLE <span class="m">01</span><span class="p">;</span><span class="m">34</span> <span class="c1"># dir that is other-writable (o+w) and not sticky</span>
+STICKY <span class="m">01</span><span class="p">;</span><span class="m">34</span> <span class="c1"># dir with the sticky bit set (+t) and not other-writable</span>
+<span class="se">\#</span> This is <span class="k">for</span> files with execute permission:
+EXEC <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span> List any file extensions like <span class="s1">&#39;.gz&#39;</span> or <span class="s1">&#39;.tar&#39;</span> that you would like ls
+<span class="se">\#</span> to colorize below. Put the extension, a space, and the color init string.
+<span class="se">\#</span> <span class="o">(</span>and any comments you want to add after a <span class="s1">&#39;#&#39;</span><span class="o">)</span>
+<span class="se">\#</span> If you use DOS-style suffixes, you may want to uncomment the following:
+<span class="se">\#</span>.cmd <span class="m">01</span><span class="p">;</span><span class="m">32</span> <span class="c1"># executables (bright green)</span>
+<span class="se">\#</span>.exe <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span>.com <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span>.btm <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span>.bat <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span> Or <span class="k">if</span> you want to colorize scripts even <span class="k">if</span> they <span class="k">do</span> not have the
+<span class="se">\#</span> executable bit actually set.
+<span class="se">\#</span>.sh <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span>.csh <span class="m">01</span><span class="p">;</span><span class="m">32</span>
+<span class="se">\#</span> archives or compressed <span class="o">(</span>bright red<span class="o">)</span>
+.tar <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.tgz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.arj <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.taz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.lzh <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.lzma <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.tlz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.txz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.zip <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.z <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.Z <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.dz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.gz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.lz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.xz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.bz2 <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.bz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.tbz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.tbz2 <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.tz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.deb <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.rpm <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.jar <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.war <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.ear <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.sar <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.rar <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.ace <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.zoo <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.cpio <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.7z <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+.rz <span class="m">01</span><span class="p">;</span><span class="m">31</span>
+<span class="se">\#</span> image formats
+.jpg <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.jpeg <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.gif <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.bmp <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.pbm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.pgm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.ppm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.tga <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.xbm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.xpm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.tif <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.tiff <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.png <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.svg <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.svgz <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mng <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.pcx <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mov <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mpg <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mpeg <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.m2v <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mkv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.webm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.ogm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mp4 <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.m4v <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.mp4v <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.vob <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.qt <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.nuv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.wmv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.asf <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.rm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.rmvb <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.flc <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.avi <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.fli <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.flv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.gl <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.dl <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.xcf <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.xwd <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.yuv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.cgm <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.emf <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+<span class="se">\#</span> http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+.axv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.anx <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.ogv <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+.ogx <span class="m">01</span><span class="p">;</span><span class="m">35</span>
+<span class="se">\#</span> audio formats
+.aac <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.au <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.flac <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.mid <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.midi <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.mka <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.mp3 <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.mpc <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.ogg <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.ra <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.wav <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+<span class="se">\#</span> http://wiki.xiph.org/index.php/MIME_Types_and_File_Extensions
+.axa <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.oga <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.spx <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+.xspf <span class="m">00</span><span class="p">;</span><span class="m">36</span>
+</code></pre></div>
+
 </li>
 <li>
 <p>外接投影仪或者显示器
 外接显示器或者投影器，你必须使用xrand来支持。开机的时候awesome好像默认会检测你
-的屏幕数量然后加以显示。如果没有自动，那么你只需要运行一下一下的代码就可以了。
-{% highlight bash %}
-#/usr/bin/env bash
-case $1 in
-    "-c")
-        # 打开外接显示器(--auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）
+的屏幕数量然后加以显示。如果没有自动，那么你只需要运行一下一下的代码就可以了。</p>
+<div class="highlight"><pre><span></span><code><span class="se">\#</span>/usr/bin/env bash
+<span class="k">case</span> <span class="nv">$1</span> <span class="k">in</span>
+    <span class="s2">&quot;-c&quot;</span><span class="o">)</span>
+        <span class="c1"># 打开外接显示器(--auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）</span>
         xrandr --output VGA1 --same-as LVDS1 --auto
-        ;;
-    "-cs")
-        # 打开外接显示器(分辨率为1280x1024)，与笔记本液晶屏幕显示同样内容（克隆）
+        <span class="p">;;</span>
+    <span class="s2">&quot;-cs&quot;</span><span class="o">)</span>
+        <span class="c1"># 打开外接显示器(分辨率为1280x1024)，与笔记本液晶屏幕显示同样内容（克隆）</span>
         xrandr --output VGA1 --same-as LVDS1 --mode 1280x1024
-        ;;
-    "-el")
-        # 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕
+        <span class="p">;;</span>
+    <span class="s2">&quot;-el&quot;</span><span class="o">)</span>
+        <span class="c1"># 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕</span>
         xrandr --output VGA1 --left-of LVDS1 --auto 
-        ;;
-    "-er")
-        # 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕
+        <span class="p">;;</span>
+    <span class="s2">&quot;-er&quot;</span><span class="o">)</span>
+        <span class="c1"># 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕</span>
         xrandr --output VGA1 --right-of LVDS1 --auto
-        ;;
-    "-f")
-        # 关闭外接显示器
+        <span class="p">;;</span>
+    <span class="s2">&quot;-f&quot;</span><span class="o">)</span>
+        <span class="c1"># 关闭外接显示器</span>
         xrandr --output VGA1 --off
-        ;;
-    "-oe")
-        # 打开外接显示器，同时关闭笔记本液晶屏幕（只用外接显示器工作）
+        <span class="p">;;</span>
+    <span class="s2">&quot;-oe&quot;</span><span class="o">)</span>
+        <span class="c1"># 打开外接显示器，同时关闭笔记本液晶屏幕（只用外接显示器工作）</span>
         xrandr --output VGA1 --auto --output LVDS1 --off
-        ;;
-    "-oo")
-        # 关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）
+        <span class="p">;;</span>
+    <span class="s2">&quot;-oo&quot;</span><span class="o">)</span>
+        <span class="c1"># 关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）</span>
         xrandr --output VGA1 --off --output LVDS1 --auto
-        ;;
-    "")
-        echo "-c: 打开外接显示器(--auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）"
-        echo "-cs: 打开外接显示器(分辨率为1280x1024)，与笔记本液晶屏幕显示同样内容（克隆）"
-        echo "-er: 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕"
-        echo "-el: 打开外接显示器(--auto:最高分辨率)，设置为left侧扩展屏幕"
-        echo "-f: 关闭外接显示器"
-        echo "-oe: 打开外接显示器，同时关闭笔记本液晶屏幕（只用外接显示器工作）"
-        echo "-oo: 关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）"
-        echo "如果使用awesome，modkey+ctrl+j,modkey+ctrl+k,切换不同的screen"
-        ;;</p>
-<p>"-h")
-    echo "-c: 打开外接显示器(--auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）"
-    echo "-cs: 打开外接显示器(分辨率为1280x1024)，与笔记本液晶屏幕显示同样内容（克隆）"
-    echo "-e: 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕"
-    echo "-f: 关闭外接显示器"
-    echo "-oe: 打开外接显示器，同时关闭笔记本液晶屏幕（只用外接显示器工作）"
-    echo "-oo: 关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）"
-    echo "如果使用awesome，modkey+ctrl+j,modkey+ctrl+k,切换不同的screen"
-    ;;
-esac
-{% endhighlight %}
-<br/></p>
+        <span class="p">;;</span>
+    <span class="s2">&quot;&quot;</span><span class="o">)</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-c: 打开外接显示器(--auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-cs: 打开外接显示器(分辨率为1280x1024)，与笔记本液晶屏幕显示同样内容（克隆）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-er: 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-el: 打开外接显示器(--auto:最高分辨率)，设置为left侧扩展屏幕&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-f: 关闭外接显示器&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-oe: 打开外接显示器，同时关闭笔记本液晶屏幕（只用外接显示器工作）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-oo: 关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;如果使用awesome，modkey+ctrl+j,modkey+ctrl+k,切换不同的screen&quot;</span>
+        <span class="p">;;</span>
+
+    <span class="s2">&quot;-h&quot;</span><span class="o">)</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-c: 打开外接显示器(--auto:最高分辨率)，与笔记本液晶屏幕显示同样内容（克隆）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-cs: 打开外接显示器(分辨率为1280x1024)，与笔记本液晶屏幕显示同样内容（克隆）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-e: 打开外接显示器(--auto:最高分辨率)，设置为右侧扩展屏幕&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-f: 关闭外接显示器&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-oe: 打开外接显示器，同时关闭笔记本液晶屏幕（只用外接显示器工作）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;-oo: 关闭外接显示器，同时打开笔记本液晶屏幕 （只用笔记本液晶屏）&quot;</span>
+        <span class="nb">echo</span> <span class="s2">&quot;如果使用awesome，modkey+ctrl+j,modkey+ctrl+k,切换不同的screen&quot;</span>
+        <span class="p">;;</span>
+<span class="k">esac</span>
+</code></pre></div>
+
+</li>
+</ol>
 <h4>结束语</h4>
 <p>这些配置文件都是可以直接拿来用的，我已经经过了测试。保证可以使用。<br>
 因为现在也不太用ub+awesome了，改用了mac，但是说实话，mac没有ub+awesome好用和自
 如。如果还能选择，我想还是ub+awesome来的更适合我一些。</p>
-</li>
-</ol>
     </article>
 
         <div class="tags">
