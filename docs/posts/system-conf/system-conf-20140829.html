@@ -33,7 +33,7 @@
 
 
 
-        <meta name="description" content="多年来，具体来说5年了，我一直使用ub+awesome的工作环境。在过程中，被公司的同事笑成为"生活在CUI"中的另类。我选中ub是因为方便，apt-get实在让我无法自拔，并且ub对于desktop的支持也是很多别的linux发行版无法比拟的。cos等等都比较适合部署在s...">
+        <meta name="description" content="多年来，具体来说5年了，我一直使用ub+awesome的工作环境。在过程中，被公司的同事笑成为”生活在CUI”中的另类。我选中ub是因为方便，apt-get实在让我无法自拔，并且ub对于desktop的支持也是很多别的linux发行版无法比拟的。cos等等都比较适合部署在s...">
 
         <meta name="author" content="spk xu">
 
@@ -47,7 +47,7 @@
 	<meta property="og:url" content="/posts/system-conf/system-conf-20140829.html">
 	<meta property="og:title" content="Linux系统配置">
 	<meta property="article:published_time" content="2014-08-29 00:00:00+08:00">
-            <meta property="og:description" content="多年来，具体来说5年了，我一直使用ub+awesome的工作环境。在过程中，被公司的同事笑成为"生活在CUI"中的另类。我选中ub是因为方便，apt-get实在让我无法自拔，并且ub对于desktop的支持也是很多别的linux发行版无法比拟的。cos等等都比较适合部署在s...">
+            <meta property="og:description" content="多年来，具体来说5年了，我一直使用ub+awesome的工作环境。在过程中，被公司的同事笑成为”生活在CUI”中的另类。我选中ub是因为方便，apt-get实在让我无法自拔，并且ub对于desktop的支持也是很多别的linux发行版无法比拟的。cos等等都比较适合部署在s...">
 
             <meta property="og:image" content="/theme/images/post-bg.jpg">
 </head>
@@ -107,42 +107,42 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <!-- Post Content -->
     <article>
-        <h4>摘要</h4>
-<p>多年来，具体来说5年了，我一直使用ub+awesome的工作环境。在过程中，被公司的同事
-笑成为"生活在CUI"中的另类。我选中ub是因为方便，apt-get实在让我无法自拔，并且ub
-对于desktop的支持也是很多别的linux发行版无法比拟的。cos等等都比较适合部署在
-server环境上。选中awesome，是因为喜欢它简洁的界面，瓦片式的管理也让屏幕的任何
-一部分都不会被浪费。再加上我本身就喜欢CUI，所以awesome就成了首选。这些年来，积
+        <h4 id="_1">摘要</h4>
+<p>多年来，具体来说5年了，我一直使用ub+awesome的工作环境。在过程中，被公司的同事<br>
+笑成为&rdquo;生活在CUI&rdquo;中的另类。我选中ub是因为方便，apt-get实在让我无法自拔，并且ub<br>
+对于desktop的支持也是很多别的linux发行版无法比拟的。cos等等都比较适合部署在<br>
+server环境上。选中awesome，是因为喜欢它简洁的界面，瓦片式的管理也让屏幕的任何<br>
+一部分都不会被浪费。再加上我本身就喜欢CUI，所以awesome就成了首选。这些年来，积<br>
 累了一些配置文件，个人觉得还算用着顺手，这里就拿出来分享一下。  </p>
 <p><img alt="awesome" src="awesome.jpg"></p>
 <ol>
 <li>声音。<br>
-ub的root默认是不开的，我又不喜欢使用sudo，就是不喜欢那种隔一层纱的感觉，所以虽
-然自知linux不推荐开启root，但是我还是喜欢使用root的直接。所以一般我第一件事情
-就是把root开启。开启的root的命令是：
-    <code>sudo pwsswd root</code>
-然后输入你的root密码，这样就算是打开了，但是还不能登陆。还需要更改登陆配置。找
+ub的root默认是不开的，我又不喜欢使用sudo，就是不喜欢那种隔一层纱的感觉，所以虽<br>
+然自知linux不推荐开启root，但是我还是喜欢使用root的直接。所以一般我第一件事情<br>
+就是把root开启。开启的root的命令是：<br>
+<code>sudo pwsswd root</code><br>
+然后输入你的root密码，这样就算是打开了，但是还不能登陆。还需要更改登陆配置。找<br>
 到/etc/gdm/gdm.conf，然后把AllowRoot改为true。<br>
-如果你的root账户还不能登陆，你还需要去"系统-&gt;系统管理-&gt;登陆窗口"中的安全页中把
-"允许本地系统管理员登陆"选项打开。  </li>
+如果你的root账户还不能登陆，你还需要去&rdquo;系统-&gt;系统管理-&gt;登陆窗口&rdquo;中的安全页中把<br>
+&ldquo;允许本地系统管理员登陆&rdquo;选项打开。  </li>
 <li>声音。<br>
-root登陆后，你会发现声音没了。对我这种上班就带上耳机的人来说这是相当不能接受的
-。所以你也要把声音打开。找到pulseaudio文件，然后把文件内的两个选项改成以下这样：
-    <code>PULSEAUDIO_SYSTEM_START=1
-    DISALLOW_MODULE_LOADING=0</code>
-重启，就会有声音了。但是还有一个问题就是不知道为什么，有的时候启动的时候也是没
-有声音，但是重启一下就正常了，分析了一下日志也没发现有什么问题，如果你知道，请
+root登陆后，你会发现声音没了。对我这种上班就带上耳机的人来说这是相当不能接受的<br>
+。所以你也要把声音打开。找到pulseaudio文件，然后把文件内的两个选项改成以下这样：<br>
+<code>PULSEAUDIO_SYSTEM_START=1
+    DISALLOW_MODULE_LOADING=0</code><br>
+重启，就会有声音了。但是还有一个问题就是不知道为什么，有的时候启动的时候也是没<br>
+有声音，但是重启一下就正常了，分析了一下日志也没发现有什么问题，如果你知道，请<br>
 你告诉我。  </li>
 <li>chrome在root下无法启动。<br>
-ub的root环境下，chrome无法启动，所以必须得给它加一个脚本，自定义user-data-dir
+ub的root环境下，chrome无法启动，所以必须得给它加一个脚本，自定义user-data-dir<br>
 参数，就可以了。<br>
 <code># /bin/bash
     google-chrome \-\-user-data-dir=/root/.config/google-chrome &amp;</code></li>
 <li>awesome<br>
 安装awesome<br>
 <code>bash
-    apt-get install awesome</code>
-awesome在/etc/下有一个文件夹是有它的配置文件的，awesome的配置文件使用lua写的，
+    apt-get install awesome</code><br>
+awesome在/etc/下有一个文件夹是有它的配置文件的，awesome的配置文件使用lua写的，<br>
 个人的配置文件如下：  <div class="highlight"><pre><span></span><code><span class="c1">-- Standard awesome library</span>
 <span class="nb">require</span><span class="p">(</span><span class="s2">&quot;awful&quot;</span><span class="p">)</span>
 <span class="nb">require</span><span class="p">(</span><span class="s2">&quot;awful.autofocus&quot;</span><span class="p">)</span>
@@ -466,7 +466,7 @@ awesome在/etc/下有一个文件夹是有它的配置文件的，awesome的配�
 </li>
 </ol>
 <p>在使用awesome的过程中，需要dmenu加以配合，这样你的CUI才能真正的用起来，算起来。  </p>
-<ol>
+<ol start="5">
 <li>
 <p>关机<br>
 关机需要xlockmore和xautolock两个软件进行配合，使用apt-get就可以。<br>
@@ -508,9 +508,9 @@ xlockmore是锁屏和关机的，xautolock是自动启动屏保啥的。<br>
 </li>
 <li>
 <p>小红点<br>
-因为一直使用Thinkpad的笔记本，但是ub对于小红点的支持貌似不是太好，刚刚开始的几
-个ub的版本好像还不支持小红点，所以就使用一个第三方的软件来加以支持，这个软件叫
-gpointing-device-settings,安装以后还是相当好用的，但是你还需要加一个配置文件。
+因为一直使用Thinkpad的笔记本，但是ub对于小红点的支持貌似不是太好，刚刚开始的几<br>
+个ub的版本好像还不支持小红点，所以就使用一个第三方的软件来加以支持，这个软件叫<br>
+gpointing-device-settings,安装以后还是相当好用的，但是你还需要加一个配置文件。<br>
 当然，后来的ub好像已经开始支持小红点了，具体忘了，很久没用Thinkpad了。</p>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/bin/sh</span>
 <span class="c1">#close touch</span>
@@ -525,7 +525,7 @@ xinput set-int-prop <span class="s2">&quot;TPPS/2 IBM TrackPoint&quot;</span> <s
 </li>
 <li>
 <p>CUI中文件夹的颜色<br>
-当你使用CUI的时候，使用ls列出来的文件和文件夹都是一样的颜色，你也不能很好的辨
+当你使用CUI的时候，使用ls列出来的文件和文件夹都是一样的颜色，你也不能很好的辨<br>
 认出来，所以，你增加一个dircolors文件，并且做一个软连接到这个文件就可以：</p>
 <div class="highlight"><pre><span></span><code><span class="se">\#</span> Configuration file <span class="k">for</span> dircolors, a utility to <span class="nb">help</span> you <span class="nb">set</span> the
 <span class="se">\#</span> LS_COLORS environment variable used by GNU ls with the --color option.
@@ -733,8 +733,8 @@ EXEC <span class="m">01</span><span class="p">;</span><span class="m">32</span>
 
 </li>
 <li>
-<p>外接投影仪或者显示器
-外接显示器或者投影器，你必须使用xrand来支持。开机的时候awesome好像默认会检测你
+<p>外接投影仪或者显示器<br>
+外接显示器或者投影器，你必须使用xrand来支持。开机的时候awesome好像默认会检测你<br>
 的屏幕数量然后加以显示。如果没有自动，那么你只需要运行一下一下的代码就可以了。</p>
 <div class="highlight"><pre><span></span><code><span class="se">\#</span>/usr/bin/env bash
 <span class="k">case</span> <span class="nv">$1</span> <span class="k">in</span>
@@ -791,9 +791,9 @@ EXEC <span class="m">01</span><span class="p">;</span><span class="m">32</span>
 
 </li>
 </ol>
-<h4>结束语</h4>
+<h4 id="_2">结束语</h4>
 <p>这些配置文件都是可以直接拿来用的，我已经经过了测试。保证可以使用。<br>
-因为现在也不太用ub+awesome了，改用了mac，但是说实话，mac没有ub+awesome好用和自
+因为现在也不太用ub+awesome了，改用了mac，但是说实话，mac没有ub+awesome好用和自<br>
 如。如果还能选择，我想还是ub+awesome来的更适合我一些。</p>
     </article>
 

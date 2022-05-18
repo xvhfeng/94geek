@@ -110,10 +110,10 @@
         <p>可惜这是一次完完全全的装逼不成反被X的典型例子。</p>
 <p>但是，这是二次装逼失败，嗯！是真正的装逼失败!</p>
 <p>对不起大家，学艺不精，有待更加努力！ </p>
-<h2>背景</h2>
+<h2 id="_1">背景</h2>
 <p>很早之前，我写过一遍文章<a href="/posts/gdb-stacksize/gdb-stacksize-20170627.html">gdb线上crash调试-记一次装逼失败的教训</a>，这篇文章主要讲了我使用gdb来调试一次进程crash事件。当时因为没有注意core文件中参数的问题，导致了其实找到的问题引起点是错误的。</p>
 <p>为什么我们后来知道当时找到问题的点错误了呢？嗯....因为问题再次出现，进程又crash了。</p>
-<h2>再次排查</h2>
+<h2 id="_2">再次排查</h2>
 <p>其实上一次gdb的操作方法都对，但我们分析的路走错了，找了一个错误的方向。</p>
 <p>首先，我们发现stack的sym信息没了，然后我们靠寄存器恢复stack的信息。恢复stack的信息后我们再定位到调用的函数，进行分析。这个套路没有错，但是我们却大意了stack信息中的参数问题。</p>
 <p>具体的前面的操作我就不累述了，需要了解的请看前文《<a href="/posts/gdb-stacksize/gdb-stacksize-20170627.html">gdb线上crash调试-记一次装逼失败的教训</a>。</p>
@@ -124,9 +124,9 @@
 <p>下来我们分析一下这4个参数，根据stack的特性，我们能得到这样一个list：</p>
 <ol>
 <li>x1d -&gt; timeout 算到十进制为30</li>
-<li>0x10360...000le -&gt; port 算到十进制是4150。我们展开讲一下，从timeout我们能看出，这台机器的内存为高寻址机器。为啥？因为0x1d在最前面，如果低寻址，那么应该是0x0..01d.所以，同理我们知道0x1036其实就是port的值，那么又为什么后面还有00le，而我们没有计算在内呢？那是因为port是一个int型参数，所以主要前面的32位即可。但机器是64位，所以每个显示是64位的int而已，而存在le，是因为c的stack内存要在需要使用的时候才会清零，在这里这段其实就是内存垃圾。</li>
+<li>0x10360&hellip;000le -&gt; port 算到十进制是4150。我们展开讲一下，从timeout我们能看出，这台机器的内存为高寻址机器。为啥？因为0x1d在最前面，如果低寻址，那么应该是0x0..01d.所以，同理我们知道0x1036其实就是port的值，那么又为什么后面还有00le，而我们没有计算在内呢？那是因为port是一个int型参数，所以主要前面的32位即可。但机器是64位，所以每个显示是64位的int而已，而存在le，是因为c的stack内存要在需要使用的时候才会清零，在这里这段其实就是内存垃圾。</li>
 <li>0x1292928 -&gt; ip 不用计算，因为ip本来就是一个指针，这即指针而已。</li>
-<li>0x4c30...0 -&gt;fd,换算到十进制是1219.换算原理同上面的port。</li>
+<li>0x4c30&hellip;0 -&gt;fd,换算到十进制是1219.换算原理同上面的port。</li>
 </ol>
 <p>至此，我们的参数分析结束。从参数分析看，好像没问题。然后我们看一下我们的代码。</p>
 <div class="highlight"><pre><span></span><code>      <span class="nv">err_t</span> <span class="nv">spx_socket_connect_nb</span><span class="ss">(</span><span class="nv">int</span> <span class="nv">fd</span>,<span class="nv">string_t</span> <span class="nv">ip</span>,<span class="nv">int</span> <span class="nv">port</span>,<span class="nv">u32_t</span> <span class="nb">timeout</span><span class="ss">)</span>{  

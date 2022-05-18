@@ -82,3 +82,19 @@ CATEGORY_URL       = "category/{slug}.html"
 CATEGORY_SAVE_AS   = CATEGORY_URL
 CATEGORIES_URL     = "category/categories.html"
 CATEGORIES_SAVE_AS = CATEGORIES_URL
+
+MARKDOWN = {
+    'extension_configs': {
+        'markdown.extensions.extra': {},
+        'markdown.extensions.admonition': {},
+        'markdown.extensions.codehilite': {'css_class': 'highlight'},
+        'markdown.extensions.meta': {},
+        'markdown.extensions.nl2br': {},
+        'markdown.extensions.sane_lists': {},
+        'markdown.extensions.smarty':{},
+        'markdown.extensions.toc': {},
+        'markdown.extensions.wikilinks': {},
+        'markdown.extensions.mermaid': {},  # 启用mermaid, 需要将附件中的mermaid.py放入venv/lib/python-version/site-packages/markdown/extensions,   
+    },
+    'output_format': 'html5',
+}

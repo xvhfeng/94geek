@@ -107,7 +107,7 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <!-- Post Content -->
     <article>
-        <p>事情的起因是安装llvm+clang的时候一直不成功。提示说没有磁盘空间了。因为制作vagrant的box的时候，我选择的是自动扩展虚拟磁盘，所以也没有往磁盘真的没有了这个问题上想。还以为编译的时候有些operation没有选对，捣鼓了一阵子。后来执行了一下df才发现vagrant中的虚拟磁盘竟然真的不够用了。这至少告诉我们2个问题：
+        <p>事情的起因是安装llvm+clang的时候一直不成功。提示说没有磁盘空间了。因为制作vagrant的box的时候，我选择的是自动扩展虚拟磁盘，所以也没有往磁盘真的没有了这个问题上想。还以为编译的时候有些operation没有选对，捣鼓了一阵子。后来执行了一下df才发现vagrant中的虚拟磁盘竟然真的不够用了。这至少告诉我们2个问题：<br>
 1. vagrant不能自动扩展磁盘；      <br>
 2. 使用vagrant制作的vbox的映像不能继承原来vbox中的设置；      <br>
 那怎么样才能让vagrant中的磁盘映像扩大呢？</p>
@@ -115,44 +115,44 @@
 <p>起先，还是想到了老办法：原来在用虚拟机的时候记得可以直接在虚拟机中就可以调整磁盘大小的，但是这招在这里不可行，没有找到任何可以设置或者扩展磁盘大小的设置。然后找了一下vbox的文档，发现VBoxManage命令可以更改磁盘印象的大小。</p>
 <ol>
 <li>
-<p>先要找到vagrant接管的磁盘映像放在了哪里？执行命令：<code>VBoxManage list hdds</code>，如下：
+<p>先要找到vagrant接管的磁盘映像放在了哪里？执行命令：<code>VBoxManage list hdds</code>，如下：<br>
 <img alt="box-list-hd" src="vbox-hd-list.jpg"></p>
 </li>
 <li>
-<p>找到了磁盘映像后就可以更改其大小了。这里有两种方法，一种使用磁盘路径作为参数，另外一种是使用如图所示的第一行UUID作为参数。我们使用UUID（因为短），执行命令：
-    <code>VBoxManage modifyhd "5f25beda-db03-4801-9522-a56403878304" --resize 15360</code>
-    将磁盘映像调整到15G，结果报错，如下图：
-    <img alt="box-modify-error" src="vbox-modify-error.jpg">    </p>
+<p>找到了磁盘映像后就可以更改其大小了。这里有两种方法，一种使用磁盘路径作为参数，另外一种是使用如图所示的第一行UUID作为参数。我们使用UUID（因为短），执行命令：<br>
+<code>VBoxManage modifyhd "5f25beda-db03-4801-9522-a56403878304" --resize 15360</code><br>
+    将磁盘映像调整到15G，结果报错，如下图：<br>
+<img alt="box-modify-error" src="vbox-modify-error.jpg">    </p>
 </li>
 <li>
-<p>报错提示“格式不支持执行的操作”。但是找了半天，都说vmdk格式也可以动态扩展大小，但是不知道为什么VBoxManage不支持（HEI：难道是因为vmdk是vmware标准格式？）。但是VBoxManage命令支持vdi格式(HEI：vdi是vbox私有的格式。)。那就把vmdk格式转换成vdi吧！还是使用VBoxManage命令：
-    <code>VBoxManage clonehd /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vmdk   /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vdi --format VDI</code>  <br>
+<p>报错提示“格式不支持执行的操作”。但是找了半天，都说vmdk格式也可以动态扩展大小，但是不知道为什么VBoxManage不支持（HEI：难道是因为vmdk是vmware标准格式？）。但是VBoxManage命令支持vdi格式(HEI：vdi是vbox私有的格式。)。那就把vmdk格式转换成vdi吧！还是使用VBoxManage命令：<br>
+<code>VBoxManage clonehd /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vmdk   /Users/xuhaifeng/VirtualBox\ VMs/vagrant_default_1493825204615_42659/box-disk1.vdi --format VDI</code>  <br>
     转换成功，结果如图所示：  <br>
 <img alt="box-disk-cast" src="vbox-disk-cast.png"></p>
 </li>
 <li>
-<p>再扩展vdi的大小，还是使用VBoxManage命令，但因为vdi没有被挂载在系统中，所以参数使用路径，如下：
-     <img alt="vbox-modify-disk.png" src="vbox-modify-disk.png">
+<p>再扩展vdi的大小，还是使用VBoxManage命令，但因为vdi没有被挂载在系统中，所以参数使用路径，如下：<br>
+<img alt="vbox-modify-disk.png" src="vbox-modify-disk.png"><br>
      扩展成功。</p>
 </li>
 <li>
-<p>将原来vagrant接管的虚拟机的vmdk磁盘映像换成刚刚生成的这个vdi的磁盘映像。打开vbox，点击SATA端口的右边将其换掉，如图所示：
- <img alt="box-change-disk" src="vbox-change-disk.png"></p>
+<p>将原来vagrant接管的虚拟机的vmdk磁盘映像换成刚刚生成的这个vdi的磁盘映像。打开vbox，点击SATA端口的右边将其换掉，如图所示：<br>
+<img alt="box-change-disk" src="vbox-change-disk.png"></p>
 </li>
 <li>
-<p>启动vagrant，发现报了很多“磁盘空间不够”的错误。如下图：
- <img alt="vagrant-up-error-disksize" src="vagrant-up-error-disksize.png"></p>
+<p>启动vagrant，发现报了很多“磁盘空间不够”的错误。如下图：<br>
+<img alt="vagrant-up-error-disksize" src="vagrant-up-error-disksize.png"></p>
 </li>
 </ol>
-<p>登陆系统，发现扩展的空间确实没有被加上去，如下图：
- <img alt="login-vagrant-df" src="login-vagrant-df.png"></p>
-<p>但是使用fdisk查看一下，发现磁盘的大小确实已经加上了，但是没法使用。如图所示：
- <img alt="fdisk-list-dev" src="fdisk-dev.png"></p>
-<ol>
+<p>登陆系统，发现扩展的空间确实没有被加上去，如下图：<br>
+<img alt="login-vagrant-df" src="login-vagrant-df.png"></p>
+<p>但是使用fdisk查看一下，发现磁盘的大小确实已经加上了，但是没法使用。如图所示：<br>
+<img alt="fdisk-list-dev" src="fdisk-dev.png"></p>
+<ol start="7">
 <li>
 <p>把新扩展的磁盘大小给加上去。还是使用fdisk命令：</p>
 <p><code>fdisk /dev/sda</code>  <br>
-沿着命令，一路根据提示，输入：
+沿着命令，一路根据提示，输入：<br>
 <code new partition>n</code>      <br>
 <code>p</code> {primary partition}     <br>
 <code>3</code> {partition number}     <br>
@@ -161,14 +161,14 @@
 <code>3</code> {partition number}    <br>
 <code>8e</code> {Linux LVM partition}    <br>
 <code>w</code></p>
-<p>如图所示：
- <img alt="fdisk-operator" src="fdisk-operator.png"></p>
+<p>如图所示：<br>
+<img alt="fdisk-operator" src="fdisk-operator.png"></p>
 </li>
 <li>
-<p>再重启vagrant，发现启动的时候还是很多“磁盘空间不足”的报错信息，先忽略它。登入系统后，执行命令：
- <code>fdisk -l /dev/sda</code>  <br>
- 发现我们加上去的那块磁盘已经又块设备的标识了。如下图：
- <img alt="fdisk-dev" src="fdisk-list-dev.png"></p>
+<p>再重启vagrant，发现启动的时候还是很多“磁盘空间不足”的报错信息，先忽略它。登入系统后，执行命令：<br>
+<code>fdisk -l /dev/sda</code>  <br>
+ 发现我们加上去的那块磁盘已经又块设备的标识了。如下图：<br>
+<img alt="fdisk-dev" src="fdisk-list-dev.png"></p>
 </li>
 <li>
 <p>调整卷的大小，使用命令：<code>vgdisplay</code>先看一下卷的信息，记住 VG Name这个选项的值，然后我们依次使用命令 </p>
@@ -177,12 +177,12 @@
 <li><code>vgextend vg_xvhfeng /dev/sda3</code>    </li>
 <li><code>lvextend /dev/vg_xvhfeng/lv_root /dev/sda3</code>    </li>
 <li><code>resize2fs /dev/vg_xvhfeng/lv_root</code>  <br>
-将其合并到原来的挂载点中。如下图所示：
- <img alt="mount-disk" src="mount-disk.png"></li>
+将其合并到原来的挂载点中。如下图所示：<br>
+<img alt="mount-disk" src="mount-disk.png"></li>
 </ol>
 </li>
 </ol>
-<p>10.最后，再重启机器，登录后执行df命令，发现磁盘的大小终于被扩展大了。如下图：
+<p>10.最后，再重启机器，登录后执行df命令，发现磁盘的大小终于被扩展大了。如下图：<br>
 <img alt="last-df" src="last-df.png"></p>
 <p>大功告成。</p>
     </article>

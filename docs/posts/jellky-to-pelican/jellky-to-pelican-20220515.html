@@ -109,7 +109,7 @@
     <article>
         <p>将blog从jekyll迁移至pelican,从开始行动,到最后本地成功,一直都是一个无心拆柳柳成荫的行为.最开始的原因是因为:新的Mac一直无法运行jellky,也不知道什么原因,系统上的jekyll和ruby一直存在兼容问题.但是同样版本,同样方法安装的jellky好人ruby在老的Mac确实稳如狗.对于ruby,确实不熟悉,所以解决问题也一筹莫展.在很长一段时间内,blog一直被闲置(终于找到一个长期不更新blog的理由,狗头奇怪!).</p>
 <p>这个星期天在家逛github,无意中看见很久之前fork的pelican,当初为什么fork这个项目已经无从考证了,仔细看了一下,是基于python的blog的生成工具.python,这个我还是熟悉的,至少比ruby熟悉很多吧.所以就抱着试试看的态度把blog迁移了.</p>
-<h2>virtualenvs</h2>
+<h2 id="virtualenvs">virtualenvs</h2>
 <p>首先把pelican程序给更新了,然后clone下来进行了安装.整个过程中,使用了virtualenvs对pelican进行了环境隔离.对于venv还是非常推荐的,它可以很好的隔离你安装的程序和系统的环境,使用venv,可以让你实现搞不定pelican的情况下,删库跑路,不留下一丁点痕迹.所以对于python程序来说,venv基本就是居家旅行,杀人越货的必备良药.</p>
 <div class="highlight"><pre><span></span><code>安装  Pelican
 sudo port selfupdate  <span class="c1">#更新macprot</span>
@@ -132,11 +132,11 @@ python -m pip install <span class="s2">&quot;pelican[markdown]&quot;</span> <spa
 </li>
 </ul>
 <p>另外上面的命令中:</p>
-<p>:::bash
+<p>:::bash<br>
   source bin/activate</p>
-<p>特别重要,你可以把这句命令看成是"启动"虚拟机,其实在系统中,是设置当前环境的PATH,让你可以在当前命令行中直接调用当前环境下命令.</p>
-<p>PS:如果你不想要这个venv了,直接把这个目录删除就可以了.有没有"删库跑路"的快感?!</p>
-<h2>pelican基础</h2>
+<p>特别重要,你可以把这句命令看成是&rdquo;启动&rdquo;虚拟机,其实在系统中,是设置当前环境的PATH,让你可以在当前命令行中直接调用当前环境下命令.</p>
+<p>PS:如果你不想要这个venv了,直接把这个目录删除就可以了.有没有&rdquo;删库跑路&rdquo;的快感?!</p>
+<h2 id="pelican">pelican基础</h2>
 <p>搞好py虚拟机,安装好pelican的基本环境后,下面就开始建立blog.</p>
 <p>先使用pelican的命令快速的搭建一个空的架子,在这个架子上搭建我们的blog会更加的快速一些.使用如下命令:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># 注意当前命令必须链接在上面的venvs环境下执行</span>
@@ -147,7 +147,7 @@ pelican-quickstart <span class="c1">#新建一个blog的框架</span>
 pelican --autoreload --listen  <span class="c1">#启动blog  默认本机,端口8000</span>
 </code></pre></div>
 
-<p>以上的命令让我们在原来的vens的目录下创建了一个以我们的blog为名字的目录,之所以再创建一个source目录是因为想到后续还会有pelican的一些组件什么可能需要拉取安装之类的,这样能分门别类的管理清楚.再使用pelican的快速启动命令生成了一个框架,生成框架的过程很简单,照着提示问答一些诸如:blog的名字,作者的名字,url,时区...这些问题就可以了.这里最好是如实填写,但是如果你瞎写也没关系,后续可以在配置文件中更改.生成框架的命令执行完后,后续会在当前文件夹下生成一个以你blog名字为路径的/blog-name/source/的目录.,在我们的机器上如下图:</p>
+<p>以上的命令让我们在原来的vens的目录下创建了一个以我们的blog为名字的目录,之所以再创建一个source目录是因为想到后续还会有pelican的一些组件什么可能需要拉取安装之类的,这样能分门别类的管理清楚.再使用pelican的快速启动命令生成了一个框架,生成框架的过程很简单,照着提示问答一些诸如:blog的名字,作者的名字,url,时区&hellip;这些问题就可以了.这里最好是如实填写,但是如果你瞎写也没关系,后续可以在配置文件中更改.生成框架的命令执行完后,后续会在当前文件夹下生成一个以你blog名字为路径的/blog-name/source/的目录.,在我们的机器上如下图:</p>
 <p><img alt="pelican初始目录" src="./attach/pelican-floder.png" title="pelican初始目录"></p>
 <p>所以,开始的我们创建的/blog-name/source/的目录其实是多此一举了,不过也无所谓反正是同名.</p>
 <p>在source目录中的几个文件和文件夹,它们的作用分别如下:</p>
@@ -166,29 +166,29 @@ pelican --autoreload --listen  <span class="c1">#启动blog  默认本机,端口
 </code></pre></div>
 
 <p>来启动pelican,只不过到目前为止,我们没有任何的东西,在浏览器中使用http://127.0.0.1:8000查看的时候是一个空的blog,相当于目前我们的blog还是毛胚状态,虽然可以使用,但是一点美感都没有,所以我们还是要适当的装修一下.</p>
-<h2>主题</h2>
+<h2 id="_1">主题</h2>
 <p>下一步,我们将对我们的blog装修一下.一般具有blog经验的开发者说到装饰blog,那么第一个想到的绝对也是去找一个皮肤,或者高大上一些叫做主题.pelican也给我们准备了很多的主题,找到主题的仓库:<a href="http://www.pelicanthemes.com/" title="Pelican的主题">Pelican的主题</a>,选取一个你自己喜欢的主题,然后先fork到自己的github,再clone到本地.为什么要先fork然后再clone而不是直接clone,主要有2个原因:</p>
 <ol>
 <li>为了避免后续仓库被删除或者仓库不存在之类的问题,还是先fork了安心;</li>
 <li>对于既有主题,肯定有一些是不对你胃口的,所以你肯定是要去修改一些东西的;那么你还不如直接在你自己的仓库上去修改;</li>
 </ol>
-<p>我个人因为不需要花里胡哨,也不喜欢那种很多栏目的blog,所以就选了一个相对比较简单但是又不是那么"毛胚"的主题:pelican-clean-blog.把这个主题的代码拉到本地,在source同级的目录中,建立一个名为themes的文件夹,把pelican-clean-blog的代码拉取到themes目录下,这样做的好处是:当你对其它主题见异思迁的时候,你可以方便的在themes目录下拉取多个主题,然后每个都可以试试,反正试试也不要钱.</p>
+<p>我个人因为不需要花里胡哨,也不喜欢那种很多栏目的blog,所以就选了一个相对比较简单但是又不是那么&rdquo;毛胚&rdquo;的主题:pelican-clean-blog.把这个主题的代码拉到本地,在source同级的目录中,建立一个名为themes的文件夹,把pelican-clean-blog的代码拉取到themes目录下,这样做的好处是:当你对其它主题见异思迁的时候,你可以方便的在themes目录下拉取多个主题,然后每个都可以试试,反正试试也不要钱.</p>
 <div class="highlight"><pre><span></span><code>pelican-themes -lv  <span class="c1">#查看当前已经安装的主题</span>
 pelican-themes --install ./pelican-clean-blog/ --verbose <span class="c1">#安装主题</span>
 pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</span>
 </code></pre></div>
 
 <p>使用上面的命令安装本地的主题到pelican的环境下,使用-v参数可以看到主题安装存放的地址.在我的机器上,主题被安装到了venvs下lib目录下:</p>
-<p>virtualenvs/pelican/lib/python3.9/site-packages/pelican/themes/pelican-clean-blog
+<p>virtualenvs/pelican/lib/python3.9/site-packages/pelican/themes/pelican-clean-blog<br>
 记住这个路径,后面有用.</p>
 <p>要启用这个主题,我们还得在pelicancong.py文件上增加一行:</p>
 <div class="highlight"><pre><span></span><code><span class="n">THEME</span> <span class="o">=</span> <span class="s2">&quot;pelican-clean-blog&quot;</span> <span class="c1"># 说明使用主题,主题必须安装到当前环境下</span>
 </code></pre></div>
 
 <p>然后我们再启动pelican,就能看到带有主题的blog,但是因为我们还是么有放内容,所以当前的blog还是空的.</p>
-<h2>配置与自定义</h2>
-<h3>自定义</h3>
-<p>在选择的pelican-clean-blog主题上,带有Social widget和menuitems的功能.前者一般被配置为SNS等账号,比如wechat,facebook等等;后者为blog上一些除正文内容外的内链和外链,比如内链有"关于",等等,外链有github地址等等.这里的配置根据自己的情况自己决定,我的配置为:</p>
+<h2 id="_2">配置与自定义</h2>
+<h3 id="_3">自定义</h3>
+<p>在选择的pelican-clean-blog主题上,带有Social widget和menuitems的功能.前者一般被配置为SNS等账号,比如wechat,facebook等等;后者为blog上一些除正文内容外的内链和外链,比如内链有&rdquo;关于&rdquo;,等等,外链有github地址等等.这里的配置根据自己的情况自己决定,我的配置为:</p>
 <div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">SOCIAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="err">&#39;</span><span class="n">github</span><span class="err">&#39;</span><span class="p">,</span><span class="w"> </span><span class="err">&#39;</span><span class="n">https</span><span class="o">:</span><span class="c1">//github.com/xvhfeng$_blank&#39;), #打开_blank方式</span>
 <span class="w">                    </span><span class="p">(</span><span class="err">&#39;</span><span class="n">wechat</span><span class="sc">&#39;,&#39;</span><span class="o">/</span><span class="n">pages</span><span class="o">/</span><span class="n">follow</span><span class="p">.</span><span class="n">html</span><span class="err">&#39;</span><span class="p">),</span><span class="w"></span>
 <span class="w">                    </span><span class="p">(</span><span class="err">&#39;</span><span class="n">envelope</span><span class="sc">&#39;,&#39;</span><span class="n">mailto</span><span class="o">:</span><span class="n">xvhfeng</span><span class="mf">@126.</span><span class="n">com</span><span class="err">&#39;</span><span class="p">),</span><span class="w"></span>
@@ -201,7 +201,7 @@ pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</sp
 <span class="w">                    </span><span class="p">)</span><span class="w"></span>
 </code></pre></div>
 
-<p>在配置Social widget和menuitems的时候碰到了一个问题,即默认的情况下,链接的打开方式都是"_self"方式,但是这种模式对于像About,Sharing,Follow这种页面是没有问题,因为这些页面本身就是站内链接,是根据当前的模版生成的;对于github,这个是一个标准的外链地址,而linux c函数栏虽然是一个站内链接,但是它只是简单的html文件,并不是根据当前站点的模版生成的,所以替换掉当前的页面会显得非常突兀,所以对于这种方式我更想要的是使用"_blank"打开方式,而不是"_self"打开方式.然后找了一圈都没找到支持"_blank"打开方式的配置支持.也就是只能自己来去解决问题了.</p>
+<p>在配置Social widget和menuitems的时候碰到了一个问题,即默认的情况下,链接的打开方式都是&rdquo;_self&rdquo;方式,但是这种模式对于像About,Sharing,Follow这种页面是没有问题,因为这些页面本身就是站内链接,是根据当前的模版生成的;对于github,这个是一个标准的外链地址,而linux c函数栏虽然是一个站内链接,但是它只是简单的html文件,并不是根据当前站点的模版生成的,所以替换掉当前的页面会显得非常突兀,所以对于这种方式我更想要的是使用&rdquo;_blank&rdquo;打开方式,而不是&rdquo;_self&rdquo;打开方式.然后找了一圈都没找到支持&rdquo;_blank&rdquo;打开方式的配置支持.也就是只能自己来去解决问题了.</p>
 <p>找到主题的代码,注意这里我们不应该去themes目录下找,因为pelican使用的是你安装后的主题,所以我们要去venvs的lib下的主题文件夹找,根据链接输出的样式,我们找到在base.html文件中,存在有这两个板块的链接输出.代码如下(仅以menuitems为例):</p>
 <div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- Collect the nav links, forms, and other content for toggling --&gt;</span>
 <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;collapse navbar-collapse&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;bs-example-navbar-collapse-1&quot;</span><span class="p">&gt;</span>
@@ -250,7 +250,7 @@ pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</sp
 </ol>
 <p>但是不管怎么样,主要还是为了方便和快速的解决问题.</p>
 <p>另外提一嘴:我个人就是把pelican-clean-blog这个主题给fork到了我自己的github上,然后自己给自己开了一个myself的分支,我的所有更改都是在myself这个分支上进行,这样既能保证主题的master可以升级又能保证myself供给我自己使用,一举两得.</p>
-<h3>MENUITEMS显示设置</h3>
+<h3 id="menuitems">MENUITEMS显示设置</h3>
 <p>在pelican的配置中,关于pages的配置也说一下,我个人比较control in all,秉着这个原则,我对于pages也采取了这种原则.我的配置如下:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Page相关设置，主要是为了About页面</span>
 <span class="n">PAGE_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;pages&#39;</span><span class="p">]</span> <span class="c1">#配置content下,作为pages输出的文件夹</span>
@@ -261,7 +261,7 @@ pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</sp
 </code></pre></div>
 
 <p>这样的配置就把所有pages的内容全部归纳到站点root下的pages文件夹内,并且通过DISPLAY_PAGES_ON_MENU和DISPLAY_CATEGORIES_ON_MENU选项,我们将禁止这些页面与链接自动的在menu区域内显示,这样我们可以通过MENUITEMS配置项来做到需要显示多少就显示多少.</p>
-<h3>内容与静态文件</h3>
+<h3 id="_4">内容与静态文件</h3>
 <p>作为一个技术blog,我们对于blog最主要的内容有几个要求:</p>
 <ol>
 <li>markdown或者rst文件作为源文件,blog可以解析并且生成html输出</li>
@@ -290,7 +290,7 @@ pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</sp
 <span class="p">}</span>
 </code></pre></div>
 
-<p>这种模式确实能很好的解决生成文件的问题,但是却无法解决静态文件和markdown的引用问题.
+<p>这种模式确实能很好的解决生成文件的问题,但是却无法解决静态文件和markdown的引用问题.<br>
 因为posts文件夹中存放的静态图片无法被pelican无差别的复制到markdown相应的html文件的文件夹中.主要的原因是,根据上面的配置信息,markdown在转换成html的过程中,pelican会根据markdown中的date信息来去生成html所存放的目录.而且因为posts被指定为markdown的文件夹,所以默认pelican不会对其进行静态文件的赋值操作,所以我们必须首先把posts文件夹也要静态文件夹化,所以在STATIC_PATHS中先增加一个试试看,将STATIC_PATHS配置成如下:</p>
 <div class="highlight"><pre><span></span><code><span class="n">STATIC_PATHS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;files&#39;</span><span class="p">,</span><span class="s1">&#39;linuxc&#39;</span><span class="p">,</span><span class="s1">&#39;posts&#39;</span><span class="p">]</span>
 <span class="n">EXTRA_PATH_METADATA</span> <span class="o">=</span> <span class="p">{</span> <span class="c1">#按照目录的原样输出</span>
@@ -320,12 +320,12 @@ pelican-themes -lv <span class="c1">#查看一下主题是否已经被安装</sp
 </code></pre></div>
 
 <p>来看一下具有主题,能实现文件管理的blog了.</p>
-<h2>与github page服务结合</h2>
+<h2 id="github-page">与github page服务结合</h2>
 <p>与github page的结合就就相对简单了.只要在github上开一个pages的服务,然后把我们的文章签入就可以了.这里要说一下,以前的pages服务也不知道是我没注意呢?还是没有相对的功能.原来的pages服务只能是从gh-pages这个分支下去支持服务,所以就搞的很麻烦.要先在本地通过blog的source生成一遍html,然后再把生成的html签入github,但是因为分支的原因,你的source和生成的html文件还得分开处理.所以像我怕麻烦的就是直接索性开了两个仓库,一个存放blog的source一个用来做pages服务.但是这次去看了一下设置,发现pages可以通过gh-pages(也有可以选择master分支的,没试,也行也可以)分支的docs目录来提供服务.这样就方便多了,可以把source放在仓库的根目录下,本机生成的html定位到docs目录,这样只要一次提交就可以把所有的东西全部提交到github,方便多了!</p>
-<h2>总结</h2>
+<h2 id="_5">总结</h2>
 <p>至此,我们的blog迁移完成了,总体来说不难,中间碰到的问题也不多.而且就算是碰到了,也是很方便快速的解决了.pelican用了几次发现比jekyll方便多了,并且得益于python具有的venv功能,环境也干净了很多,目前在迁移和使用的过程中并没有发生像jekyll这样需要花很长时间去处理环境的问题.所以这一点还是比较满意的.</p>
 <p>虽然整个blog的写作和处理的方式和以前差不多,当pelican提供了还是相比jekyll更符合我的某些特殊爱好的功能,所以也个适合我一点吧!以后blog应该会一直使用pelican管理下去了,jekyll应该是不会再用了!</p>
-<p>Bye Bye,Jekyll!
+<p>Bye Bye,Jekyll!<br>
 Hello, Pelican!</p>
     </article>
 
