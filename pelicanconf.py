@@ -59,10 +59,10 @@ DISPLAY_PAGES_ON_MENU = False
 DISPLAY_CATEGORIES_ON_MENU = False
 
 # 文章生成
-ARTICLE_SAVE_AS = 'posts/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
-ARTICLE_URL = 'posts/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
-ARTICLE_LANG_SAVE_AS = 'posts/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
-ARTICLE_LANG_URL = 'posts/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
+ARTICLE_SAVE_AS = 'posts/{date:%Y}/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
+ARTICLE_URL = 'posts/{date:%Y}/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
+ARTICLE_LANG_SAVE_AS = 'posts/{date:%Y}/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
+ARTICLE_LANG_URL = 'posts/{date:%Y}/{slug}/{slug}-{date:%Y}{date:%m}{date:%d}.html'
 
 STATIC_PATHS = ['files','linuxc','posts','extra/CNAME']  # 静态文件目录
 ARTICLE_EXCLUDES = ['files','linuxc'] # 生成忽略的目录

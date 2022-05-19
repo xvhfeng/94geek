@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>gdb线上crash调试-记一次装逼失败的教训</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="/theme/css/code_blocks/github.css" rel="stylesheet">
+
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="碰到了内存泄漏的问题,进程无故的down掉.一次完完全全的装逼不成反被X的典型例子。">
+
+        <meta name="author" content="spk xu">
+
+        <meta name="tags" content="调试">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="大嘴的嘴bu大">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="/author/spk-xu.html">
+	<meta property="og:url" content="/posts/2017/gdb-stacksize/gdb-stacksize-20170627.html">
+	<meta property="og:title" content="gdb线上crash调试-记一次装逼失败的教训">
+	<meta property="article:published_time" content="2017-06-27 00:00:00+08:00">
+            <meta property="og:description" content="碰到了内存泄漏的问题,进程无故的down掉.一次完完全全的装逼不成反被X的典型例子。">
+
+            <meta property="og:image" content="/theme/images/post-bg.jpg">
+</head>
+
+<body class="article-gdb-stacksize">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">94geek.com</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/pages/about.html">About</a></li>
+                        <li><a href="/pages/sharing.html">Sharing</a></li>
+                        <li><a href="/pages/follow.html">Follow</a></li>
+                        <li><a href="/files/linuxc/main.htm" target="_blank">Linux C函数</a></li>
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('/theme/images/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>gdb线上crash调试-记一次装逼失败的教训</h1>
+                        <span class="meta">Posted by
+                                <a href="/author/spk-xu.html">spk xu</a>
+                             on Tue 27 June 2017
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <p>可惜这是一次完完全全的装逼不成反被X的典型例子。  </p>
+<h2 id="_1">背景</h2>
+<p>有一天早晨刚到公司，运维小帅哥突然通知我，我们的dfs在平稳运行了一年时间后，在没有任何异常波动、没有任何资源报警、没有任何升级，也没有任何违规操作的情况下，毫无征兆的crash了。<br>
+小帅哥一头雾水，我一脸懵逼。<br>
+dfs是我们的核心服务，绝对不能down机的，所以就先紧急把它拉了起来。命好的是，起来后程序又平稳运行了，既不crash也不拒绝服务，服务和性能又都是杠杠的。这就让我更懵逼了。  </p>
+<h2 id="_2">怀疑</h2>
+<p>首先怀疑的是内存泄漏一类的资源泄漏问题。毕竟dfs是c写的，内存、fd、locker等等的资源处理太多太杂了。特别是内存，几乎每个函数内都会出现。所以重点对象就是它。<br>
+1. 找运维查看一下报警系统是不是有没有发出来的报警？查了一下没有。<br>
+2. 自己还是不放心，直接看了一下线上产生的core文件，大小也只有mb级别，确定确实没有溢出。  </p>
+<p>接下来，怀疑是fd或者locker。<br>
+- 先说locker。dfs是我们自己设计的无锁处理算法，根本不存在locker的资源操作，所以这个也被排除了。<br>
+- fd，文件描述符。如果fd有溢出，我们也对fd加了报警，报警系统是不会不报的。就算漏了，fd溢出的现象也不应该是进程直接crash，而是会无响应才对。而且去查看了一下log，并没有发现执行close有错误的迹象。    </p>
+<p>到目前为止，所有所能想到的原因全部不成立，线索全部中断。那么如果非要弄清楚这次crash到底为了什么，唯一的办法就是去看程序的runtimes。  </p>
+<h2 id="_3">碰碰运气</h2>
+<p>反正线上的core文件都已经生成了，不玩白不玩。通知运维把core给拿下来，我非得去看看到底为啥就crash了？不看不要紧，一看就自己打了自己的脸啊！    </p>
+<ol>
+<li>加载core文件，发现程序是因为收到信号6的原因进程被退出的。如下图：<br>
+<img alt="single 6" src="1.png"><br>
+信号6，也就是SIGABRT，Linux的man解释：由调用abort函数生成的信号。引起这个信号的可能性有很多，所以这一点没啥用。   </li>
+<li>加载可执行文件，然后看看crash的一瞬间的堆栈是一个什么情况，好做一个大概的判断：哪一行代码可能出现了问题。<br>
+<img alt="load file" src="2.png"><br>
+执行bt命令后，显示出来的stack信息全是？？，出现这种情况的可能性有2个：<br>
+- 可执行被重新编译了，导致了新的可执行文件的元数据和core文件中的元数据对不上，这个首先被排除，我们的可执行文件都是从线上直接拖下来的，所以不可能出现这种情况（这里也要告诫大家，千万要保留运行时程序的可执行文件版本，包括.o文件等）；<br>
+- stack已经被破坏了。这种情况很容易就会发生。程序在运行的过程中因为stack，array等溢出的问题没有第一时间被crash，接着在执行命令的时候，产生的core文件stack可能就会被破坏；  </li>
+</ol>
+<p>目前来看，我们所能拿到的信息都已经指向了线索中断。操作系统给出的信号不能定位问题，使用gdb调试core因为stack被破坏无法再进一步。那么还有没有别的办法呢？  </p>
+<h2 id="_4">再进一步</h2>
+<p>竟然stack已经被破坏，gdb也无法认出，按照正常的路子是解决不了这个问题了。所以这时候“野路子”（其实是更合理更深层次的解决方案）就上场了。既然被破坏，那就恢复它或者是想办法绕过它。<br>
+恢复stack的难度有点大，你首先得知道core文件所有的元数据信息，然后和可执行文件的元数据信息一一合并，还要考虑程序在runtime状态下的内存状态，难度确实是相当的大。所以这一步首先被排除了。<br>
+那就绕过它。考验计算机操作系统原理和计算机运行原理的时刻来了（所以要多读书）。<br>
+首先我们知道所有的程序都是由cpu来执行机器指令的，和cpu执行指令相互配合的是寄存器，其中有几个寄存器记录了当前程序runtime状态下的地址，比如esp/rsp，ebp/rbp等寄存器。也就是说我如果知道程序crash的时候寄存器的值，可能就有希望能复原当时的stack。<br>
+方针已经制定，就看执行了。  <br>
+1. 首先看一下各个寄存器的值，如下图:<br>
+<img alt="regediter" src="3.png"><br>
+别的都不用看，只要看一下rbp和rsp的值就可以了。<br>
+- rsp表示是当时程序runtime的时候栈顶的地址值；<br>
+- rbp表示当时程序执行到的指令的地址值；<br>
+2. 再看一下执行到rbp的指令的时候，程序前面都执行了什么指令，如下图：<br>
+<img alt="rbp" src="4.png"><br>
+哈哈，终于看到函数了。spx_socket_connect_nb和ydb_storage_heartbeat_send。按照stack的FILO的原理，是执行到spx_socket_connect_nb的时候程序发生了问题。具体的地址在函数的地址+611处。先看一下汇编，查一下地址看看能不能看出来一点什么？如图：<br>
+<img alt="code" src="5.png"><br>
+好像没啥，前面就是给connect构造结构体，后面就是调用connect。但是问题确实是在connect之前就crash了啊。查看一下代码:</p>
+<div class="highlight"><pre><span></span><code>```
+<span class="nv">err_t</span> <span class="nv">spx_socket_connect_nb</span><span class="ss">(</span><span class="nv">int</span> <span class="nv">fd</span>,<span class="nv">string_t</span> <span class="nv">ip</span>,<span class="nv">int</span> <span class="nv">port</span>,<span class="nv">u32_t</span> <span class="nb">timeout</span><span class="ss">)</span>{
+    <span class="nv">struct</span> <span class="nv">sockaddr_in</span> <span class="nv">addr</span><span class="c1">;</span>
+    <span class="nv">bzero</span><span class="ss">(</span><span class="o">&amp;</span><span class="nv">addr</span>,<span class="nv">sizeof</span><span class="ss">(</span><span class="nv">addr</span><span class="ss">))</span><span class="c1">;</span>
+    <span class="nv">addr</span>.<span class="nv">sin_family</span> <span class="o">=</span> <span class="nv">AF_INET</span><span class="c1">;</span>
+    <span class="nv">addr</span>.<span class="nv">sin_port</span><span class="o">=</span><span class="nv">htons</span><span class="ss">(</span><span class="nv">port</span><span class="ss">)</span><span class="c1">;</span>
+    <span class="nv">addr</span>.<span class="nv">sin_addr</span>.<span class="nv">s_addr</span> <span class="o">=</span> <span class="nv">inet_addr</span><span class="ss">(</span><span class="nv">ip</span><span class="ss">)</span><span class="c1">;</span>
+    <span class="nv">err_t</span> <span class="nv">err</span> <span class="o">=</span> <span class="mi">0</span><span class="c1">;</span>
+    <span class="nv">err_t</span> <span class="nv">rc</span> <span class="o">=</span> <span class="mi">0</span><span class="c1">;</span>
+    <span class="k">if</span><span class="ss">(</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="k">connect</span><span class="ss">(</span><span class="nv">fd</span>,<span class="ss">(</span><span class="nv">struct</span> <span class="nv">sockaddr</span> <span class="o">*</span><span class="ss">)</span> <span class="o">&amp;</span><span class="nv">addr</span>,<span class="nv">sizeof</span><span class="ss">(</span><span class="nv">addr</span><span class="ss">)))</span>{
+        <span class="o">//</span><span class="nv">filter</span> <span class="nv">this</span> <span class="nv">errno</span>,
+        <span class="o">//</span><span class="nv">socket</span> <span class="nv">is</span> <span class="nv">not</span> <span class="k">connect</span> <span class="nv">to</span> <span class="nv">server</span> <span class="nv">and</span> <span class="k">return</span> <span class="nv">at</span> <span class="nv">once</span>
+        <span class="k">if</span> <span class="ss">(</span><span class="nv">EINPROGRESS</span> <span class="o">==</span> <span class="nv">errno</span><span class="ss">)</span> {
+            <span class="nv">struct</span> <span class="nv">timeval</span> <span class="nv">tv</span><span class="c1">;</span>
+            <span class="nv">SpxZero</span><span class="ss">(</span><span class="nv">tv</span><span class="ss">)</span><span class="c1">;</span>
+            <span class="nv">tv</span>.<span class="nv">tv_sec</span> <span class="o">=</span> <span class="nb">timeout</span><span class="c1">;</span>
+            <span class="nv">tv</span>.<span class="nv">tv_usec</span> <span class="o">=</span> <span class="mi">0</span><span class="c1">;</span>
+            <span class="nv">fd_set</span> <span class="nv">frd</span><span class="c1">;</span>
+            <span class="nv">FD_ZERO</span><span class="ss">(</span><span class="o">&amp;</span><span class="nv">frd</span><span class="ss">)</span><span class="c1">;</span>
+            <span class="nv">FD_SET</span><span class="ss">(</span><span class="nv">fd</span>,<span class="o">&amp;</span><span class="nv">frd</span><span class="ss">)</span><span class="c1">;</span>
+            <span class="nv">socklen_t</span> <span class="nv">len</span> <span class="o">=</span> <span class="nv">sizeof</span><span class="ss">(</span><span class="nv">err</span><span class="ss">)</span><span class="c1">;</span>
+            <span class="k">if</span> <span class="ss">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="ss">(</span><span class="nv">rc</span> <span class="o">=</span> <span class="nv">select</span> <span class="ss">(</span><span class="nv">fd</span><span class="o">+</span><span class="mi">1</span> , <span class="nv">NULL</span>,<span class="o">&amp;</span><span class="nv">frd</span>,<span class="nv">NULL</span>,<span class="o">&amp;</span><span class="nv">tv</span><span class="ss">)))</span> {
+                <span class="k">if</span><span class="ss">(</span><span class="mi">0</span> <span class="o">&gt;</span> <span class="nv">getsockopt</span><span class="ss">(</span><span class="nv">fd</span>,<span class="nv">SOL_SOCKET</span>,<span class="nv">SO_ERROR</span>,<span class="ss">(</span><span class="nv">void</span><span class="o">*</span><span class="ss">)(</span><span class="o">&amp;</span><span class="nv">err</span><span class="ss">)</span>,<span class="o">&amp;</span><span class="nv">len</span><span class="ss">))</span> {
+                    <span class="nv">err</span> <span class="o">=</span> <span class="nv">errno</span><span class="c1">;</span>
+                    <span class="k">return</span> <span class="nv">err</span><span class="c1">;</span>
+                }
+                <span class="k">if</span> <span class="ss">(</span><span class="mi">0</span> <span class="o">!=</span> <span class="nv">err</span><span class="ss">)</span> {
+                    <span class="k">return</span> <span class="nv">err</span><span class="c1">;</span>
+                }
+            } <span class="k">else</span> <span class="k">if</span><span class="ss">(</span><span class="mi">0</span> <span class="o">==</span> <span class="nv">rc</span><span class="ss">)</span> {
+                <span class="nv">err</span> <span class="o">=</span> <span class="nv">ETIMEDOUT</span><span class="c1">;</span>
+                <span class="k">return</span> <span class="nv">err</span><span class="c1">;</span>
+            } <span class="k">else</span> {
+                <span class="nv">err</span> <span class="o">=</span> <span class="nv">EXDEV</span><span class="c1">;</span>
+                <span class="k">return</span> <span class="nv">err</span><span class="c1">;</span>
+            }
+            <span class="nv">SpxErrReset</span><span class="c1">;</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="c1">;</span>
+        } <span class="k">else</span> {
+            <span class="k">return</span> <span class="nv">errno</span><span class="c1">;</span>
+        }
+    }
+    <span class="k">return</span> <span class="mi">0</span><span class="c1">;</span>
+}
+</code></pre></div>
+
+<p>```</p>
+<p>确实前面我们就构建了一个struct sockaddr_in的结构体，然后我们就直接connect了。貌似不会出问题，而且代码也已经运行了很久很久了。但是突然间，有种预感冥冥中就出来了。nm可能就这里出问题了。去看一下配置文件，其中的配置项：<br>
+<code>stacksize = 64kb</code><br>
+直刺眼睛啊！火辣辣的。<br>
+这个配置项用来做什么的？其实这个配置项是用来限制系统的stack大小的。也许很多同学都没有听过东东，但是如果你在linux上运行一下命令：<br>
+<code>ulimit -a</code><br>
+<img alt="ulimit -a" src="6.png"><br>
+会出来如上图的一排设置，其中红色框框圈出来的就是这个stacksize的值。在这台机器上默认的是8mb。stacksize的设置在每种linux发行版上的值可能都是不同的。当初就是为了“装逼”，显示自己的编程水平，将stacksize设置成了64kb，这样程序中每个线程最大的stack可用大小就是64kb，你看看我控制系统资源控制的多好？！结果，当碰上一不小心不注意的时候，stack的size马上就超出了64kb，这样stack就溢出了。当然程序就会crash，stack也当然的被破坏了。<br>
+那么为什么我们的会出现这个问题呢？<br>
+1. sockaddr_in的结构体其实并不是很大，但是它申请的是stack的内存，原来使用的内存大小+sockaddr_in的大小应该正好碰上临界点；所以sockaddr_in的申请应该是最后一根稻草；<br>
+2. ydb_storage_heartbeat_send这个函数是在heartbeat线程中运行的，heartbeat线程是一个常驻线程，由timer事件来触发，每次都会向tracker发送心跳数据，所以可能会存在stack因为某些原因，导致了再一次运行中申请的内存比较多，比如log记日志的时候；<br>
+3. 那么为什么不起来就出现这个问题呢，而是要在运行了一段时间后呢？这个问题其实没办法确定申请stack的时间点，比如因为网络的问题我需要记录日志，然而又不是时时刻刻网络不行的，正好在某个瞬间网络不行，申请stack内存记录日志，这样没有释放正好被抓到；<br>
+4. 又因为heartbeat是常驻线程，所以stack基本上不太会被第一时间回收，肯定要在事件处理的最后被回收，所以在一次事件处理内一定要确保有适当的大小来满足程序对于stack的需求；<br>
+原因也找到了，怎么解决这个问题呢？有几种办法：<br>
+1. 不要装逼了，直接这个项不用设置。我们的程序使用的是事件模型，并不是像java一样的每个connection一个处理线程，dfs是一个线程对应着多个connection，所以线程数并不多，就算是每个线程最大的stacksize是8mb，也用不了多少的内存；<br>
+2. 把配置文件中的stacksize改大一点，比如1024kb什么的就可以了。   </p>
+<h2 id="_5">经验教训</h2>
+<p>因为stacksize这个项的设置导致了出问题的人我不是第一个，也不会是最后一个，仅仅在dfs出了这个问题的时候，我就知道还有别人因为同样的问题导致程序被crash，只是当时程序跑的好好的我就没有多加注意。所以在这里诚恳的告诫大家：<br>
+莫装逼，装逼遭雷劈;<br>
+莫装帅，装帅遭人踹;<br>
+莫装吊，装吊遭狗咬…    </p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="/tag/diao-shi.html">调试</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://github.com/xvhfeng" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:xvhfeng@126.com">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  spk xu
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="/theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>jekyll图片管理插件</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="/theme/css/code_blocks/github.css" rel="stylesheet">
+
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="使用jekyll搭建github的pages服务已经很多年了，虽然写的blog不是特别多，但在使用的过程中难免还是遇到了很多的问题。在所有这些问题中，几乎所有的问题都被解决了。但有且只有一个问题几乎无解：图片管理。使用jekyll的程序员几乎都搭配markdown，但是ma...">
+
+        <meta name="author" content="spk xu">
+
+        <meta name="tags" content="技术">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="大嘴的嘴bu大">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="/author/spk-xu.html">
+	<meta property="og:url" content="/posts/2017/blog/blog-20170526.html">
+	<meta property="og:title" content="jekyll图片管理插件">
+	<meta property="article:published_time" content="2017-05-26 00:00:00+08:00">
+            <meta property="og:description" content="使用jekyll搭建github的pages服务已经很多年了，虽然写的blog不是特别多，但在使用的过程中难免还是遇到了很多的问题。在所有这些问题中，几乎所有的问题都被解决了。但有且只有一个问题几乎无解：图片管理。使用jekyll的程序员几乎都搭配markdown，但是ma...">
+
+            <meta property="og:image" content="/theme/images/post-bg.jpg">
+</head>
+
+<body class="article-blog">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">94geek.com</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/pages/about.html">About</a></li>
+                        <li><a href="/pages/sharing.html">Sharing</a></li>
+                        <li><a href="/pages/follow.html">Follow</a></li>
+                        <li><a href="/files/linuxc/main.htm" target="_blank">Linux C函数</a></li>
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('/theme/images/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>jekyll图片管理插件</h1>
+                        <span class="meta">Posted by
+                                <a href="/author/spk-xu.html">spk xu</a>
+                             on Fri 26 May 2017
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <p>使用jekyll搭建github的pages服务已经很多年了，虽然写的blog不是特别多，但在使用的过程中难免还是遇到了很多的问题。在所有这些问题中，几乎所有的问题都被解决了。但有且只有一个问题几乎无解：图片管理。使用jekyll的程序员几乎都搭配markdown，但是markdown对于图片的管理，简直就是可以用一坨屎来形容。  </p>
+<h3 id="_1">以前问题</h3>
+<hr>
+<p>通常在markdown中，引用图片都是使用标记来进行。但是引用的图片路径往往是一个问题。优先了jekyll，那么本地的编辑器可能就无法显示和预览；优先了本地预览，那么markdown上传到jekyll后路径是一个问题。   </p>
+<p>那么我们最常用的就是这种办法：因为markdown引用图片最常用的就是http形式的地址引用。所以前提就是你必须先有一个稳定的图床，然后上传图片，获取地址，再把地址贴入markdown中。这种方式我受不了的地方在于中间插入图片或者修改图片多次的话，往往需要长时间的停下来先弄图片，再写markdown，整个思路会受到很多的影响。有时候弄完图片已经没心情再写东西了。  </p>
+<p>那么有没有一种办法来解决这个问题呢？  </p>
+<p>首先我们想到了一种办法，把图片直接放到某个文件夹里面，上传到github，但是这样的做法还是会在本地编辑器和jekyll中满足一个。另外一个办法，就是把图片和markdown放在同一个文件夹，这样就没有路径问题了，直接用文件名就可以引用图片。但是这种办法满足了编辑器，在jekyll build的时候，jekyll对于_post目录下的文件只处理markdown文件，不会处理别的文件。看上去这条路也不通了。  </p>
+<p>那么到底有没有别的办法呢？  </p>
+<h3 id="_2">我的解决方案</h3>
+<hr>
+<p>其实能想到的方案上面都已经全部想到了，但是不管怎么去解决，在jekyll和本地编辑器中往往只能满足一个，两个能同时兼顾的就没有。但是对比上面的几种方案，最靠谱的貌似还是最后一种<strong> markdown和图片同目录 </strong> 但是在同目录jekyll又不管，幸好jekyll提供了插件功能。  </p>
+<p>jekyll的插件有很多种，具体的请查看 <a href="http://jekyllcn.com/docs/plugins/">jekyll插件科普</a> </p>
+<p>回到我们的问题，我们的问题其实已经很清楚了，就是在jekyll解析markdown到html的同时，将同目录的静态文件全部cp到生成的html的目录。这样markdown文件生成的html和静态资源文件又在一个目录下了，这样就可以避免目录的问题了。  </p>
+<p>在这些插件的hooks中，我们选择了 :posts :post_write 这个hooks，因为这个hooks是在markdown已经被解析，并且被写入磁盘以后发生的。这个时间点正好就是我们想要的这个时间点。那么我们现在就是只要实现这个hooks就可以了。所以就有了下面的代码：   </p>
+<div class="highlight"><pre><span></span><code><span class="n">Jekyll</span><span class="o">::</span><span class="n">Hooks</span><span class="p">.</span><span class="n">register</span><span class="w"> </span><span class="o">:</span><span class="n">posts</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="n">post_write</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="o">|</span><span class="n">doc</span><span class="o">|</span><span class="w"></span>
+<span class="p">#</span><span class="w"> </span><span class="n">Minify</span><span class="w"> </span><span class="n">HTML</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="n">after</span><span class="w"> </span><span class="n">site</span><span class="w"> </span><span class="n">build</span><span class="w"></span>
+<span class="p">#</span><span class="w">  </span><span class="n">gulp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="k">join</span><span class="p">(</span><span class="n">site</span><span class="p">.</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="p">&#39;</span><span class="n">node_modules</span><span class="p">&#39;,</span><span class="w"> </span><span class="p">&#39;.</span><span class="n">bin</span><span class="p">&#39;,</span><span class="w"> </span><span class="p">&#39;</span><span class="n">gulp</span><span class="p">&#39;)</span><span class="w"></span>
+<span class="p">#</span><span class="w">  </span><span class="n">system</span><span class="w"> </span><span class="s">&quot;#{gulp} minifyHTML --silent&quot;</span><span class="w"></span>
+<span class="p">#</span><span class="w"></span>
+<span class="p">#</span><span class="n">Kernel</span><span class="p">.</span><span class="n">puts</span><span class="w"> </span><span class="s">&quot;11111111111111111111&quot;</span><span class="w"></span>
+<span class="p">#</span><span class="n">Kernel</span><span class="p">.</span><span class="n">puts</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="n">path</span><span class="w"></span>
+
+<span class="n">pn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pathname</span><span class="p">.</span><span class="n">new</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">path</span><span class="p">)</span><span class="w"></span>
+<span class="n">basedir</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">pn</span><span class="p">.</span><span class="n">dirname</span><span class="w"> </span>
+<span class="n">dest_path</span><span class="w"> </span><span class="o">=</span><span class="n">File</span><span class="p">.</span><span class="k">join</span><span class="p">(</span><span class="n">doc</span><span class="p">.</span><span class="n">site</span><span class="p">.</span><span class="n">config</span><span class="p">[</span><span class="s">&quot;destination&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="n">url</span><span class="p">)</span><span class="w"></span>
+<span class="n">Dir</span><span class="p">.</span><span class="n">foreach</span><span class="p">(</span><span class="n">basedir</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="o">|</span><span class="n">x</span><span class="o">|</span><span class="w"> </span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">start_with</span><span class="o">?</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">end_with</span><span class="o">?</span><span class="p">(</span><span class="s">&quot;md&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">end_with</span><span class="o">?</span><span class="p">(</span><span class="s">&quot;markdown&quot;</span><span class="p">))</span><span class="w"></span>
+<span class="w">            </span><span class="n">stmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="k">join</span><span class="p">(</span><span class="n">basedir</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">dtmp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">.</span><span class="k">join</span><span class="p">(</span><span class="n">dest_path</span><span class="p">,</span><span class="n">x</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">Kernel</span><span class="p">.</span><span class="n">puts</span><span class="w"> </span><span class="n">stmp</span><span class="w"></span>
+<span class="w">            </span><span class="n">Kernel</span><span class="p">.</span><span class="n">puts</span><span class="w"> </span><span class="n">dtmp</span><span class="w"></span>
+<span class="w">            </span><span class="n">FileUtils</span><span class="p">.</span><span class="n">cp</span><span class="p">(</span><span class="n">stmp</span><span class="p">,</span><span class="n">dtmp</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">Kernel</span><span class="p">.</span><span class="n">puts</span><span class="w"> </span><span class="s">&quot;copy static file from #{stmp} to #{dtmp}&quot;</span><span class="w"></span>
+<span class="w">        </span><span class="k">end</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">end</span><span class="w"></span>
+</code></pre></div>
+
+<p>将这个文件保存到_plugins目录下，随便给一个文件名即可。再次运行jekyll server就可以看到这个hooks被执行了。</p>
+<p>具体:<br>
+1. 项目源码: <a href="https://github.com/xvhfeng/jekyll-markdown-image">github project</a><br>
+2 如何使用：<a href="https://github.com/xvhfeng/blog-source">blog源码</a></p>
+<h3 id="_3">缺点</h3>
+<hr>
+<p>这个解决方案并不是万能的，它也有自己的缺点。目前使用下来，缺点有几个： <br>
+1. 只支持markdown和静态文件同目录的情况； <br>
+2. 对于jekyll的permalink的配置一定要正确，千奇百怪的配置不一定可用，我的配置是/blog/:year/:title/，注意，最后那个目录分隔符 &ldquo;/&rdquo; 一定要带;<br>
+3. 对于post中的markdown转html的时候，列表页的显示也有问题，如果列表页上会显示摘要或者是文章的一部分内容，而恰巧这部分在列表上显示的内容中有图片的引用，这样这个图片也会有显示问题。因为图片其实是在markdown生成的html目录，而列表页是一个单独的目录，所以图片路径是取不到的。这部分其实是可以完善的，但是对于我来说，这部分几乎很少用到，我也就没管了；<br>
+4. 因为你使用了自定义的plugin，而github为了安全考虑是不支持自定义plugin的，所以对于使用自定义的用户来说，只能在本地build完了站点后，把_site目录下的文件签入github，使用静态文件的方式来提供blog的服务；（PS，好处时自定义的插件可以让你为所欲为，有失必有得）  </p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="/tag/ji-zhu.html">技术</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://github.com/xvhfeng" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:xvhfeng@126.com">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  spk xu
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="/theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>

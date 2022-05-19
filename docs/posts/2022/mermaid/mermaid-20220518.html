@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>mermaid从入门到入土</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="/theme/css/code_blocks/github.css" rel="stylesheet">
+
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="这可能是这个blog迄今为止第一篇转载,也是唯一的一篇.mermaid对于写markdown的我很眼馋,那么多的语法又记不住.搭建pelican也需要实验,所以就先转载了这篇文章以方便自己查阅。">
+
+        <meta name="author" content="spk xu">
+
+        <meta name="tags" content="转载">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="大嘴的嘴bu大">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="/author/spk-xu.html">
+	<meta property="og:url" content="/posts/2022/mermaid/mermaid-20220518.html">
+	<meta property="og:title" content="mermaid从入门到入土">
+	<meta property="article:published_time" content="2022-05-18 00:00:00+08:00">
+            <meta property="og:description" content="这可能是这个blog迄今为止第一篇转载,也是唯一的一篇.mermaid对于写markdown的我很眼馋,那么多的语法又记不住.搭建pelican也需要实验,所以就先转载了这篇文章以方便自己查阅。">
+
+            <meta property="og:image" content="/theme/images/post-bg.jpg">
+</head>
+
+<body class="article-mermaid">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">94geek.com</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/pages/about.html">About</a></li>
+                        <li><a href="/pages/sharing.html">Sharing</a></li>
+                        <li><a href="/pages/follow.html">Follow</a></li>
+                        <li><a href="/files/linuxc/main.htm" target="_blank">Linux C函数</a></li>
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('/theme/images/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>mermaid从入门到入土</h1>
+                        <span class="meta">Posted by
+                                <a href="/author/spk-xu.html">spk xu</a>
+                             on Wed 18 May 2022
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <h1 id="_1">概述</h1>
+<p>什么是Mermaid？<br>
+  Mermaid是一种基于Javascript的绘图工具，使用类似于Markdown的语法，使用户可以方便快捷地通过代码创建图表。</p>
+<p>项目地址：https://github.com/mermaid-js/mermaid（需要将梯子设置成全局模式才能访问）</p>
+<p>怎么使用Mermaid？</p>
+<p>使用特定的Mermaid渲染器；</p>
+<p><strong>使用集成了Mermaid渲染功能的Markdown编辑器，如<a href="https://www.typora.io/">Typora</a>。</strong>使用时，需要将代码块的语言选择为Mermaid。</p>
+<blockquote>
+<p>Typora是宇宙第一笔记软件，不接受反驳 </p>
+</blockquote>
+<p>作为转载者,我得说一句,自从丫的收费后,就不看了.所以我选择了Obsidian.目前用的也很high,个人版免费,还不限制功能.必须实力做一波广告.</p>
+<p>Mermaid能绘制哪些图？</p>
+<ul>
+<li>饼状图：使用<code>pie</code>关键字，具体用法后文将详细介绍</li>
+<li>流程图：使用<code>graph</code>关键字，具体用法后文将详细介绍</li>
+<li>序列图：使用<code>sequenceDiagram</code>关键字</li>
+<li>甘特图：使用<code>gantt</code>关键字</li>
+<li>类图：使用<code>classDiagram</code>关键字</li>
+<li>状态图：使用<code>stateDiagram</code>关键字</li>
+<li>用户旅程图：使用<code>journey</code>关键字</li>
+</ul>
+<h1 id="_2">讲解</h1>
+<p>朱元璋家谱简图，圆圈代表皇帝</p>
+<div class="highlight"><pre><span></span><code><span class="nf">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">emperor</span><span class="p">((</span><span class="err">朱八八</span><span class="p">))</span><span class="o">-</span><span class="p">.</span><span class="err">子</span><span class="p">.</span><span class="o">-&gt;</span><span class="n">father</span><span class="p">(</span><span class="err">朱五四</span><span class="p">)</span><span class="o">-</span><span class="p">.</span><span class="err">子</span><span class="p">.</span><span class="o">-&gt;</span><span class="err">朱四九</span><span class="o">-</span><span class="p">.</span><span class="err">子</span><span class="p">.</span><span class="o">-&gt;</span><span class="err">朱百六</span><span class="w"></span>
+<span class="err">朱雄英</span><span class="o">--</span><span class="err">长子</span><span class="o">--&gt;</span><span class="err">朱标</span><span class="o">--</span><span class="err">长子</span><span class="o">--&gt;</span><span class="n">emperor</span><span class="w"></span>
+<span class="n">emperor2</span><span class="p">((</span><span class="err">朱允炆</span><span class="p">))</span><span class="o">--</span><span class="err">次子</span><span class="o">--&gt;</span><span class="err">朱标</span><span class="w"></span>
+<span class="err">朱樉</span><span class="o">--</span><span class="err">次子</span><span class="o">--&gt;</span><span class="n">emperor</span><span class="w"></span>
+<span class="err">朱棡</span><span class="o">--</span><span class="err">三子</span><span class="o">--&gt;</span><span class="n">emperor</span><span class="w"></span>
+<span class="n">emperor3</span><span class="p">((</span><span class="err">朱棣</span><span class="p">))</span><span class="o">--</span><span class="err">四子</span><span class="o">--&gt;</span><span class="n">emperor</span><span class="w"></span>
+<span class="n">emperor4</span><span class="p">((</span><span class="err">朱高炽</span><span class="p">))</span><span class="o">--</span><span class="err">长子</span><span class="o">--&gt;</span><span class="n">emperor3</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+graph LR
+emperor((朱八八))-.子.->father(朱五四)-.子.->朱四九-.子.->朱百六
+
+
+朱雄英--长子-->朱标--长子-->emperor
+emperor2((朱允炆))--次子-->朱标
+朱樉--次子-->emperor
+朱棡--三子-->emperor
+emperor3((朱棣))--四子-->emperor
+emperor4((朱高炽))--长子-->emperor3
+</div>
+
+<p>以上是概述，下面详细介绍饼状图和流程图的语法。其他图的语法可访问上文给出的项目地址，自行学习。（记得挂梯子）</p>
+<h1 id="_3">饼状图</h1>
+<p>在线渲染器：<a href="https://mermaidjs.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoicGllXG5cIkRvZ3NcIiA6IDQyLjk2XG5cIkNhdHNcIiA6IDUwLjA1XG5cIlJhdHNcIiA6IDEwLjAxIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQifX0">Online FlowChart &amp; Diagrams Editor</a>（需要梯子）</p>
+<p>语法</p>
+<ul>
+<li>从<code>pie</code>关键字开始图表</li>
+<li>然后使用<code>title</code>关键字及其在字符串中的值，为饼图赋予标题。（这是<strong>可选的</strong>）</li>
+<li>
+<p>数据部分</p>
+<ul>
+<li>在<code>" "</code>内写上分区名。</li>
+<li>分区名后使用<code>:</code>作为分隔符</li>
+<li>分隔符后写上数值，最多支持2位小数——数据会以百分比的形式展示</li>
+</ul>
+</li>
+<li>
+<p>实例</p>
+<div class="highlight"><pre><span></span><code>pie
+title 为什么总是宅在家里？
+&quot;喜欢宅&quot; : 15
+&quot;天气太热或太冷&quot; : 20
+&quot;穷&quot; : 500
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+pie
+title 为什么总是宅在家里？
+"喜欢宅" : 15
+"天气太热或太冷" : 20
+"穷" : 500
+</div>
+
+<h1 id="_4">流程图</h1>
+<p>在线渲染器：<a href="https://mermaidjs.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiZ3JhcGggVERcbiAgICBBW0hhcmRdIC0tPnxUZXh0fCBCKFJvdW5kKVxuICAgIEIgLS0-IEN7RGVjaXNpb259XG4gICAgQyAtLT58T25lfCBEW1Jlc3VsdCAxXVxuICAgIEMgLS0-fFR3b3wgRVtSZXN1bHQgMl0iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9fQ">Online FlowChart &amp; Diagrams Editor</a>（需要挂梯子）</p>
+<h2 id="_5">实例</h2>
+<div class="highlight"><pre><span></span><code><span class="n">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">A</span><span class="o">[</span><span class="n">Start</span><span class="o">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">B</span><span class="err">{</span><span class="k">Is</span><span class="w"> </span><span class="n">it</span><span class="vm">?</span><span class="err">}</span><span class="p">;</span><span class="w"></span>
+<span class="n">B</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">Yes</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">C</span><span class="o">[</span><span class="n">OK</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">D</span><span class="o">[</span><span class="n">Rethink</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+<span class="n">B</span><span class="w"> </span><span class="c1">-- No ----&gt; E[End];</span>
+</code></pre></div>
+
+<div class="mermaid">
+graph LR
+A[Start] --> B{Is it?};
+B -- Yes --> C[OK];
+C --> D[Rethink];
+D --> B;
+B -- No ----> E[End];
+</div>
+
+<h2 id="_6">方向</h2>
+<p>用于开头，声明流程图的方向。</p>
+<ul>
+<li><code>graph</code>或<code>graph TB</code>或<code>graph TD</code>：从上往下</li>
+<li><code>graph BT</code>：从下往上</li>
+<li><code>graph LR</code>：从左往右</li>
+<li><code>graph RL</code>：从右往左</li>
+</ul>
+<h2 id="_7">结点</h2>
+<ul>
+<li>无名字的结点：直接写内容，此时结点边框为方形；节点内容不能有空格</li>
+<li>有名字的结点：节点名后书写内容，内容左右有特定符号，结点边框由符号决定；节点内容可以有空格</li>
+</ul>
+<blockquote>
+<p>下面的实例中，没有为graph指定方向，因此默认是从上往下的。但是由于各个结点之前没有箭头，所以他们都处于同一排。</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code>graph
+默认方形
+id1[方形]
+id2(圆边矩形)
+id3([体育场形])
+id4[[子程序形]]
+id5[(圆柱形)]
+id6((圆形))
+</code></pre></div>
+
+<div class="mermaid">
+graph
+默认方形
+id1[方形]
+id2(圆边矩形)
+id3([体育场形])
+id4[[子程序形]]
+id5[(圆柱形)]
+id6((圆形))
+</div>
+
+<div class="highlight"><pre><span></span><code><span class="x">graph</span>
+<span class="x">id1{菱形}</span>
+<span class="x">id2</span><span class="cp">{{</span><span class="err">六角形</span><span class="cp">}}</span><span class="x"></span>
+<span class="x">id3[/平行四边形/]</span>
+<span class="x">id4[\反向平行四边形\]</span>
+<span class="x">id5[/梯形\]</span>
+<span class="x">id6[\反向梯形/]</span>
+</code></pre></div>
+
+<div class="mermaid">
+graph
+id1{菱形}
+id2{{六角形}}
+id3[/平行四边形/]
+id4[\反向平行四边形\]
+id5[/梯形\]
+id6[\反向梯形/]
+</div>
+
+<h2 id="_8">连线样式</h2>
+<ul>
+<li>实线箭头：分为无文本箭头和有文本箭头，有文本箭头有2种书写格式<div class="highlight"><pre><span></span><code><span class="nf">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">a</span><span class="o">--&gt;</span><span class="n">b</span><span class="o">--</span><span class="err">文本</span><span class="mi">1</span><span class="o">--&gt;</span><span class="n">c</span><span class="o">--&gt;|</span><span class="err">文本</span><span class="mi">2</span><span class="o">|</span><span class="n">d</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+a-->b--文本1-->c-->|文本2|d
+</div>
+
+<ul>
+<li>粗实线箭头：分为无文本箭头和有文本箭头<div class="highlight"><pre><span></span><code>graph LR
+a==&gt;b==文本==&gt;c
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+a==>b==文本==>c
+</div>
+
+<ul>
+<li>虚线箭头：分为无文本箭头和有文本箭头<div class="highlight"><pre><span></span><code><span class="nf">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">a</span><span class="o">-</span><span class="p">.</span><span class="o">-&gt;</span><span class="n">b</span><span class="o">-</span><span class="p">.</span><span class="err">文本</span><span class="p">.</span><span class="o">-&gt;</span><span class="n">c</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+a-.->b-.文本.->c
+</div>
+
+<ul>
+<li>无箭头线：即以上三种连线去掉箭头后的形式<div class="highlight"><pre><span></span><code>graph LR
+a---b
+b--文本1---c
+c---|文本2|d
+d===e
+e==文本3===f
+f-.-g
+g-.文本.-h
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+a---b
+b--文本1---c
+c---|文本2|d
+d===e
+e==文本3===f
+f-.-g
+g-.文本.-h
+</div>
+
+<ul>
+<li>其他连线：需要将<code>graph</code>关键字改为<code>flowchart</code>，除了新增加的连线形式外，上面三种线的渲染效果也会不同<div class="highlight"><pre><span></span><code><span class="n">flowchart</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">A</span><span class="w"> </span><span class="n">o</span><span class="o">--</span><span class="n">o</span><span class="w"> </span><span class="n">B</span><span class="w"></span>
+<span class="n">B</span><span class="w"> </span><span class="o">&lt;--&gt;</span><span class="w"> </span><span class="n">C</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="n">x</span><span class="o">--</span><span class="n">x</span><span class="w"> </span><span class="n">D</span><span class="w"></span>
+
+<span class="err">旧连线</span><span class="w"> </span><span class="o">--</span><span class="err">文本</span><span class="o">--&gt;</span><span class="w"> </span><span class="err">也会不同</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+flowchart LR
+A o--o B
+B <--> C
+C x--x D
+
+旧连线 --文本--> 也会不同
+</div>
+
+<ul>
+<li>延长连线：增加相应字符即可，如下图中的B到E，连线中增加了一个<code>-</code>。字符可多次添加。<div class="highlight"><pre><span></span><code><span class="n">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">A</span><span class="o">[</span><span class="n">Start</span><span class="o">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">B</span><span class="err">{</span><span class="k">Is</span><span class="w"> </span><span class="n">it</span><span class="vm">?</span><span class="err">}</span><span class="p">;</span><span class="w"></span>
+<span class="n">B</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">Yes</span><span class="o">|</span><span class="w"> </span><span class="n">C</span><span class="o">[</span><span class="n">OK</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">D</span><span class="o">[</span><span class="n">Rethink</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+<span class="n">B</span><span class="w"> </span><span class="c1">---&gt;|No| E[End];</span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+A[Start] --> B{Is it?};
+B -->|Yes| C[OK];
+C --> D[Rethink];
+D --> B;
+B --->|No| E[End];
+</div>
+
+<h2 id="_9">连线形式</h2>
+<ul>
+<li>直链<div class="highlight"><pre><span></span><code><span class="nf">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">A</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="o">--</span><span class="w"> </span><span class="n">text2</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">C</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+A -- text --> B -- text2 --> C
+</div>
+
+<ul>
+<li>多重链：可以使用<code>&amp;</code>字符，或单个描述<div class="highlight"><pre><span></span><code><span class="nf">graph</span><span class="w"> </span>
+<span class="w">   </span><span class="n">a</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">c</span><span class="o">--&gt;</span><span class="w"> </span><span class="n">d</span><span class="w"></span>
+
+<span class="w">   </span><span class="n">A</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">B</span><span class="o">--&gt;</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">D</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">M</span><span class="w"></span>
+<span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+<span class="w">    </span><span class="n">Y</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">M</span><span class="w"></span>
+<span class="w">    </span><span class="n">Y</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">N</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph
+a --> b & c--> d
+
+A & B--> C & D
+
+X --> M
+X --> N
+Y --> M
+Y --> N
+</div>
+
+<h2 id="_10">其他</h2>
+<ul>
+<li>子图：需要将<code>graph</code>关键字改为<code>flowchart</code>，在代码段的开始加入<code>subgraph</code>，尾部加入<code>end</code><div class="highlight"><pre><span></span><code><span class="n">flowchart</span><span class="w"> </span><span class="n">TB</span><span class="w"></span>
+<span class="w">    </span><span class="n">c1</span><span class="o">--&gt;</span><span class="n">a2</span><span class="w"></span>
+<span class="w">    </span><span class="n">subgraph</span><span class="w"> </span><span class="n">one</span><span class="w"></span>
+<span class="w">    </span><span class="n">a1</span><span class="o">--&gt;</span><span class="n">a2</span><span class="w"></span>
+<span class="w">    </span><span class="kd">end</span>
+<span class="w">    </span><span class="n">subgraph</span><span class="w"> </span><span class="n">two</span><span class="w"></span>
+<span class="w">    </span><span class="n">b1</span><span class="o">--&gt;</span><span class="n">b2</span><span class="w"></span>
+<span class="w">    </span><span class="kd">end</span>
+<span class="w">    </span><span class="n">subgraph</span><span class="w"> </span><span class="n">three</span><span class="w"></span>
+<span class="w">    </span><span class="n">c1</span><span class="o">--&gt;</span><span class="n">c2</span><span class="w"></span>
+<span class="w">    </span><span class="kd">end</span>
+<span class="w">    </span><span class="n">one</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">two</span><span class="w"></span>
+<span class="w">    </span><span class="n">three</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">two</span><span class="w"></span>
+<span class="w">    </span><span class="n">two</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">c2</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+flowchart TB
+c1-->a2
+subgraph one
+a1-->a2
+end
+subgraph two
+b1-->b2
+end
+subgraph three
+c1-->c2
+end
+one --> two
+three --> two
+two --> c2
+</div>
+
+<ul>
+<li>注释：在行首加入<code>%%</code>即可。<div class="highlight"><pre><span></span><code><span class="n">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="o">%%</span><span class="n">这是一条注释</span><span class="err">，</span><span class="n">在渲染图中不可见</span><span class="w"></span>
+<span class="w">    </span><span class="n">A</span><span class="p">[</span><span class="n">Hard</span><span class="w"> </span><span class="n">edge</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">Link</span><span class="w"> </span><span class="n">text</span><span class="o">|</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="n">Round</span><span class="w"> </span><span class="n">edge</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">B</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">{</span><span class="n">Decision</span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="n">C</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">One</span><span class="o">|</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="n">Result</span><span class="w"> </span><span class="n">one</span><span class="p">]</span><span class="w"></span>
+<span class="w">    </span><span class="n">C</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">Two</span><span class="o">|</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="n">Result</span><span class="w"> </span><span class="n">two</span><span class="p">]</span><span class="w"></span>
+</code></pre></div>
+
+</li>
+</ul>
+<div class="mermaid">
+graph LR
+%%这是一条注释，在渲染图中不可见
+A[Hard edge] -->|Link text| B(Round edge)
+B --> C{Decision}
+C -->|One| D[Result one]
+C -->|Two| E[Result two]
+</div>
+
+<h1 id="_11">示例</h1>
+<h2 id="1flowcharts">1.Flowcharts</h2>
+<div class="highlight"><pre><span></span><code><span class="n">graph</span><span class="w"> </span><span class="n">LR</span><span class="w"></span>
+<span class="n">A</span><span class="p">[</span><span class="n">Hard</span><span class="w"> </span><span class="n">edge</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">Link</span><span class="w"> </span><span class="n">text</span><span class="o">|</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="n">Round</span><span class="w"> </span><span class="n">edge</span><span class="p">)</span><span class="w"></span>
+<span class="n">B</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">{</span><span class="n">Decision</span><span class="p">}</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">One</span><span class="o">|</span><span class="w"> </span><span class="n">D</span><span class="p">[</span><span class="n">Result</span><span class="w"> </span><span class="n">one</span><span class="p">]</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">--&gt;|</span><span class="n">Two</span><span class="o">|</span><span class="w"> </span><span class="n">E</span><span class="p">[</span><span class="n">Result</span><span class="w"> </span><span class="n">two</span><span class="p">]</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+graph LR
+A[Hard edge] -->|Link text| B(Round edge)
+B --> C{Decision}
+C -->|One| D[Result one]
+C -->|Two| E[Result two]
+</div>
+
+<h2 id="2sequence-diagrams">2.Sequence diagrams</h2>
+<div class="highlight"><pre><span></span><code><span class="n">sequenceDiagram</span><span class="w"></span>
+<span class="w">    </span><span class="n">autonumber</span><span class="w"></span>
+<span class="w">    </span><span class="n">Alice</span><span class="o">-&gt;&gt;</span><span class="n">John</span><span class="o">:</span><span class="w"> </span><span class="n">Hello</span><span class="w"> </span><span class="n">John</span><span class="p">,</span><span class="w"> </span><span class="n">how</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="n">you</span><span class="o">?</span><span class="w"></span>
+<span class="w">    </span><span class="nf">loop</span><span class="w"> </span><span class="n">Healthcheck</span><span class="w"></span>
+<span class="w">        </span><span class="n">John</span><span class="o">-&gt;&gt;</span><span class="n">John</span><span class="o">:</span><span class="w"> </span><span class="n">Fight</span><span class="w"> </span><span class="n">against</span><span class="w"> </span><span class="n">hypochondria</span><span class="w"></span>
+<span class="w">    </span><span class="kd">end</span>
+<span class="w">    </span><span class="n">Note</span><span class="w"> </span><span class="kr">right</span><span class="w"> </span><span class="kr">of</span><span class="w"> </span><span class="n">John</span><span class="o">:</span><span class="w"> </span><span class="n">Rational</span><span class="w"> </span><span class="n">thoughts</span><span class="o">!</span><span class="w"></span>
+<span class="w">    </span><span class="n">John</span><span class="o">--&gt;&gt;</span><span class="n">Alice</span><span class="o">:</span><span class="w"> </span><span class="n">Great</span><span class="o">!</span><span class="w"></span>
+<span class="w">    </span><span class="n">John</span><span class="o">-&gt;&gt;</span><span class="n">Bob</span><span class="o">:</span><span class="w"> </span><span class="n">How</span><span class="w"> </span><span class="n">about</span><span class="w"> </span><span class="n">you</span><span class="o">?</span><span class="w"></span>
+<span class="w">    </span><span class="n">Bob</span><span class="o">--&gt;&gt;</span><span class="n">John</span><span class="o">:</span><span class="w"> </span><span class="n">Jolly</span><span class="w"> </span><span class="n">good</span><span class="o">!</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+sequenceDiagram
+autonumber
+Alice->>John: Hello John, how are you?
+loop Healthcheck
+John->>John: Fight against hypochondria
+end
+Note right of John: Rational thoughts!
+John-->>Alice: Great!
+John->>Bob: How about you?
+Bob-->>John: Jolly good!
+</div>
+
+<h2 id="3class-diagrams">3.Class diagrams</h2>
+<div class="highlight"><pre><span></span><code><span class="w">     </span><span class="n">classDiagram</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="w"> </span><span class="o">&lt;|--</span><span class="w"> </span><span class="n">Duck</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="w"> </span><span class="o">&lt;|--</span><span class="w"> </span><span class="n">Fish</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="w"> </span><span class="o">&lt;|--</span><span class="w"> </span><span class="n">Zebra</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">+</span><span class="n">int</span><span class="w"> </span><span class="n">age</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">+</span><span class="n">String</span><span class="w"> </span><span class="n">gender</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="o">:</span><span class="w"> </span><span class="o">+</span><span class="n">isMammal</span><span class="bp">()</span><span class="w">       </span>
+<span class="w">         </span><span class="n">Animal</span><span class="o">:</span><span class="w"> </span><span class="o">+</span><span class="n">mate</span><span class="bp">()</span><span class="w">       </span>
+<span class="w">         </span><span class="k">class</span><span class="w"> </span><span class="n">Duck</span><span class="o">{</span><span class="w">           </span>
+<span class="w">             </span><span class="o">+</span><span class="n">String</span><span class="w"> </span><span class="n">beakColor</span><span class="w">           </span>
+<span class="w">             </span><span class="o">+</span><span class="n">swim</span><span class="bp">()</span><span class="w">           </span>
+<span class="w">             </span><span class="o">+</span><span class="n">quack</span><span class="bp">()</span><span class="w">       </span>
+<span class="w">        </span><span class="o">}</span><span class="w">       </span>
+<span class="w">        </span><span class="k">class</span><span class="w"> </span><span class="n">Fish</span><span class="o">{</span><span class="w">           </span>
+<span class="w">                </span><span class="o">-</span><span class="n">int</span><span class="w"> </span><span class="n">sizeInFeet</span><span class="w">           </span>
+<span class="w">                </span><span class="o">-</span><span class="n">canEat</span><span class="bp">()</span><span class="w">       </span>
+<span class="w">        </span><span class="o">}</span><span class="w">       </span>
+<span class="w">        </span><span class="k">class</span><span class="w"> </span><span class="n">Zebra</span><span class="o">{</span><span class="w">           </span>
+<span class="w">                </span><span class="o">+</span><span class="kt">bool</span><span class="w"> </span><span class="n">is_wild</span><span class="w">           </span>
+<span class="w">                </span><span class="o">+</span><span class="n">run</span><span class="bp">()</span><span class="w">       </span>
+<span class="w">        </span><span class="o">}</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+classDiagram
+Animal <|-- Duck
+Animal <|-- Fish
+Animal <|-- Zebra
+Animal : +int age
+Animal : +String gender
+Animal: +isMammal()
+Animal: +mate()
+class Duck{
++String beakColor
++swim()
++quack()
+}
+class Fish{
+-int sizeInFeet
+-canEat()
+}
+class Zebra{
++bool is_wild
++run()
+}
+</div>
+
+<h2 id="4state-diagrams">4.State diagrams</h2>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">stateDiagram</span><span class="o">-</span><span class="n">v2</span><span class="w"></span>
+<span class="w">        </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="kr">First</span><span class="w"></span>
+<span class="w">        </span><span class="kr">First</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">Second</span><span class="w"></span>
+<span class="w">        </span><span class="kr">First</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">Third</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">state</span><span class="w"> </span><span class="kr">First</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">fir</span><span class="w"></span>
+<span class="w">            </span><span class="n">fir</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">state</span><span class="w"> </span><span class="n">Second</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">sec</span><span class="w"></span>
+<span class="w">            </span><span class="n">sec</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">state</span><span class="w"> </span><span class="n">Third</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">thi</span><span class="w"></span>
+<span class="w">            </span><span class="n">thi</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="p">[</span><span class="o">*</span><span class="p">]</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+stateDiagram-v2
+[*] --> First
+First --> Second
+First --> Third
+
+state First {
+[*] --> fir
+fir --> [*]
+}
+
+state Second {
+[*] --> sec
+sec --> [*]
+}
+
+state Third {
+[*] --> thi
+thi --> [*]
+}
+</div>
+
+<h2 id="5entity-relationship-diagrams">5.Entity Relationship Diagrams</h2>
+<div class="highlight"><pre><span></span><code>erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+</code></pre></div>
+
+<div class="mermaid">
+erDiagram
+CUSTOMER ||--o{ ORDER : places
+ORDER ||--|{ LINE-ITEM : contains
+CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+
+</div>
+
+<div class="highlight"><pre><span></span><code>    <span class="nv">erDiagram</span>
+        <span class="nv">CUSTOMER</span> }<span class="o">|</span>..<span class="o">|</span>{ <span class="nv">DELIVERY</span><span class="o">-</span><span class="nv">ADDRESS</span> : <span class="nv">has</span>
+        <span class="nv">CUSTOMER</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">ORDER</span> : <span class="nv">places</span>
+        <span class="nv">CUSTOMER</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">INVOICE</span> : <span class="s2">&quot;</span><span class="s">liable for</span><span class="s2">&quot;</span>
+        <span class="nv">DELIVERY</span><span class="o">-</span><span class="nv">ADDRESS</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">ORDER</span> : <span class="nv">receives</span>
+        <span class="nv">INVOICE</span> <span class="o">||--|</span>{ <span class="nv">ORDER</span> : <span class="nv">covers</span>
+        <span class="nv">ORDER</span> <span class="o">||--|</span>{ <span class="nv">ORDER</span><span class="o">-</span><span class="nv">ITEM</span> : <span class="nv">includes</span>
+        <span class="nv">PRODUCT</span><span class="o">-</span><span class="nv">CATEGORY</span> <span class="o">||--|</span>{ <span class="nv">PRODUCT</span> : <span class="nv">contains</span>
+        <span class="nv">PRODUCT</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">ORDER</span><span class="o">-</span><span class="nv">ITEM</span> : <span class="s2">&quot;</span><span class="s">ordered in</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<div class="mermaid">
+erDiagram
+
+CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+
+CUSTOMER ||--o{ ORDER : places
+
+CUSTOMER ||--o{ INVOICE : "liable for"
+
+DELIVERY-ADDRESS ||--o{ ORDER : receives
+
+INVOICE ||--|{ ORDER : covers
+
+ORDER ||--|{ ORDER-ITEM : includes
+
+PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+
+PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+</div>
+
+<h2 id="6user-journey-diagram">6.User Journey Diagram</h2>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">journey</span><span class="w"></span>
+<span class="w">        </span><span class="n">title</span><span class="w"> </span><span class="n">My</span><span class="w"> </span><span class="n">working</span><span class="w"> </span><span class="nf">day</span><span class="w"></span>
+<span class="w">        </span><span class="k">section</span><span class="w"> </span><span class="k">Go</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">work</span><span class="w"></span>
+<span class="w">          </span><span class="n">Make</span><span class="w"> </span><span class="nl">tea</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="err">:</span><span class="w"> </span><span class="n">Me</span><span class="w"></span>
+<span class="w">          </span><span class="k">Go</span><span class="w"> </span><span class="nl">upstairs</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="err">:</span><span class="w"> </span><span class="n">Me</span><span class="w"></span>
+<span class="w">          </span><span class="n">Do</span><span class="w"> </span><span class="k">work</span><span class="err">:</span><span class="w"> </span><span class="mi">1</span><span class="err">:</span><span class="w"> </span><span class="n">Me</span><span class="p">,</span><span class="w"> </span><span class="n">Cat</span><span class="w"></span>
+<span class="w">        </span><span class="k">section</span><span class="w"> </span><span class="k">Go</span><span class="w"> </span><span class="n">home</span><span class="w"></span>
+<span class="w">          </span><span class="k">Go</span><span class="w"> </span><span class="nl">downstairs</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="err">:</span><span class="w"> </span><span class="n">Me</span><span class="w"></span>
+<span class="w">          </span><span class="n">Sit</span><span class="w"> </span><span class="nl">down</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="err">:</span><span class="w"> </span><span class="n">Me</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+journey
+title My working day
+section Go to work
+Make tea: 5: Me
+Go upstairs: 3: Me
+Do work: 1: Me, Cat
+section Go home
+Go downstairs: 5: Me
+Sit down: 5: Me
+</div>
+
+<h2 id="7gantt-diagrams">7.Gantt diagrams</h2>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">gantt</span><span class="w"></span>
+<span class="w">        </span><span class="n">dateFormat</span><span class="w">  </span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span><span class="w"></span>
+<span class="w">        </span><span class="n">title</span><span class="w">       </span><span class="n">Adding</span><span class="w"> </span><span class="n">GANTT</span><span class="w"> </span><span class="n">diagram</span><span class="w"> </span><span class="n">functionality</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">mermaid</span><span class="w"></span>
+<span class="w">        </span><span class="n">excludes</span><span class="w">    </span><span class="n">weekends</span><span class="w"></span>
+<span class="w">        </span><span class="o">%%</span><span class="w"> </span><span class="p">(</span><span class="n n-Quoted">`excludes`</span><span class="w"> </span><span class="n">accepts</span><span class="w"> </span><span class="k">specific</span><span class="w"> </span><span class="n">dates</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span><span class="w"> </span><span class="k">format</span><span class="p">,</span><span class="w"> </span><span class="n">days</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="k">week</span><span class="w"> </span><span class="p">(</span><span class="s2">&quot;sunday&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="s2">&quot;weekends&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">but</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">word</span><span class="w"> </span><span class="s2">&quot;weekdays&quot;</span><span class="p">.)</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">section</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="n">section</span><span class="w"></span>
+<span class="w">        </span><span class="n">Completed</span><span class="w"> </span><span class="n">task</span><span class="w">            </span><span class="o">:</span><span class="n">done</span><span class="p">,</span><span class="w">    </span><span class="n">des1</span><span class="p">,</span><span class="w"> </span><span class="mi">2014</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">06</span><span class="p">,</span><span class="mi">2014</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">08</span><span class="w"></span>
+<span class="w">        </span><span class="k">Active</span><span class="w"> </span><span class="n">task</span><span class="w">               </span><span class="o">:</span><span class="k">active</span><span class="p">,</span><span class="w">  </span><span class="n">des2</span><span class="p">,</span><span class="w"> </span><span class="mi">2014</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">09</span><span class="p">,</span><span class="w"> </span><span class="n">3d</span><span class="w"></span>
+<span class="w">        </span><span class="n">Future</span><span class="w"> </span><span class="n">task</span><span class="w">               </span><span class="o">:</span><span class="w">         </span><span class="n">des3</span><span class="p">,</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="n">des2</span><span class="p">,</span><span class="w"> </span><span class="n">5d</span><span class="w"></span>
+<span class="w">        </span><span class="n">Future</span><span class="w"> </span><span class="n">task2</span><span class="w">              </span><span class="o">:</span><span class="w">         </span><span class="n">des4</span><span class="p">,</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="n">des3</span><span class="p">,</span><span class="w"> </span><span class="n">5d</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">section</span><span class="w"> </span><span class="n">Critical</span><span class="w"> </span><span class="n">tasks</span><span class="w"></span>
+<span class="w">        </span><span class="n">Completed</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">critical</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="o">:</span><span class="n">crit</span><span class="p">,</span><span class="w"> </span><span class="n">done</span><span class="p">,</span><span class="w"> </span><span class="mi">2014</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">06</span><span class="p">,</span><span class="n">24h</span><span class="w"></span>
+<span class="w">        </span><span class="n">Implement</span><span class="w"> </span><span class="k">parser</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">jison</span><span class="w">          </span><span class="o">:</span><span class="n">crit</span><span class="p">,</span><span class="w"> </span><span class="n">done</span><span class="p">,</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="n">des1</span><span class="p">,</span><span class="w"> </span><span class="n">2d</span><span class="w"></span>
+<span class="w">        </span><span class="k">Create</span><span class="w"> </span><span class="n">tests</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="k">parser</span><span class="w">             </span><span class="o">:</span><span class="n">crit</span><span class="p">,</span><span class="w"> </span><span class="k">active</span><span class="p">,</span><span class="w"> </span><span class="n">3d</span><span class="w"></span>
+<span class="w">        </span><span class="n">Future</span><span class="w"> </span><span class="n">task</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">critical</span><span class="w"> </span><span class="n">line</span><span class="w">        </span><span class="o">:</span><span class="n">crit</span><span class="p">,</span><span class="w"> </span><span class="n">5d</span><span class="w"></span>
+<span class="w">        </span><span class="k">Create</span><span class="w"> </span><span class="n">tests</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">renderer</span><span class="w">           </span><span class="o">:</span><span class="n">2d</span><span class="w"></span>
+<span class="w">        </span><span class="k">Add</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">mermaid</span><span class="w">                      </span><span class="o">:</span><span class="n">1d</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">section</span><span class="w"> </span><span class="n">Documentation</span><span class="w"></span>
+<span class="w">        </span><span class="k">Describe</span><span class="w"> </span><span class="n">gantt</span><span class="w"> </span><span class="n">syntax</span><span class="w">               </span><span class="o">:</span><span class="k">active</span><span class="p">,</span><span class="w"> </span><span class="n">a1</span><span class="p">,</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="n">des1</span><span class="p">,</span><span class="w"> </span><span class="n">3d</span><span class="w"></span>
+<span class="w">        </span><span class="k">Add</span><span class="w"> </span><span class="n">gantt</span><span class="w"> </span><span class="n">diagram</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">demo</span><span class="w"> </span><span class="k">page</span><span class="w">      </span><span class="o">:</span><span class="k">after</span><span class="w"> </span><span class="n">a1</span><span class="w">  </span><span class="p">,</span><span class="w"> </span><span class="n">20h</span><span class="w"></span>
+<span class="w">        </span><span class="k">Add</span><span class="w"> </span><span class="n">another</span><span class="w"> </span><span class="n">diagram</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">demo</span><span class="w"> </span><span class="k">page</span><span class="w">    </span><span class="o">:</span><span class="n">doc1</span><span class="p">,</span><span class="w"> </span><span class="k">after</span><span class="w"> </span><span class="n">a1</span><span class="w">  </span><span class="p">,</span><span class="w"> </span><span class="n">48h</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">section</span><span class="w"> </span><span class="k">Last</span><span class="w"> </span><span class="n">section</span><span class="w"></span>
+<span class="w">        </span><span class="k">Describe</span><span class="w"> </span><span class="n">gantt</span><span class="w"> </span><span class="n">syntax</span><span class="w">               </span><span class="o">:</span><span class="k">after</span><span class="w"> </span><span class="n">doc1</span><span class="p">,</span><span class="w"> </span><span class="n">3d</span><span class="w"></span>
+<span class="w">        </span><span class="k">Add</span><span class="w"> </span><span class="n">gantt</span><span class="w"> </span><span class="n">diagram</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">demo</span><span class="w"> </span><span class="k">page</span><span class="w">      </span><span class="o">:</span><span class="n">20h</span><span class="w"></span>
+<span class="w">        </span><span class="k">Add</span><span class="w"> </span><span class="n">another</span><span class="w"> </span><span class="n">diagram</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">demo</span><span class="w"> </span><span class="k">page</span><span class="w">    </span><span class="o">:</span><span class="n">48h</span><span class="w"></span>
+</code></pre></div>
+
+<div class="mermaid">
+gantt
+dateFormat  YYYY-MM-DD
+title       Adding GANTT diagram functionality to mermaid
+excludes    weekends
+%% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
+
+section A section
+Completed task            :done,    des1, 2014-01-06,2014-01-08
+Active task               :active,  des2, 2014-01-09, 3d
+Future task               :         des3, after des2, 5d
+Future task2              :         des4, after des3, 5d
+
+section Critical tasks
+Completed task in the critical line :crit, done, 2014-01-06,24h
+Implement parser and jison          :crit, done, after des1, 2d
+Create tests for parser             :crit, active, 3d
+Future task in critical line        :crit, 5d
+Create tests for renderer           :2d
+Add to mermaid                      :1d
+
+section Documentation
+Describe gantt syntax               :active, a1, after des1, 3d
+Add gantt diagram to demo page      :after a1  , 20h
+Add another diagram to demo page    :doc1, after a1  , 48h
+
+section Last section
+Describe gantt syntax               :after doc1, 3d
+Add gantt diagram to demo page      :20h
+Add another diagram to demo page    :48h
+</div>
+
+<h2 id="8pie-chart-diagrams">8.Pie chart diagrams</h2>
+<div class="highlight"><pre><span></span><code>    pie title Pets adopted by volunteers
+    &quot;Dogs&quot; : 386
+    &quot;Cats&quot; : 85
+    &quot;Rats&quot; : 15
+</code></pre></div>
+
+<div class="mermaid">
+pie title Pets adopted by volunteers
+"Dogs" : 386
+"Cats" : 85
+"Rats" : 15
+</div>
+
+<h2 id="git">git</h2>
+<div class="highlight"><pre><span></span><code>    gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    commit
+</code></pre></div>
+
+<div class="mermaid">
+gitGraph
+commit
+commit
+branch develop
+checkout develop
+commit
+commit
+checkout main
+merge develop
+commit
+commit
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="/tag/zhuan-zai.html">转载</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://github.com/xvhfeng" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:xvhfeng@126.com">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  spk xu
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="/theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>

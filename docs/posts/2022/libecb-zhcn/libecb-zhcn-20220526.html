@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>libecb中文翻译</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="/theme/css/code_blocks/github.css" rel="stylesheet">
+
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="libecb是一个不需要configurtion脚本就可以在c语言中直接使用的接近编译器分类的简单头文件.几年前偶然看到这个库,然后忘记名字了.直到去看libev源码才发现原来两者是一起的.它们应该出于同一家公司,可能还是同一个项目.本着这个比较实用的原则,我花了点时间把它...">
+
+        <meta name="author" content="spk xu">
+
+        <meta name="tags" content="翻译">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="大嘴的嘴bu大">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="/author/spk-xu.html">
+	<meta property="og:url" content="/posts/2022/libecb-zhcn/libecb-zhcn-20220526.html">
+	<meta property="og:title" content="libecb中文翻译">
+	<meta property="article:published_time" content="2022-05-26 00:00:00+08:00">
+            <meta property="og:description" content="libecb是一个不需要configurtion脚本就可以在c语言中直接使用的接近编译器分类的简单头文件.几年前偶然看到这个库,然后忘记名字了.直到去看libev源码才发现原来两者是一起的.它们应该出于同一家公司,可能还是同一个项目.本着这个比较实用的原则,我花了点时间把它...">
+
+            <meta property="og:image" content="/theme/images/post-bg.jpg">
+</head>
+
+<body class="article-libecb-zhcn">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">94geek.com</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/pages/about.html">About</a></li>
+                        <li><a href="/pages/sharing.html">Sharing</a></li>
+                        <li><a href="/pages/follow.html">Follow</a></li>
+                        <li><a href="/files/linuxc/main.htm" target="_blank">Linux C函数</a></li>
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('/theme/images/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>libecb中文翻译</h1>
+                        <span class="meta">Posted by
+                                <a href="/author/spk-xu.html">spk xu</a>
+                             on Thu 26 May 2022
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <h1 id="libecb-e-c-builtins">LIBECB - e-C-Builtins</h1>
+<h2 id="about-libecb">ABOUT LIBECB</h2>
+<p>Libecb目前是一个简单的头文件，可以在不需要任何配置的情况下加入到你自己的项目中。</p>
+<p>它是整个套件的一部分，其他成员包括libev libeio。</p>
+<p><a href="[http://software.schmorp.de/pkg/libecb](http://software.schmorp.de/pkg/libecb)">主页</a>可在此找到(但是这个网址已经失效了,可惜):</p>
+<p>它主要为许多内置编译器提供了许多包装器，以及其他编译器的替换函数。 除此之外，它还提供了许多其他比较底层的C实用程序，如字节交换或位旋转。</p>
+<p>或者换句话说，libecb可以被引入到任何标准C开发的系统中， 它可以保证不同编译器中的通用性.</p>
+<p><strong><em>译者注:</em></strong> libecb是一个不需要configurtion脚本就可以在c语言中直接使用的接近编译器分类的简单头文件.几年前偶然看到这个库,然后忘记名字了.直到去看libev源码才发现原来两者是一起的.它们应该出于同一家公司,可能还是同一个项目.本着这个比较实用的原则,我花了点时间把它原来的文档给翻译了.然后,因为经常做开发的原因,我也在libecb的基础上添加了一些宏定义,所以libceb的源文件和我添加的文件一直组成了我自己使用的基础头文件.</p>
+<p><a href="https://github.com/xvhfeng/libecb">libecb开源地址</a></p>
+<h2 id="about-the-header">ABOUT THE HEADER</h2>
+<p>现在，你所要做的就是复制&lt;ecb.h>,放入你的项目.编译器可以找到它并包含它:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ecb.h&gt;</span><span class="cp"></span>
+</code></pre></div>
+
+<p>头文件对于C和c++编译都可以很好地工作，并为您提供除了ECB符号外，所有的&lt;inttypes.h>。</p>
+<p>目前没有.o文件需要被link,未来的版本可能会提供可选的.o文件, 以用来减少代码的大小和增加额外的功能.</p>
+<p>它目前还包括从&lt;inttypes.h>开始的所有内容。</p>
+<h2 id="about-this-manual-conventions">ABOUT THIS MANUAL / CONVENTIONS</h2>
+<p>本手册主要描述了&lt;ecb.h>头文件内可用的每个(公共)函数. 头文件可以定义其他符号,但那些都不是公共API的一部分，也不会有任何的支持.</p>
+<p>当手册提到一个“函数”时，它可以一个内联函数、一个宏定义或外部符号。</p>
+<p>当函数使用具体的标准类型时，例如<code>int</code>或<code>uint32_t</code>，则相应的函数只适用于该类型。 如果只使用通用名称(<code>expr</code>， <code>cond</code>， <code>value</code>，等等)，那么对应的函数依赖于C语言来实现正确的类型，并且通常作为宏实现。 具体地说，是本手册中的“bool”指任何类型的布尔值，而不是特定类型。</p>
+<h2 id="types-type-support">TYPES / TYPE SUPPORT</h2>
+<p>ecb.h确保以下类型被定义(以预期的方式):</p>
+<div class="highlight"><pre><span></span><code>int8_t       uint8_
+int16_t      uint16_t
+int32_t      uint32_
+int64_t      uint64_t
+int_fast8_t  uint_fast8_t
+int_fast16_t uint_fast16_t
+int_fast32_t uint_fast32_t
+int_fast64_t uint_fast64_t
+intptr_t     uintptr_t
+</code></pre></div>
+
+<p>宏<code>ECB_PTRSIZE</code>定义为目标平台上的指针的大小(目前<code>4</code>或<code>8</code>),可以用于预处理器表达式。</p>
+<p>而<code>ptrdiff_t</code>和<code>size_t</code>使用的<code>stddef.h</code>/<code>cstddef</code>中的定义.</p>
+<h2 id="languageenvironmentcompiler-versions">LANGUAGE/ENVIRONMENT/COMPILER VERSIONS</h2>
+<p>下面的符号都可以在预处理器指令中被展开且可以被作为一个bool值而被测试(如果你需要的话,使用<code>!!</code>确保它是<code>0</code>或<code>1</code>).</p>
+<h3 id="ecb_c">ECB_C</h3>
+<p>当该值为true,则表示当前实现定义了<code>__STDC__</code>宏定义.仅仅是c,不是cxx. PS:当前的版本好像去掉了这个宏,因为没找到.</p>
+<h3 id="ecb_c99">ECB_C99</h3>
+<p>当该值为True,这表示当前实现声称符合C99 (ISO/IEC9999:1999)或任何更新的版本，而不是声称是c++。</p>
+<p>请注意，新版本(ECB_C11)会再次删除核心特性(例如可变长度数组)。</p>
+<h3 id="ecb_c11-ecb_c17">ECB_C11, ECB_C17</h3>
+<p>当该值为True,这表示当前实现声称符合ECB_C11, ECB_C17 (ISO/IEC9899:2011, :20187)或任何更新的版本，而不是声称是c++。</p>
+<h3 id="ecb_cpp">ECB_CPP</h3>
+<p>当该值为True,则表示定义的宏 <code>__cplusplus__</code>为True. 这是一个典型的对于c++编译器的真值.</p>
+<h3 id="ecb_cpp11-ecb_cpp14-ecb_cpp17">ECB_CPP11, ECB_CPP14, ECB_CPP17</h3>
+<p>当该值为True,则表示当前实现符合C++11/C++14/C++17(ISO/IEC 14882:2011, :2014, :2017)或任何更新的版本.</p>
+<p>请注意，c++ 20的许多特性可能都有自己的特性测试(参见<a href="http://eel.is/c++draft/cpp.predefined#1.8">c++ 20新特性</a>)。</p>
+<h3 id="ecb_optimize_size">ECB_OPTIMIZE_SIZE</h3>
+<p>当编译器优化大小时为<code>1</code>，否则为<code>0</code>。</p>
+<p>这个符号也可以在包含_ecb.h_之前定义，那么该值将会是定义的值,而不会改变。</p>
+<h3 id="ecb_gcc_version-major-minor">ECB_GCC_VERSION (major, minor)</h3>
+<p>如果编译器使用的是指定版本或者更改版本的GNU C编译器,则该值为True.</p>
+<p>当认为编译器为GCC但是它不是的时候,则返回False.</p>
+<h3 id="ecb_extern_c">ECB_EXTERN_C</h3>
+<p>该值在c++中扩展为<code>extern "C"</code>，在C中扩展为简单的<code>extern</code>。</p>
+<p>这可以用来声明一个单独的外部C函数:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ECB_EXTERN_C</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="n">printf</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="nb">char</span><span class="w"> </span><span class="o">*</span><span class="n">format</span><span class="err">，…</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="ecb_extern_c_beg-ecb_extern_c_end">ECB_EXTERN_C_BEG / ECB_EXTERN_C_END</h3>
+<p>这两个宏可以用来包装多个 <code>extern "C"</code> 的定义-在C里面不会有任何的效果</p>
+<p>它们在头文件中多数被这样使用:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ECB_EXTERN_C_BEG</span>
+
+<span class="n">int</span> <span class="n">mycfun1</span> <span class="p">(</span><span class="n">int</span> <span class="n">x</span><span class="p">);</span>
+<span class="n">int</span> <span class="n">mycfun2</span> <span class="p">(</span><span class="n">int</span> <span class="n">x</span><span class="p">);</span>
+
+<span class="n">ECB_EXTERN_C_END</span>
+</code></pre></div>
+
+<h3 id="ecb_stdfp">ECB_STDFP</h3>
+<p>如果此值计算为真(可用于预处理器做判断),那么<code>float</code>和<code>double</code> 使用IEEE 754 single/binary32和double/binary64表示. 内部两者的字节序和<code>uint32_t</code>与<code>uint64_t</code>的字节序相同.</p>
+<p>这意味着您可以将<code>float</code>(或<code>double</code>)的位复制到<code>uint32_t</code>(或<code>uint64_t</code>)， 得到原始的IEEE 754位表示而无需考虑格式或字节序。</p>
+<p>这对于所有现代的平台都是正确的，虽然_ecb.h_可能无法在任何地方正确地推导出这点，而且可能会在安全方面出错。</p>
+<p>PS:也就是说int和float两者之间可以转换,但是没有办法证明一定正确,但现实就是很多都是这么使用的.如何转换,是一个C的hack,自己想一下??</p>
+<h3 id="ecb_64bit_native">ECB_64BIT_NATIVE</h3>
+<p>如果计算结果为真(该值也可用于预处理器和C代码的测试),那么该体系结构对于64位的支持是内置的. 也就是说,速度上64位和32位整数是差不对哦的,虽然64位支持非常常见(实际上libecb也需要), 但32位的cpu必须模拟64位的操作,所以你可能希望避免它们. PS:libecb的年代64位还没那么普及??</p>
+<h3 id="ecb_amd64-ecb_amd64_x32">ECB_AMD64, ECB_AMD64_X32</h3>
+<p>这两个宏在x86_64/amd64 ABI和X32 ABI上分别定义为<code>1</code>，在其他地方未定义。</p>
+<p>新的X32 ABI的设计者出于某种无法解释的原因，决定让它看起来像amd64的一模一样.</p>
+<p>尽管它与那个ABI完全不兼容，这打破了假定<code>__x86_64</code>表示x86-64 ABI，所以使得这些宏是必要的。</p>
+<h2 id="macro-trickery">MACRO TRICKERY</h2>
+<h3 id="ecb_concat-a-b">ECB_CONCAT (a, b)</h3>
+<p>展开<code>a</code>和<code>b</code>中的任何宏，然后将结果连接起来形成单个标记。这主要用于从组件中形成标识符，</p>
+<p>e.g.:</p>
+<div class="highlight"><pre><span></span><code>#define S1 str
+#define S2 cpy
+
+ECB_CONCAT (S1, S2)(s1, s2); // == strcpy (s1, s2);
+</code></pre></div>
+
+<h3 id="ecb_stringify-arg">ECB_STRINGIFY (arg)</h3>
+<p>展开<code>arg</code>中的任何宏并返回它的字符串化版本。这主要用于以字符串形式获取宏的内容，</p>
+<p>e.g.:</p>
+<div class="highlight"><pre><span></span><code>#define SQL_LIMIT 100
+sql_exec (&quot;select * from table limit &quot; ECB_STRINGIFY (SQL_LIMIT));
+</code></pre></div>
+
+<h3 id="ecb_stringify_expr-expr">ECB_STRINGIFY_EXPR (expr)</h3>
+<p>类似于<code>ECB_STRINGIFY</code>，但是会先计算一次<code>expr</code>以确保它是一个有效的表达式。 (PS:所以,这里会有一个宏定义常有的,expr被多次计算的问题) 这对于捕捉输入错误或宏不可用的情况很有用:</p>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;errno.h&gt;</span><span class="cp"></span>
+
+<span class="n">ECB_STRINGIFY</span><span class="w">      </span><span class="p">(</span><span class="n">EDOM</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;33&quot; (on my system at least)</span>
+<span class="n">ECB_STRINGIFY_EXPR</span><span class="w"> </span><span class="p">(</span><span class="n">EDOM</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;33&quot;</span>
+
+<span class="c1">// now imagine we had a typo:</span>
+<span class="c1">//现在假设我们有一个打印错误</span>
+
+<span class="n">ECB_STRINGIFY</span><span class="w">      </span><span class="p">(</span><span class="n">EDAM</span><span class="p">);</span><span class="w"> </span><span class="c1">// &quot;EDAM&quot; 这样的话直接就是输出</span>
+<span class="n">ECB_STRINGIFY_EXPR</span><span class="w"> </span><span class="p">(</span><span class="n">EDAM</span><span class="p">);</span><span class="w"> </span><span class="c1">// error: EDAM undefined,第一次计算发现EDAM没有被定义,所以直接报错</span>
+</code></pre></div>
+
+<h2 id="attributes">ATTRIBUTES</h2>
+<p>libecb的大部分的附加属性可以用于函数、变量的处理，有时甚至是一些类型的附加属性,像C中的<code>const</code>或<code>volatile</code>。 它们是使用GCC属性或其他编译器/语言特定特性实现的。属性声明必须放在整个声明之前:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ecb_const</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="n">mysqrt</span><span class="w"> </span><span class="p">(</span><span class="nb nb-Type">int</span><span class="w"> </span><span class="n">a</span><span class="p">);</span><span class="w"></span>
+<span class="n">ecb_unused</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="ecb_unused">ecb_unused</h3>
+<p>将函数或变量标记为“未使用”，这只会在编译器检测到它未使用时，简单地抑制编译器的警告。 当你声明一个变量但不总是使用它时，这是很有用的:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">ecb_unused</span><span class="w"> </span><span class="nb nb-Type">int</span><span class="w"> </span><span class="k">var</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">#ifdef SOMECONDITION</span><span class="w"></span>
+<span class="w">     </span><span class="k">var</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">...</span><span class="p">;</span><span class="w"></span>
+<span class="w">     </span><span class="k">return</span><span class="w"> </span><span class="k">var</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="c1">#else</span><span class="w"></span>
+<span class="w">     </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">  </span><span class="c1">#endif</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="ecb_deprecated">ecb_deprecated</h3>
+<p>类似于<code>ecb_unused</code>，此标记讲函数、变量或类型标记为弃用。 这使得一些编译器在使用该类型时发出警告。</p>
+<h3 id="ecb_deprecated_message-message">ecb_deprecated_message (message)</h3>
+<p>与<code>ecb_deprecated</code>相同，但如果可能，在使用对象时使用指定的诊断信息，而不是通用的报错消息。</p>
+<h3 id="ecb_inline">ecb_inline</h3>
+<p>扩展为<code>static inline</code>,或者如果不支持内联，仅仅扩展为<code>static</code>(编译器特定的等效)。 由于代码大小或速度的原因，它应该仅仅用于声明应该内联的函数。</p>
+<p>示例:内联这个函数，它肯定会减少代码。</p>
+<div class="highlight"><pre><span></span><code><span class="nv">ecb_inline</span> <span class="nv">int</span>
+<span class="nv">negmul</span> <span class="ss">(</span><span class="nv">int</span> <span class="nv">a</span>, <span class="nv">int</span> <span class="nv">b</span><span class="ss">)</span>
+{
+  <span class="k">return</span> <span class="o">-</span> <span class="ss">(</span><span class="nv">a</span> <span class="o">*</span> <span class="nv">b</span><span class="ss">)</span><span class="c1">;</span>
+}
+</code></pre></div>
+
+<h3 id="ecb_noinline">ecb_noinline</h3>
+<p>防止函数内联——它可能会被优化掉，但不会内联到其他函数中。 如果您知道您的函数很少被调用，并且足够大以至于内联不会有帮助，那么这个宏定义是很有用的。</p>
+<h3 id="ecb_noreturn">ecb_noreturn</h3>
+<p>将函数标记为“永远不返回”。 一些永不返回的典型函数像是<code>exit</code>或<code>abort</code>(这些函数确实很难做到不返回)， 现在你可以创建自己类似的函数:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ecb_noreturn</span><span class="w"> </span><span class="nb nb-Type">void</span><span class="w"></span>
+<span class="n">my_abort</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="nb">char</span><span class="w"> </span><span class="o">*</span><span class="n">errline</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="n">puts</span><span class="w"> </span><span class="p">(</span><span class="n">errline</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="n">abort</span><span class="w"> </span><span class="p">();</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>在这种情况下，编译器足够聪明的话能够自行推导出它，所以这主要用于声明。</p>
+<h3 id="ecb_restrict">ecb_restrict</h3>
+<p>在支持的编译器上扩展为<code>restrict</code>关键字或等效值，而在其他编译器上则没有扩展为任何值。 必须在指针类型或数组索引上指定，以指示内存没有与同一作用域中的任何其他受限制的指针别名。 PS: 参考restrict关键字:restrict是c99标准引入的，它只可以用于限定和约束指针， 并表明指针是访问一个数据对象的唯一且初始的方式. 即它告诉编译器，所有修改该指针所指向内存中内容的操作都必须通过该指针来修改, 而不能通过其它途径(其它变量或指针)来修改;这样做的好处是,能帮助编译器进行更好的优化代码,生成更有效率的汇编代码. 也就是说在restrict关键字形容的变量的相同的访问内,不允许出现restrict修饰指针或者数组的别名.</p>
+<p>例如:将一个向量乘起来，并允许编译器并行化循环，因为编译器知道它不会覆盖输入的值。</p>
+<div class="highlight"><pre><span></span><code><span class="n">void</span><span class="w"></span>
+<span class="n">multiply</span><span class="w"> </span><span class="p">(</span><span class="n">ecb_restrict</span><span class="w"> </span><span class="nc">float</span><span class="w"> </span><span class="o">*</span><span class="n">src</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="n">ecb_restrict</span><span class="w"> </span><span class="nc">float</span><span class="w"> </span><span class="o">*</span><span class="n">dst</span><span class="p">,</span><span class="w"></span>
+<span class="w">          </span><span class="nc">int</span><span class="w"> </span><span class="nf">len</span><span class="p">,</span><span class="w"> </span><span class="nc">float</span><span class="w"> </span><span class="n">factor</span><span class="p">)</span><span class="w"></span>
+<span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="nc">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nf">len</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">dst</span><span class="w"> </span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">src</span><span class="w"> </span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">factor</span><span class="p">;</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="ecb_const">ecb_const</h3>
+<p>声明函数只依赖于其实参的值，就像数学函数。它特殊之处在于不读取或写入任何参数可能指向的内存、全局变量或调用任何非const函数。它也也会有任何的副作用。</p>
+<p>这样的函数可以由编译器更好地优化——例如，具有相同参数的多个调用可以优化为一个调用，如果编译器预设该调用具有任何副作用，那么这种优化是不可能的。</p>
+<p>它最适合于数学函数意义上的函数，例如返回其输入参数平方根的函数。</p>
+<p>不适合使用计算传入内存区域的哈希值、打印一些消息或查看全局变量来决定舍入的函数。</p>
+<p>请参阅<code>ecb_pure</code>了解限制稍少的函数类。</p>
+<p>PS: 用const属性修饰的函数与用pure属性修饰的十分类似，不过const属性比pure更严格. 它要求函数不能读全局对象。 此外，用const属性修饰的函数的参数不能是一个指针类型，而且在用const属性修饰的函数内往往不能调用一个非const属性的函数。</p>
+<h3 id="ecb_pure">ecb_pure</h3>
+<p>类似于<code>ecb_const</code>，声明一个没有副作用的函数。与<code>ecb_const</code>不同， 该函数允许检查全局变量和任何其他内存区域(比如通过指针传递给它的内存区域)。</p>
+<p>虽然这些函数不能像<code>ecb_const</code>函数那样被更好地优化，但在很多情况下， 它们仍然可以被优化掉，而且编译器可以更自由地将调用转移到它们那里。</p>
+<p>这类函数的典型例子是<code>strlen</code>或<code>memcmp</code>。函数计算输入的MD5并且作为参数传递更新MD5的状态, 这些函数不是pure的,因为这些函数将修改一些不是返回值的内存区域.</p>
+<p>PS: 用pure属性修饰的函数用来说明该函数除了返回值之外没有其他任何效果， 并且该函数所返回的值仅仅依赖于函数的形参以及/或全局对象。 用 pure属性所修饰的函数可以用来辅助编译器做消除公共子表达式以及帮助做循环优化，使用这种函数就好比使用算术操作符一般。</p>
+<p>用pure属性所修饰的函数体内不应该含有无限循环，不应该对volatile修饰的全局对象进行访问或是对多个线程所共享的全局对象进行访问， 也 不应该访问其他系统资源，比如对文件、套接字等进行操作。 简而言之， 对同一个使用pure属性修饰的函数连续做两次调用（如果该函数带有参 数，那么两次调用应该用同样的实参）， 那么这两次调用所返回的结果应 该始终是相同的。因此，用pure属性所修饰的函数也很容易让编译器做内 联处理。</p>
+<h3 id="ecb_hot">ecb_hot</h3>
+<p>这是声明函数对于缓存是“hot”函数,也就是说此函数使用频繁.如果可能的话,将它保持在缓存中是非常有用的.</p>
+<p>编译器的做法是试图将热函数彼此靠近保存在内存里。</p>
+<p>一个函数是否热通常取决于整个程序，函数本身的作用更小。实践中<code>ecb_cold</code>可能更有用。</p>
+<p>PS:是不是就是说,将函数直接保存在内存中,减少加载的时间?</p>
+<h3 id="ecb_cold">ecb_cold</h3>
+<p>与<code>ecb_hot</code>相反的是，声明一个函数对于缓存来说是“冷的”. 或者换句话说，这个函数不经常被调用，或者不是在临界速度的时候调用，将它保存在缓存中可能是对缓存的浪费。</p>
+<p>除了一起放置冷功能(或者至少远离热功能),这些知识可以用在其他方面. 例如,函数将优化函数大小,而不是速度.导致调用这些函数的代码路径可以自动标记为<code>ecb_expect_false</code>，就像已经使用<code>ecb_expect_false</code>访问它们一样。</p>
+<p>这类函数的好例子是错误报告函数，或者仅在异常或罕见情况下调用的函数。</p>
+<h3 id="ecb_artificial">ecb_artificial</h3>
+<p>声明函数是“artificial”的,在这种情况下,也就是说,这个函数并不意味着是一个函数, 更像一个访问器——许多方法在C++类中仅仅是访问器的功能,具有和崩溃报告同样的方法,或单步通过他们. 通常不是那么有用,特别是当它只内联到几个指令的时候。</p>
+<p>将它们标记为artificial将指导调试器了解这一点，从而使调试工作更愉快，从而使生活更愉快。</p>
+<p>例如:在某种智能指针类中，将指针访问器标记为人工的，这样整个类的行为就更像一个指针，而不像某个c++抽象怪物。</p>
+<div class="highlight"><pre><span></span><code><span class="nv">template</span><span class="o">&lt;</span><span class="nv">typename</span> <span class="nv">T</span><span class="o">&gt;</span>
+<span class="nv">struct</span> <span class="nv">my_smart_ptr</span>
+{
+  <span class="nv">T</span> <span class="o">*</span><span class="nv">value</span><span class="c1">;</span>
+
+  <span class="nv">ecb_artificial</span>
+  <span class="nv">operator</span> <span class="nv">T</span> <span class="o">*</span><span class="ss">()</span>
+  {
+    <span class="k">return</span> <span class="nv">value</span><span class="c1">;</span>
+  }
+}<span class="c1">;</span>
+</code></pre></div>
+
+<h2 id="optimisation-hints">OPTIMISATION HINTS</h2>
+<h3 id="bool-ecb_is_constant-expr">bool ecb_is_constant (expr)</h3>
+<p>如果表达式被推断为编译时常量，则返回true，否则返回false。</p>
+<p>例如，当您有一个返回16位随机数的<code>rndm16</code>函数，并且您有一个函数将其映射到从0开始到N-1的范围，那么你可以在头文件中使用这个内联函数:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">ecb_inline</span> <span class="nv">uint32_t</span>
+<span class="nv">rndm</span> <span class="ss">(</span><span class="nv">uint32_t</span> <span class="nv">n</span><span class="ss">)</span>
+{
+  <span class="k">return</span> <span class="ss">(</span><span class="nv">n</span> <span class="o">*</span> <span class="ss">(</span><span class="nv">uint32_t</span><span class="ss">)</span><span class="nv">rndm16</span> <span class="ss">())</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="c1">;</span>
+}
+</code></pre></div>
+
+<p>但是，对于2的幂，您可以使用普通掩码，不过只有在编译时检测到这种情况才可以这样做。 这是当传递的数字是一个常数，也是2的幂(<code>n &amp; (n -1) == 0</code>)的情况:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ecb_inline</span><span class="w"> </span><span class="n">uint32_t</span><span class="w"></span>
+<span class="n">rndm</span><span class="w"> </span><span class="p">(</span><span class="n">uint32_t</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">is_constant</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="err">?</span><span class="w"> </span><span class="n">rndm16</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">num</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">uint32_t</span><span class="p">)</span><span class="n">rndm16</span><span class="w"> </span><span class="p">())</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="ecb_expect-expr-value">ecb_expect (expr, value)</h3>
+<p>计算<code>expr</code>并返回它。此外，它告诉编译器<code>expr</code>的计算结果很多都是<code>value</code>，这可以用于静态分支优化。</p>
+<p>通常，您希望使用更直观的<code>ecb_expect_true</code>和<code>ecb_expect_false</code>函数。</p>
+<h3 id="bool-ecb_expect_true-cond">bool ecb_expect_true (cond)</h3>
+<h3 id="bool-ecb_expect_false-cond">bool ecb_expect_false (cond)</h3>
+<p>这两个函数期望表达式为true或false，并分别返回<code>1</code>或<code>0</code>. 因此当用于<code>if</code>或其他条件语句的条件时，它不会改变程序:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* these two do the same thing */</span><span class="w"></span>
+<span class="kr">if</span><span class="w"> </span><span class="o">(</span>some_condition<span class="o">)</span><span class="w"> </span><span class="o">...</span><span class="err">;</span><span class="w"></span>
+<span class="kr">if</span><span class="w"> </span><span class="o">(</span>ecb_expect_true<span class="w"> </span><span class="o">(</span>some_condition<span class="o">))</span><span class="w"> </span><span class="o">...</span><span class="err">;</span><span class="w"></span>
+</code></pre></div>
+
+<p>但是，通过使用<code>ecb_expect_true</code>，您可以告诉编译器该条件大概率可能为真(对于<code>ecb_expect_false</code>，它大概率为假)。</p>
+<p>例如，当你检查一个空指针，并期望它是一个罕见的，异常的，大小写，然后使用<code>ecb_expect_false</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">void</span> <span class="nv">my_free</span> <span class="ss">(</span><span class="nv">void</span> <span class="o">*</span><span class="nv">ptr</span><span class="ss">)</span>
+{
+  <span class="k">if</span> <span class="ss">(</span><span class="nv">ecb_expect_false</span> <span class="ss">(</span><span class="nv">ptr</span> <span class="o">==</span> <span class="mi">0</span><span class="ss">))</span>
+    <span class="k">return</span><span class="c1">;</span>
+}
+</code></pre></div>
+
+<p>随后使用这些函数来标记异常情况，或者告诉编译器函数的热路径是什么，可以大大提高性能。</p>
+<p>您可能知道名称为<code>likely</code>和<code>unlikely</code>的这些函数——尽管它们是常见的别名， 但我们发现，在快速浏览代码时，期望名称更容易理解。 如果您愿意，可以使用<code>ecb_likely</code>而不是<code>ecb_expect_true</code>和<code>ecb_unlikely</code>而不是<code>ecb_expect_false</code>—这些只是别名。</p>
+<p>一个很好的例子是:在函数中,会预分配更多一些的内存来存储某些东西(例如,一个字符串流) ——那么每次添加东西的时候,你必须检查缓冲区溢出,但你认为大多数情况下,预分配的对于空间是够用的:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* make sure we have &quot;size&quot; extra room in our buffer */</span><span class="w"></span>
+ecb_inline<span class="w"> </span>void<span class="w"></span>
+reserve<span class="w"> </span><span class="o">(</span>int<span class="w"> </span>size<span class="o">)</span><span class="w"></span>
+<span class="err">{</span><span class="w"></span>
+<span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="o">(</span>ecb_expect_false<span class="w"> </span><span class="o">(</span>current<span class="w"> </span><span class="o">+</span><span class="w"> </span>size<span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="kr">end</span><span class="o">))</span><span class="w"></span>
+<span class="w">    </span>real_reserve_method<span class="w"> </span><span class="o">(</span>size<span class="o">)</span><span class="err">;</span><span class="w"> </span><span class="cm">/* presumably noinline */</span><span class="w"></span>
+<span class="err">}</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="ecb_assume-cond">ecb_assume (cond)</h3>
+<p>试图告诉编译器cond为真，即使它并不明显。这不是一个函数，而是一个语句:它不能被当做表达式使用。 PS:也就是说,它不能被放在if中做判断</p>
+<p>这可以用来告诉编译器关于不变量或其他可能改善代码生成的条件，但不可能从代码本身推断出来。</p>
+<p>例如，<code>ecb_expect_false</code>描述中的示例保留函数可以这样写(只添加了<code>ecb_assume</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="nv">ecb_inline</span> <span class="nv">void</span>
+<span class="nv">reserve</span> <span class="ss">(</span><span class="nv">int</span> <span class="nv">size</span><span class="ss">)</span>
+{
+  <span class="k">if</span> <span class="ss">(</span><span class="nv">ecb_expect_false</span> <span class="ss">(</span><span class="nv">current</span> <span class="o">+</span> <span class="nv">size</span> <span class="o">&gt;</span> <span class="k">end</span><span class="ss">))</span>
+    <span class="nv">real_reserve_method</span> <span class="ss">(</span><span class="nv">size</span><span class="ss">)</span><span class="c1">; /* presumably noinline */</span>
+
+  <span class="nv">ecb_assume</span> <span class="ss">(</span><span class="nv">current</span> <span class="o">+</span> <span class="nv">size</span> <span class="o">&lt;=</span> <span class="k">end</span><span class="ss">)</span><span class="c1">;</span>
+}
+</code></pre></div>
+
+<p>如果你调用这个函数2次,就像这样:</p>
+<div class="highlight"><pre><span></span><code>reserve (10);
+reserve (1);
+</code></pre></div>
+
+<p>然后编译器_可能_能够完全优化第二个调用，因为它知道<code>current + 1 &gt; end</code>是假的，调用将永远不会被执行。</p>
+<h3 id="ecb_unreachable">ecb_unreachable ()</h3>
+<p>这个函数本身什么都不做，除了告诉编译器它永远不会被执行。 除了在某些情况下不触发警告外，这个函数还可以用于实现<code>ecb_assume</code>或类似的功能。</p>
+<h3 id="ecb_prefetch-addr-rw-locality">ecb_prefetch (addr, rw, locality)</h3>
+<p>告诉编译器预加载数据到内存<code>addr</code>ess为后续的读(<code>rw</code> = 0)或写(<code>rw</code> = 1)做准备。 <code>locality</code> <code>0</code>意味着只有一次访问,<code>3</code>意味着可能是会经常访问的数据,并且数据准备的彼此之间……在两者之间。 addr所指向的内存不需要是可访问的(例如，它可以是一个空指针)，但是<code>rw</code>和<code>locality</code>必须是编译时常量。</p>
+<p>这是一个语句，而不是一个函数:你不能将它用作表达式的一部分。</p>
+<p>一种明显的方法是在一个大数组中，在较远的地方预加载一些数据。 这将在之后预加载内存中的128个数组元素，希望当CPU到达这个位置时，这些元素就已经准备好了。</p>
+<div class="highlight"><pre><span></span><code><span class="nc">int</span><span class="w"> </span><span class="nf">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">N</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="err">{</span><span class="w"></span>
+<span class="w">    </span><span class="nf">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">arr</span><span class="w"> </span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"></span>
+<span class="w">    </span><span class="n">ecb_prefetch</span><span class="w"> </span><span class="p">(</span><span class="n">arr</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">128</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">  </span><span class="err">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>一般很难预测预取的深度，但大多数CPU通常都能很好地预测这种行为。使用链表会变得更有趣，特别是当你对每个列表元素进行公平处理时:</p>
+<div class="highlight"><pre><span></span><code><span class="n">for</span><span class="w"> </span><span class="p">(</span><span class="n">node</span><span class="w"> </span><span class="o">*</span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">start</span><span class="p">;</span><span class="w"> </span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">ecb_prefetch</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="o">-&gt;</span><span class="n">next</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">...</span><span class="w"> </span><span class="n">do</span><span class="w"> </span><span class="n">medium</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="kr">of</span><span class="w"> </span><span class="n">work</span><span class="w"> </span><span class="n">with</span><span class="w"> </span><span class="o">*</span><span class="n">n</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>处理该节点后，下一个节点(部分)可能已经在缓存中.</p>
+<p>PS: 通过对数据手工预取的方法，减少了读取延迟，从而提高了性能，但该函数也需要 CPU 的支持。 其中参数 addr 是个内存指针，它指向要预取的数据，我们人工需要判定这些数据是很快能访问到的， 或者说是它们就在最近的内存中 &mdash; 一般来说，对于链表而言，各个节点在内存中基本上是紧挨着的，所以我们容易预取链表节点里的指针项。</p>
+<div class="highlight"><pre><span></span><code>该函数还有两个可选参数，rw 和 locality 。rw 是个编译时的常数，或 1 或 0 。1 时表示写(w)，0 时表示读(r) 。
+
+locality 必须是编译时的常数，也称为“时间局部性”(temporal locality) 。
+时间局部性是指，如果程序中某一条指令一旦执行，则不久之后该指令可能再被执行；
+如果某数据被访问，则不久之后该数据会被再次访问。该值的范围在 0 - 3 之间。为 0 时表示，它没有时间局部性，
+也就是说，要访问的数据或地址被访问之后的不长的时间里不会再被访问；
+为 3 时表示，被访问的数据或地址具有高 时间局部性，也就是说，在被访问不久之后非常有可能再次访问；
+对于值 1 和 2，则分别表示具有低 时间局部性 和中等 时间局部性。该值默认为 3 。
+</code></pre></div>
+
+<h2 id="bit-fiddling-bit-wizardry">BIT FIDDLING / BIT WIZARDRY</h2>
+<h3 id="bool-ecb_big_endian">bool ecb_big_endian ()</h3>
+<h3 id="bool-ecb_little_endian">bool ecb_little_endian ()</h3>
+<p>当字节序为大端序(最高有效字节优先)时,ecb_big_endian返回true,反之(最低有效字节优先),ecb_little_endian返回true</p>
+<p>在两者都不存在的系统上，它们的返回值是未指定的。</p>
+<h3 id="int-ecb_ctz32-uint32_t-x">int ecb_ctz32 (uint32_t x)</h3>
+<h3 id="int-ecb_ctz64-uint64_t-x">int ecb_ctz64 (uint64_t x)</h3>
+<h3 id="int-ecb_ctz-t-x-c">int ecb_ctz (T x) [C++]</h3>
+<p>返回<code>x</code>中bit集中的最低有效位的索引(或相当于在bit集中最低有效位之前bit值为0的位数)，从0开始。如果<code>x</code>是0，结果是没有定义的。</p>
+<p>对于小于<code>uint32_t</code>的类型，你可以安全地使用<code>ecb_ctz32</code>。</p>
+<p>重载的c++<code>ecb_ctz</code>函数支持<code>uint8_t</code>， <code>uint16_t</code>， <code>uint32_t</code>和<code>uint64_t</code>类型。</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code>ecb_ctz32 (3) = 0 // bit:0000 0011 所以最小有效位是0
+ecb_ctz32 (6) = 1 // bit:0000 0110 所以最小有效位是1
+</code></pre></div>
+
+<h3 id="bool-ecb_is_pot32-uint32_t-x">bool ecb_is_pot32 (uint32_t x)</h3>
+<h3 id="bool-ecb_is_pot64-uint32_t-x">bool ecb_is_pot64 (uint32_t x)</h3>
+<h3 id="bool-ecb_is_pot-t-x-c">bool ecb_is_pot (T x) [C++]</h3>
+<p>返回true,如果<code>x</code>是2的幂或<code>x == 0</code>。</p>
+<p>对于小于<code>uint32_t</code>的类型，你可以安全地使用<code>ecb_is_pot32</code>。</p>
+<p>重载的c++ <code>ecb_is_pot</code>函数支持<code>uint8_t</code>， <code>uint16_t</code>，<code>uint32_t</code>和<code>uint64_t</code>类型。</p>
+<h3 id="int-ecb_ld32-uint32_t-x">int ecb_ld32 (uint32_t x)</h3>
+<h3 id="int-ecb_ld64-uint64_t-x">int ecb_ld64 (uint64_t x)</h3>
+<h3 id="int-ecb_ld64-t-x-c">int ecb_ld64 (T x) [C++]</h3>
+<p>返回<code>x</code>中最高bit集的索引，或者该数字需要的二进制位数(等于<code>2**ld &lt;= x &lt; 2**(ld+1)</code>)。 如果<code>x</code>是0，结果是没有定义的。 一个常见的用例是计算整数二进制对数，例如<code>floor (log2 (n))</code>，以查看某个数字需要编码多少位。</p>
+<p>此函数类似于“count前导零位数”函数，不同之处在于该函数返回数字(在给定的数据类型中)“前面”有多少个零位数， 而<code>ecb_ld</code>返回数字本身需要多少位。</p>
+<p>对于小于<code>uint32_t</code>的类型，你可以安全地使用<code>ecb_ld32</code>。</p>
+<p>重载的c++ <code>ecb_ld</code>函数支持<code>uint8_t</code>， <code>uint16_t</code>，<code>uint32_t</code>和<code>uint64_t</code>类型。</p>
+<h3 id="int-ecb_popcount32-uint32_t-x">int ecb_popcount32 (uint32_t x)</h3>
+<h3 id="int-ecb_popcount64-uint64_t-x">int ecb_popcount64 (uint64_t x)</h3>
+<h3 id="int-ecb_popcount-t-x-c">int ecb_popcount (T x) [C++]</h3>
+<p>返回<code>x</code>的bit集中为1的位数。</p>
+<p>对于小于<code>uint32_t</code>的类型，你可以安全地使用<code>ecb_popcount32</code>。</p>
+<p>重载的c++ <code>ecb_popcount</code>函数支持uint8_t&gt;， <code>uint16_t</code>，uint32_t&gt;和uint64_t&gt;类型。</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code>ecb_popcount32 (7) = 3 //0000 0111
+ecb_popcount32 (255) = 8 //1111 1111
+</code></pre></div>
+
+<h3 id="uint8_t-ecb_bitrev8-uint8_t-x">uint8_t ecb_bitrev8 (uint8_t x)</h3>
+<h3 id="uint16_t-ecb_bitrev16-uint16_t-x">uint16_t ecb_bitrev16 (uint16_t x)</h3>
+<h3 id="uint32_t-ecb_bitrev32-uint32_t-x">uint32_t ecb_bitrev32 (uint32_t x)</h3>
+<h3 id="t-ecb_bitrev-t-x-c">T ecb_bitrev (T x) [C++]</h3>
+<p>反转x的位，即MSB变成LSB, MSB-1变成LSB+1等等。</p>
+<p>重载的C++ <code>ecb_bitrev</code>函数支持<code>uint8_t</code>， <code>uint16_t</code>和<code>uint32_t</code>类型。</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code>ecb_bitrev8 (0xa7) = 0xea // 1010 0111 =&gt; 1110 1010 
+ecb_bitrev32 (0xffcc4411) = 0x882233ff // 1111 1111 1100 1100 0100 0100 0001 0001 =&gt; 1000 1000 0010 0010 0011 0011 1111 1111
+
+/*
+ * 这两个好像颠倒的不一致
+ * (0xffcc4411) = 0x882233ff
+ *  1111 1111 1100 1100 0100 0100 0001 0001
+ *  0001 0001 0100 0100 1100 1100 1111 1111 第一步颠倒16位字节
+ *  1000 1000 0010 0010 0011 0011 1111 1111 第二步每个字节颠倒
+ *   8    8    2    2    3    3    f    f
+ * 所以0xa7好像有问题
+ * 0xa7 = ?
+ * 1010 0111
+ * 0111 1010
+ * 1110 0101
+ *  e    5
+ */
+</code></pre></div>
+
+<h3 id="t-ecb_bitrev-t-x-c_1">T ecb_bitrev (T x) [C++]</h3>
+<p>重载的C++ bitrev函数,</p>
+<p><code>T</code> must be one of <code>uint8_t</code>, <code>uint16_t</code> or <code>uint32_t</code>.</p>
+<p><code>T</code> 必须是以下类型之一: <code>uint8_t</code>, <code>uint16_t</code> or <code>uint32_t</code>.</p>
+<p>/<em> * 0x11223344 =&gt; 0x44332211 </em>/</p>
+<h3 id="uint32_t-ecb_bswap16-uint32_t-x">uint32_t ecb_bswap16 (uint32_t x)</h3>
+<h3 id="uint32_t-ecb_bswap32-uint32_t-x">uint32_t ecb_bswap32 (uint32_t x)</h3>
+<h3 id="uint64_t-ecb_bswap64-uint64_t-x">uint64_t ecb_bswap64 (uint64_t x)</h3>
+<h3 id="t-ecb_bswap-t-x">T ecb_bswap (T x)</h3>
+<p>这些函数返回反转16位(32位、64位)之后的值.<code>x</code>在<code>ecb_bswap32</code>中0x11223344变为0x44332211</p>
+<p>重载的c++ <code>ecb_bswap</code>函数支持<code>uint8_t</code>， <code>uint16_t</code>，<code>uint32_t</code>和<code>uint64_t</code>类型。</p>
+<h3 id="uint8_t-ecb_rotl8-uint8_t-x-unsigned-int-count">uint8_t ecb_rotl8 (uint8_t x, unsigned int count)</h3>
+<h3 id="uint16_t-ecb_rotl16-uint16_t-x-unsigned-int-count">uint16_t ecb_rotl16 (uint16_t x, unsigned int count)</h3>
+<h3 id="uint32_t-ecb_rotl32-uint32_t-x-unsigned-int-count">uint32_t ecb_rotl32 (uint32_t x, unsigned int count)</h3>
+<h3 id="uint64_t-ecb_rotl64-uint64_t-x-unsigned-int-count">uint64_t ecb_rotl64 (uint64_t x, unsigned int count)</h3>
+<h3 id="uint8_t-ecb_rotr8-uint8_t-x-unsigned-int-count">uint8_t ecb_rotr8 (uint8_t x, unsigned int count)</h3>
+<h3 id="uint16_t-ecb_rotr16-uint16_t-x-unsigned-int-count">uint16_t ecb_rotr16 (uint16_t x, unsigned int count)</h3>
+<h3 id="uint32_t-ecb_rotr32-uint32_t-x-unsigned-int-count">uint32_t ecb_rotr32 (uint32_t x, unsigned int count)</h3>
+<h3 id="uint64_t-ecb_rotr64-uint64_t-x-unsigned-int-count">uint64_t ecb_rotr64 (uint64_t x, unsigned int count)</h3>
+<p>这两组函数在将所有位按<code>count</code>位置向右(<code>ecb_rotr</code>)或向左(<code>ecb_rotl</code>)旋转后返回<code>x</code>的值。 对值<code>count</code>没有限制，即0和等于或大于字宽的值都是正确的。 同样，尽管<code>count</code>是无符号的，但负数也能工作并向相反的方向移动。</p>
+<p>当前的GCC/clang版本支持这些函数，并且通常将它们编译为“最优”代码(例如，在x86上一个<code>rol</code>或一个<code>shld</code>的组合)。</p>
+<h3 id="t-ecb_rotl-t-x-unsigned-int-count-c">T ecb_rotl (T x, unsigned int count) [C++]</h3>
+<h3 id="t-ecb_rotr-t-x-unsigned-int-count-c">T ecb_rotr (T x, unsigned int count) [C++]</h3>
+<p>重载C++的 rotl/rotr函数</p>
+<p><code>T</code> must be one of <code>uint8_t</code>, <code>uint16_t</code>, <code>uint32_t</code> or <code>uint64_t</code>. <code>T</code> 必须是以下类型以下: <code>uint8_t</code>, <code>uint16_t</code>, <code>uint32_t</code> or <code>uint64_t</code>.</p>
+<h2 id="bit-mixing-hashing">BIT MIXING, HASHING</h2>
+<p>有时候你有一个整数，想把它的位分配好，例如，把它用作哈希表中的哈希。一个常见的例子是指针值，它通常只有一个有限的范围(例如，低位和高位通常为零)。</p>
+<p>下面的函数尝试混合比特以得到一个良好的无偏置分布。它们主要是为指针而设计的，但是底层的函数也会对整数支持的很好。</p>
+<p>另一个好处是,函数是可逆的.如果你得到这个值的是时候只是一个hash值,你可以从hash值恢复到原来的指针,此操作在32位和64位平台上都支持. (如果发现不支持的情况,报告给我们,我们将添加其他功能位宽度)。</p>
+<p>unmix函数要比mix函数慢一些，所以在方便的时候存储原始值也是非常可取的。</p>
+<p>底层的算法可能会发生变化，因此目前这些函数不适合持久化哈希表，因为它们的结果值可能会在libecb的不同版本之间发生变化。</p>
+<h3 id="uintptr_t-ecb_ptrmix-void-ptr">uintptr_t ecb_ptrmix (void *ptr)</h3>
+<p>混合指针的位，结果适合于哈希表查找。换句话说，这是哈希指针值。</p>
+<h3 id="uintptr_t-ecb_ptrmix-t-ptr-c">uintptr_t ecb_ptrmix (T *ptr) [C++]</h3>
+<p>重载 <code>ecb_ptrmix</code>函数用来支持C++的中任何指针.</p>
+<h3 id="void-ecb_ptrunmix-uintptr_t-v">void *ecb_ptrunmix (uintptr_t v)</h3>
+<p>将哈希值恢复为原来的指针。这只在哈希值没有被截断的情况下才有效，即你使用<code>uintptr_t</code>(或等效的)来存储它。</p>
+<h3 id="t-ecb_ptrunmixt-uintptr_t-v-c">T *ecb_ptrunmix&lt;T> (uintptr_t v) [C++]</h3>
+<p>The somewhat less useful template version of <code>ecb_ptrunmix</code> for C++. Example:</p>
+<div class="highlight"><pre><span></span><code>sometype *myptr;
+uintptr_t hash = ecb_ptrmix (myptr); //得到这个指针的hash值
+sometype *orig = ecb_ptrunmix&lt;sometype&gt; (hash); //从这个hash值恢复到原来的指针
+</code></pre></div>
+
+<h3 id="uint32_t-ecb_mix32-uint32_t-v">uint32_t ecb_mix32 (uint32_t v)</h3>
+<h3 id="uint64_t-ecb_mix64-uint64_t-v">uint64_t ecb_mix64 (uint64_t v)</h3>
+<p>有时你没有指针，而是一个整数，它的值分布得很糟糕。在这种情况下，你可以使用针对整数版本的相应函数。目前没有提供c++模板。</p>
+<h3 id="uint32_t-ecb_unmix32-uint32_t-v">uint32_t ecb_unmix32 (uint32_t v)</h3>
+<h3 id="uint64_t-ecb_unmix64-uint64_t-v">uint64_t ecb_unmix64 (uint64_t v)</h3>
+<p>与<code>ecb_mix</code>函数相反——它们接受mixed/hashed的值并恢复原始值。</p>
+<h2 id="host-endianness-conversion">HOST ENDIANNESS CONVERSION</h2>
+<h3 id="uint_fast16_t-ecb_be_u16_to_host-uint_fast16_t-v">uint_fast16_t ecb_be_u16_to_host (uint_fast16_t v)</h3>
+<h3 id="uint_fast32_t-ecb_be_u32_to_host-uint_fast32_t-v">uint_fast32_t ecb_be_u32_to_host (uint_fast32_t v)</h3>
+<h3 id="uint_fast64_t-ecb_be_u64_to_host-uint_fast64_t-v">uint_fast64_t ecb_be_u64_to_host (uint_fast64_t v)</h3>
+<h3 id="uint_fast16_t-ecb_le_u16_to_host-uint_fast16_t-v">uint_fast16_t ecb_le_u16_to_host (uint_fast16_t v)</h3>
+<h3 id="uint_fast32_t-ecb_le_u32_to_host-uint_fast32_t-v">uint_fast32_t ecb_le_u32_to_host (uint_fast32_t v)</h3>
+<h3 id="uint_fast64_t-ecb_le_u64_to_host-uint_fast64_t-v">uint_fast64_t ecb_le_u64_to_host (uint_fast64_t v)</h3>
+<p>将一个16、32或64位的无符号值从大字节或小字节顺序转换为主机字节顺序。</p>
+<p>命名约定为<code>ecb_</code>(<code>be</code>|<code>le</code>)<code>_u``16|32|64``_to_host</code>，其中<code>be</code>和<code>le</code>分别代表大端和小端。</p>
+<h3 id="uint_fast16_t-ecb_host_to_be_u16-uint_fast16_t-v">uint_fast16_t ecb_host_to_be_u16 (uint_fast16_t v)</h3>
+<h3 id="uint_fast32_t-ecb_host_to_be_u32-uint_fast32_t-v">uint_fast32_t ecb_host_to_be_u32 (uint_fast32_t v)</h3>
+<h3 id="uint_fast64_t-ecb_host_to_be_u64-uint_fast64_t-v">uint_fast64_t ecb_host_to_be_u64 (uint_fast64_t v)</h3>
+<h3 id="uint_fast16_t-ecb_host_to_le_u16-uint_fast16_t-v">uint_fast16_t ecb_host_to_le_u16 (uint_fast16_t v)</h3>
+<h3 id="uint_fast32_t-ecb_host_to_le_u32-uint_fast32_t-v">uint_fast32_t ecb_host_to_le_u32 (uint_fast32_t v)</h3>
+<h3 id="uint_fast64_t-ecb_host_to_le_u64-uint_fast64_t-v">uint_fast64_t ecb_host_to_le_u64 (uint_fast64_t v)</h3>
+<p>像上面一样，但是将_from_主机字节顺序转换为指定的字节顺序。 =back</p>
+<p>在c++中，支持以下额外的模板函数:</p>
+<h3 id="t-ecb_be_to_host-t-v">T ecb_be_to_host (T v)</h3>
+<h3 id="t-ecb_le_to_host-t-v">T ecb_le_to_host (T v)</h3>
+<h3 id="t-ecb_host_to_be-t-v">T ecb_host_to_be (T v)</h3>
+<h3 id="t-ecb_host_to_le-t-v">T ecb_host_to_le (T v)</h3>
+<p>这些函数的工作方式与上面的C函数类似，但使用了模板，这使得它们在泛型代码中很有用。</p>
+<p><code>T</code>必须是其中一个<code>uint8_t</code>， <code>uint16_t</code>， <code>uint32_t</code>或<code>uint64_t</code>(所以不像他们的C对应，有一个版本的<code>uint8_t</code>，这在通用代码中也可以是有用的)。</p>
+<h2 id="unaligned-loadstore">UNALIGNED LOAD/STORE</h2>
+<p>这些函数加载或存储未对齐的多字节值。</p>
+<h3 id="uint_fast16_t-ecb_peek_u16_u-const-void-ptr">uint_fast16_t ecb_peek_u16_u (const void *ptr)</h3>
+<h3 id="uint_fast32_t-ecb_peek_u32_u-const-void-ptr">uint_fast32_t ecb_peek_u32_u (const void *ptr)</h3>
+<h3 id="uint_fast64_t-ecb_peek_u64_u-const-void-ptr">uint_fast64_t ecb_peek_u64_u (const void *ptr)</h3>
+<p>这些函数从内存中加载一个unaligned, unsigned 16,32或64位的值.</p>
+<h3 id="uint_fast16_t-ecb_peek_be_u16_u-const-void-ptr">uint_fast16_t ecb_peek_be_u16_u (const void *ptr)</h3>
+<h3 id="uint_fast32_t-ecb_peek_be_u32_u-const-void-ptr">uint_fast32_t ecb_peek_be_u32_u (const void *ptr)</h3>
+<h3 id="uint_fast64_t-ecb_peek_be_u64_u-const-void-ptr">uint_fast64_t ecb_peek_be_u64_u (const void *ptr)</h3>
+<h3 id="uint_fast16_t-ecb_peek_le_u16_u-const-void-ptr">uint_fast16_t ecb_peek_le_u16_u (const void *ptr)</h3>
+<h3 id="uint_fast32_t-ecb_peek_le_u32_u-const-void-ptr">uint_fast32_t ecb_peek_le_u32_u (const void *ptr)</h3>
+<h3 id="uint_fast64_t-ecb_peek_le_u64_u-const-void-ptr">uint_fast64_t ecb_peek_le_u64_u (const void *ptr)</h3>
+<p>与上面类似，但在此过程中，将大端字节顺序(<code>be</code>)或小端字节顺序(<code>le</code>)转换为主机字节顺序。</p>
+<h3 id="ecb_poke_u16_u-void-ptr-uint16_t-v">ecb_poke_u16_u (void *ptr, uint16_t v)</h3>
+<h3 id="ecb_poke_u32_u-void-ptr-uint32_t-v">ecb_poke_u32_u (void *ptr, uint32_t v)</h3>
+<h3 id="ecb_poke_u64_u-void-ptr-uint64_t-v">ecb_poke_u64_u (void *ptr, uint64_t v)</h3>
+<p>这些函数将一个非对齐、无符号的16、32或64位值存储到内存中。</p>
+<h3 id="ecb_poke_be_u16_u-void-ptr-uint_fast16_t-v">ecb_poke_be_u16_u (void *ptr, uint_fast16_t v)</h3>
+<h3 id="ecb_poke_be_u32_u-void-ptr-uint_fast32_t-v">ecb_poke_be_u32_u (void *ptr, uint_fast32_t v)</h3>
+<h3 id="ecb_poke_be_u64_u-void-ptr-uint_fast64_t-v">ecb_poke_be_u64_u (void *ptr, uint_fast64_t v)</h3>
+<h3 id="ecb_poke_le_u16_u-void-ptr-uint_fast16_t-v">ecb_poke_le_u16_u (void *ptr, uint_fast16_t v)</h3>
+<h3 id="ecb_poke_le_u32_u-void-ptr-uint_fast32_t-v">ecb_poke_le_u32_u (void *ptr, uint_fast32_t v)</h3>
+<h3 id="ecb_poke_le_u64_u-void-ptr-uint_fast64_t-v">ecb_poke_le_u64_u (void *ptr, uint_fast64_t v)</h3>
+<p>与上面类似，但在此过程中还要将主机字节顺序转换为大端字节顺序(<code>be</code>)或小端字节顺序(<code>le</code>)。</p>
+<p>在c++中，支持以下额外的模板函数:</p>
+<h3 id="t-ecb_peekt-const-void-ptr">T ecb_peek&lt;T> (const void *ptr)</h3>
+<h3 id="t-ecb_peek_bet-const-void-ptr">T ecb_peek_be&lt;T> (const void *ptr)</h3>
+<h3 id="t-ecb_peek_let-const-void-ptr">T ecb_peek_le&lt;T> (const void *ptr)</h3>
+<h3 id="t-ecb_peek_ut-const-void-ptr">T ecb_peek_u&lt;T> (const void *ptr)</h3>
+<h3 id="t-ecb_peek_be_ut-const-void-ptr">T ecb_peek_be_u&lt;T> (const void *ptr)</h3>
+<h3 id="t-ecb_peek_le_ut-const-void-ptr">T ecb_peek_le_u&lt;T> (const void *ptr)</h3>
+<p>与C语言类似，这些函数从内存中加载无符号8、16、32或64位的值，并可选地进行大/小端字节的转换。</p>
+<p>因为不能推断类型，所以必须显式指定它，例如。</p>
+<div class="highlight"><pre><span></span><code>uint_fast16_t v = ecb_peek&lt;uint16_t&gt; (ptr);
+</code></pre></div>
+
+<p><code>T</code> must be one of <code>uint8_t</code>, <code>uint16_t</code>, <code>uint32_t</code> or <code>uint64_t</code>.</p>
+<p><code>T</code> 必须是 <code>uint8_t</code>, <code>uint16_t</code>, <code>uint32_t</code> or <code>uint64_t</code>之一.</p>
+<p>与它们的C对等体不同，这些函数支持8位数量(<code>uint8_t</code>)，并且有一个对齐的版本(没有<code>_u</code>前缀)，所有这些都希望使它们在泛型代码中更有用。</p>
+<h3 id="ecb_poke-void-ptr-t-v">ecb_poke (void *ptr, T v)</h3>
+<h3 id="ecb_poke_be-void-ptr-t-v">ecb_poke_be (void *ptr, T v)</h3>
+<h3 id="ecb_poke_le-void-ptr-t-v">ecb_poke_le (void *ptr, T v)</h3>
+<h3 id="ecb_poke_u-void-ptr-t-v">ecb_poke_u (void *ptr, T v)</h3>
+<h3 id="ecb_poke_be_u-void-ptr-t-v">ecb_poke_be_u (void *ptr, T v)</h3>
+<h3 id="ecb_poke_le_u-void-ptr-t-v">ecb_poke_le_u (void *ptr, T v)</h3>
+<p>同样，与C语言类似，这些函数将一个无符号8、16、32或z64位的值存储到内存中，并可选地将其转换为大/小端序。</p>
+<p><code>T</code> must be one of <code>uint8_t</code>, <code>uint16_t</code>, <code>uint32_t</code> or <code>uint64_t</code>.</p>
+<p><code>T</code> 必须是 <code>uint8_t</code>, <code>uint16_t</code>, <code>uint32_t</code> or <code>uint64_t</code>之一.</p>
+<p>与它们的C对等体不同，这些函数支持8位数量(<code>uint8_t</code>)，并且有一个对齐的版本(没有<code>_u</code>前缀)，所有这些都希望使它们在泛型代码中更有用。</p>
+<h2 id="fast-integer-to-string">FAST INTEGER TO STRING</h2>
+<p>Libecb定义了一组非常快的整数转换为十进制字符串(或整数到ascii，short <code>i2a</code>)函数。 它们的工作原理是将整数转换为定点表示，然后依次将最上面的数字乘出来。 与其他一些同样非常快的库不同，ecb的算法应该是完全位无关的，并且不依赖于特殊的cpu函数(如clz)的存在。</p>
+<p>有一个高级API，它接受一个<code>int32_t</code>， <code>uint32_t</code>， <code>int64_t</code>或<code>uint64_t</code>作为参数， 和一个低级API，它更难使用，但支持稍微更多的格式化选项</p>
+<h3 id="high-level-api">HIGH LEVEL API</h3>
+<p>高级API由四个函数组成，分别为<code>int32_t</code>， <code>uint32_t</code>， <code>int64_t</code>和<code>uint64_t</code>:</p>
+<p>Example:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">char</span> <span class="nv">buf</span>[<span class="nv">ECB_I2A_MAX_DIGITS</span> <span class="o">+</span> <span class="mi">1</span>]<span class="c1">;</span>
+<span class="nv">char</span> <span class="o">*</span><span class="k">end</span> <span class="o">=</span> <span class="nv">ecb_i2a_i32</span> <span class="ss">(</span><span class="nv">buf</span>, <span class="mi">17262</span><span class="ss">)</span><span class="c1">;</span>
+<span class="o">*</span><span class="k">end</span> <span class="o">=</span> <span class="mi">0</span><span class="c1">;</span>
+<span class="o">//</span> <span class="nv">buf</span> <span class="nv">now</span> <span class="nv">contains</span> <span class="s2">&quot;</span><span class="s">17262</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<h3 id="ecb_i2a_i32_digits-11">ECB_I2A_I32_DIGITS (=11)</h3>
+<h3 id="char-ecb_i2a_u32-char-ptr-uint32_t-value">char <em>ecb_i2a_u32 (char </em>ptr, uint32_t value)</h3>
+<p>使用<code>uint32_t</code> _value_并将其格式化为从_ptr_开始的十进制数，最多使用<code>ECB_I2A_I32_DIGITS</code>个字符。 返回指向生成的字符串后一位指针，通常将<code>0</code>字符作为结束符。这个函数输出最小位数。</p>
+<h3 id="ecb_i2a_u32_digits-10">ECB_I2A_U32_DIGITS (=10)</h3>
+<h3 id="char-ecb_i2a_i32-char-ptr-int32_t-value">char <em>ecb_i2a_i32 (char </em>ptr, int32_t value)</h3>
+<p>类似于<code>ecb_i2a_u32</code>,但是参数支持<code>int32_t</code>类型的值,如果需要,也支持负数的&rdquo;-&ldquo;.</p>
+<h3 id="ecb_i2a_i64_digits-20">ECB_I2A_I64_DIGITS (=20)</h3>
+<h3 id="char-ecb_i2a_u64-char-ptr-uint64_t-value">char <em>ecb_i2a_u64 (char </em>ptr, uint64_t value)</h3>
+<h3 id="ecb_i2a_u64_digits-21">ECB_I2A_U64_DIGITS (=21)</h3>
+<h3 id="char-ecb_i2a_i64-char-ptr-int64_t-value">char <em>ecb_i2a_i64 (char </em>ptr, int64_t value)</h3>
+<p>与32位的类似，这些参数为64位。</p>
+<h3 id="ecb_i2a_max_digits-21">ECB_I2A_MAX_DIGITS (=21)</h3>
+<p>不使用特定于类型长度的宏，您可以只使用<code>ECB_I2A_MAX_DIGITS</code>，这对于任何<code>ecb_i2a</code>函数都足够好了。</p>
+<h3 id="low-level-api"><a href="https://github.com/xvhfeng/libecb/blob/master/ecb-zh.pod#low-level-api"></a>LOW-LEVEL API</h3>
+<p>上面的函数使用了一些低级api，这些api有一些严格的限制， 但可以用作构建块(建议学习<code>ecb_i2a_i32</code>和相关函数)。</p>
+<p>这里有3个函数簇: 1. 数字转换为固定数量的数字与补零(<code>ecb_i2a_0N</code>, <code>0</code>前置补零), 2. 函数生成到N位,前置不不零(<code>_N</code>) 3. 函数可以产生更多的数字,但领先的数字范围有限(<code>_xN</code>)。</p>
+<p>没有一个函数处理负数。</p>
+<p>Example: convert an IP address in an u32 into dotted-quad:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">uint32_t</span><span class="w"> </span><span class="nt">ip</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">0x0a000164</span><span class="o">;</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="nt">10</span><span class="p">.</span><span class="nc">0</span><span class="p">.</span><span class="nc">1</span><span class="p">.</span><span class="nc">100</span><span class="w"></span>
+<span class="nt">char</span><span class="w"> </span><span class="nt">ips</span><span class="cp">[</span><span class="mi">3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="cp">]</span><span class="o">;</span><span class="w"></span>
+<span class="nt">char</span><span class="w"> </span><span class="o">*</span><span class="nt">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">ips</span><span class="o">;</span><span class="w"></span>
+<span class="nt">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">ecb_i2a_3</span><span class="w"> </span><span class="o">(</span><span class="nt">ptr</span><span class="o">,</span><span class="w">  </span><span class="nt">ip</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nt">24</span><span class="w">        </span><span class="o">);</span><span class="w"> </span><span class="o">*</span><span class="nt">ptr</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;.&#39;</span><span class="o">;</span><span class="w"></span>
+<span class="nt">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">ecb_i2a_3</span><span class="w"> </span><span class="o">(</span><span class="nt">ptr</span><span class="o">,</span><span class="w"> </span><span class="o">(</span><span class="nt">ip</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nt">16</span><span class="o">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nt">0xff</span><span class="o">);</span><span class="w"> </span><span class="o">*</span><span class="nt">ptr</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;.&#39;</span><span class="o">;</span><span class="w"></span>
+<span class="nt">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">ecb_i2a_3</span><span class="w"> </span><span class="o">(</span><span class="nt">ptr</span><span class="o">,</span><span class="w"> </span><span class="o">(</span><span class="nt">ip</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w">  </span><span class="nt">8</span><span class="o">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="nt">0xff</span><span class="o">);</span><span class="w"> </span><span class="o">*</span><span class="nt">ptr</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;.&#39;</span><span class="o">;</span><span class="w"></span>
+<span class="nt">ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">ecb_i2a_3</span><span class="w"> </span><span class="o">(</span><span class="nt">ptr</span><span class="o">,</span><span class="w">  </span><span class="nt">ip</span><span class="w">        </span><span class="o">&amp;</span><span class="w"> </span><span class="nt">0xff</span><span class="o">);</span><span class="w"> </span><span class="o">*</span><span class="nt">ptr</span><span class="o">++</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nt">0</span><span class="o">;</span><span class="w"></span>
+<span class="nt">printf</span><span class="w"> </span><span class="o">(</span><span class="s2">&quot;ip: %s\n&quot;</span><span class="o">,</span><span class="w"> </span><span class="nt">ips</span><span class="o">);</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="nt">prints</span><span class="w"> </span><span class="s2">&quot;ip: 10.0.1.100&quot;</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="char-ecb_i2a_02-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_02 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="char-ecb_i2a_03-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_03 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="char-ecb_i2a_04-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_04 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="char-ecb_i2a_05-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_05 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_06-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_06 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_07-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_07 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_08-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_08 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_09-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_09 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<p><code>ecb_i2a_0_N_</code>函数接受一个无符号的_value_并将其转换为适当的_N_位的数字， 返回一个指向数字后面第一个字符的指针。_value_必须在一个范围内。 标记为_32 bit_的函数在内部以32位进行计算，标记为_64 bit_的函数在内部使用64位整数， 这在32位体系结构上可能会很慢(高级API使用<code>ECB_64BIT_NATIVE</code>决定32位和64位版本)。</p>
+<h3 id="char-ecb_i2a_2-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_2 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="char-ecb_i2a_3-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_3 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="char-ecb_i2a_4-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_4 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="char-ecb_i2a_5-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_5 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_6-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_6 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_7-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_7 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_8-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_8 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<h3 id="char-ecb_i2a_9-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_9 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<p>类似地，<code>ecb_i2a__N_</code>函数接受一个无符号的_value_并将其转换为最多_N_位数字， 不包含前导零，并返回一个指向数字后第一个字符的指针。</p>
+<h3 id="ecb_i2a_max_x5-59074">ECB_I2A_MAX_X5 (=59074)</h3>
+<h3 id="char-ecb_i2a_x5-char-ptr-uint32_t-value-32-bit">char <em>ecb_i2a_x5 (char </em>ptr, uint32_t value) // 32 bit</h3>
+<h3 id="ecb_i2a_max_x10-2932500665">ECB_I2A_MAX_X10 (=2932500665)</h3>
+<h3 id="char-ecb_i2a_x10-char-ptr-uint32_t-value-64-bit">char <em>ecb_i2a_x10 (char </em>ptr, uint32_t value) // 64 bit</h3>
+<p><code>ecb_i2a_x_N_</code>功能类似于<code>ecb_i2a__N_</code>功能.只要数量范围内,它们就可以生成一个数字. 这是由符号<code>ECB_I2A_MAX_X5</code>(差不多16位范围)和<code>ECB_I2A_MAX_X10</code>(31位多一点范围)。</p>
+<p>例如，32位有符号整数的数字部分刚好适合<code>ECB_I2A_MAX_X10</code>范围， 因此尽管<code>ecb_i2a_x10</code>不能转换十进制数字，但它可以转换所有32位有符号数字。 遗憾的是，对于32位无符号数来说，它还不够好。</p>
+<h2 id="floating-point-fiddling">FLOATING POINT FIDDLING</h2>
+<h3 id="ecb_infinity-uecb_no_libm">ECB_INFINITY [-UECB_NO_LIBM]</h3>
+<p>测试平台是否支持正无穷叔，不支持的话,则为一个真正巨大的数字。</p>
+<h3 id="ecb_nan-uecb_no_libm">ECB_NAN [-UECB_NO_LIBM]</h3>
+<p>检测平台是否支持NAN,如果支持的话,直接就是NAN,反之为<code>ECB_INFINITY</code>.</p>
+<h3 id="float-ecb_ldexpf-float-x-int-exp-uecb_no_libm">float ecb_ldexpf (float x, int exp) [-UECB_NO_LIBM]</h3>
+<p>与<code>ldexpf</code>相同，但始终可用。</p>
+<h3 id="uint32_t-ecb_float_to_binary16-float-x-uecb_no_libm">uint32_t ecb_float_to_binary16 (float x) [-UECB_NO_LIBM]</h3>
+<h3 id="uint32_t-ecb_float_to_binary32-float-x-uecb_no_libm">uint32_t ecb_float_to_binary32 (float x) [-UECB_NO_LIBM]</h3>
+<h3 id="uint64_t-ecb_double_to_binary64-double-x-uecb_no_libm">uint64_t ecb_double_to_binary64 (double x) [-UECB_NO_LIBM]</h3>
+<p>这些函数都接受原生<code>float</code>或<code>double</code>类型的实参， 并返回其IEEE 754位的表示(binary16/half、binary32/single或binary64/double precision)。</p>
+<p>位的表示就像IEEE 754定义的那样，即符号位将是最重要的位，然后是指数和尾数。</p>
+<p>即使本机浮点格式不符合IEEE标准，这个函数也可以工作，当然速度和代码大小会受到影响， 不过这也在合理的限制内(它试图转换nan、无穷大和非法线，但可能会将负0转换为正0)。</p>
+<p>在所有现代平台上(<code>ECB_STDFP</code>为真)，编译器应该能够完全优化掉32位和64位函数。</p>
+<p>这些函数在序列化浮点数到网络时很有用——你可以像一个正常的uint16_t/uint32_t/uint64_t一样序列化返回值，</p>
+<p>这些函数的另一个用途是直接操作浮点值。</p>
+<p>不太好的例子:切换浮点数的符号位。</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* On gcc-4.7 on amd64, */</span><span class="w"></span>
+<span class="cm">/*这将导致一个添加指令来切换位，和4个额外的指令来移动浮点值到一个整数寄存器并返回。*／</span>
+
+<span class="cm">x = ecb_binary32_to_float (ecb_float_to_binary32 (x) ^ 0x80000000U)</span>
+</code></pre></div>
+
+<h3 id="float-ecb_binary16_to_float-uint16_t-x-uecb_no_libm">float ecb_binary16_to_float (uint16_t x) [-UECB_NO_LIBM]</h3>
+<h3 id="float-ecb_binary32_to_float-uint32_t-x-uecb_no_libm">float ecb_binary32_to_float (uint32_t x) [-UECB_NO_LIBM]</h3>
+<h3 id="double-ecb_binary64_to_double-uint64_t-x-uecb_no_libm">double ecb_binary64_to_double (uint64_t x) [-UECB_NO_LIBM]</h3>
+<p>前一个函数的反向操作-将IEEE binary16、binary32或binary64的数字(half、single或double precision)的位表示转换为原生<code>float</code>或<code>double</code>格式。</p>
+<p>这个函数应该即使本机IEEE浮点格式不兼容问题也不大,当然速度和代码大小会变差, 但也在合理的范围内(它试图将法线和denormals,和可能幸运无穷大,和非凡的运气,也为负0)。</p>
+<p>在所有现代平台上(<code>ECB_STDFP</code>为真)，编译器应该能够完全优化这个函数。</p>
+<h3 id="uint16_t-ecb_binary32_to_binary16-uint32_t-x">uint16_t ecb_binary32_to_binary16 (uint32_t x)</h3>
+<h3 id="uint32_t-ecb_binary16_to_binary32-uint16_t-x">uint32_t ecb_binary16_to_binary32 (uint16_t x)</h3>
+<p>将IEEE binary32/单精度转换为binary16/半格式. 反之亦然，并且正确处理所有细节(从最接近偶数到最接近偶数、次法线、无穷大和nan)。</p>
+<p>这些函数可以在<code>-DECB_NO_LIBM</code>下使用，因为它们不依赖于平台浮点格式。 <code>ecb_float_to_binary16</code>和<code>ecb_binary16_to_float</code>函数通常是你想要的。</p>
+<h2 id="arithmetic">ARITHMETIC</h2>
+<h3 id="x-ecb_mod-m-n">x = ecb_mod (m, n)</h3>
+<p>返回<code>m</code>对<code>n</code>取模，与<code>m</code>和<code>n</code>之间的除法运算的正余数相同，使用底数除法。 不像C的运算符<code>%</code>,这个函数确保返回值总是正的. 两个数字_m_和_m&rsquo; = m + I * n_的结果总是与_n_的取模是相同的——换句话说,<code>ecb_mod</code>实现数学模操作,这是语言中没有的。</p>
+<p><code>n</code>必须是严格的正数(即<code>&gt;= 1</code>)，而<code>m</code>必须是可负的. 也就是说，<code>m</code>和<code>-m</code>必须在其类型中是可表示的(这通常排除了最小有符号整数值，与C中<code>/</code>和<code>%</code>的限制相同)。</p>
+<p>当前的GCC/clang版本几乎在所有的cpu上都将其编译成一个高效的无分支序列。</p>
+<p>例如，当你想遍历一个数组的成员<code>m</code>(可能是负的)，那么你应该使用<code>ecb_mod</code>，因为<code>%</code>运算符可能会给出负的结果，或者为负值改变方向:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="ss">(</span><span class="nv">m</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span><span class="c1">; m &lt;= 100; ++m)</span>
+  <span class="nv">int</span> <span class="nv">elem</span> <span class="o">=</span> <span class="nv">myarray</span> [<span class="nv">ecb_mod</span> <span class="ss">(</span><span class="nv">m</span>, <span class="nv">ecb_array_length</span> <span class="ss">(</span><span class="nv">myarray</span><span class="ss">))</span>]<span class="c1">;</span>
+</code></pre></div>
+
+<h3 id="x-ecb_div_rd-val-div">x = ecb_div_rd (val, div)</h3>
+<h3 id="x-ecb_div_ru-val-div">x = ecb_div_ru (val, div)</h3>
+<p>返回<code>val</code>除以<code>div</code>后向下四舍五入或向上四舍五入的值。 <code>val</code>和<code>div</code>必须是整数类型，<code>div</code>必须是严格正的。 注意，这些函数是用C语言的宏和c++的函数模板实现的。</p>
+<h2 id="utility">UTILITY</h2>
+<h3 id="element_count-ecb_array_length-name">element_count = ecb_array_length (name)</h3>
+<p>返回数组<code>name</code>中的元素个数。例如:</p>
+<div class="highlight"><pre><span></span><code><span class="nc">int</span><span class="w"> </span><span class="n">primes</span><span class="err">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">{</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">11</span><span class="w"> </span><span class="err">}</span><span class="p">;</span><span class="w"></span>
+<span class="nc">int</span><span class="w"> </span><span class="nf">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ecb_array_length</span><span class="w"> </span><span class="p">(</span><span class="n">primes</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="nf">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">primes</span><span class="w"> </span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">;</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="symbols-governing-compilation-of-ecbh-itself">SYMBOLS GOVERNING COMPILATION OF ECB.H ITSELF</h2>
+<p>在第一次包含&lt;ecb.h>之前，需要定义这些符号。</p>
+<h3 id="ecb_no_threads">ECB_NO_THREADS</h3>
+<p>如果&lt;ecb.h>从来没有在多线程环境中使用，那么这个符号可以被定义， 在这种情况下，内存栅栏(和类似的结构)被完全移除，导致更高效的代码和更少的依赖。</p>
+<p>将该符号设置为真值意味着<code>ECB_NO_SMP</code>。</p>
+<h3 id="ecb_no_smp">ECB_NO_SMP</h3>
+<p>较弱的版本的<code>ECB_NO_THREADS</code>,如果_ecb.h_在多线程中使用, 但从未并行(例如,如果系统程序只有一个CPU上运行一个核心,没有超线程等等), 那么这个符号可以被定义,导致更高效的代码和更少的依赖关系。</p>
+<h3 id="ecb_no_libm">ECB_NO_LIBM</h3>
+<p>当定义为<code>1</code>时，不要导出任何可能引入依赖于数学库的函数(通常称为_-lm_)——这些函数被标记为[-UECB_NO_LIBM]。</p>
+<h1 id="undocumented-functionality">UNDOCUMENTED FUNCTIONALITY</h1>
+<p>_ecb.h_还有很多没有文档化的功能，其中一些仅用于内部使用，一些我们&rdquo;忘记&rdquo;了文档化， 一些我们隐藏了，因为我们不确定是否会保持接口稳定。</p>
+<p>虽然欢迎您四处翻找并使用任何您认为有用的东西(我们不想阻止您). 但请记住，我们将毫不犹豫地以不兼容的方式更改未文档化的功能，而我们对已文档化的东西要保守得多。</p>
+<h1 id="authors">AUTHORS</h1>
+<p><code>libecb</code> is designed and maintained by:</p>
+<div class="highlight"><pre><span></span><code><span class="n">Emanuele</span><span class="w"> </span><span class="n">Giaquinta</span><span class="w"> </span><span class="o">&lt;</span><span class="n">e</span><span class="p">.</span><span class="n">giaquinta</span><span class="nv">@glauco</span><span class="p">.</span><span class="n">it</span><span class="o">&gt;</span><span class="w"></span>
+<span class="n">Marc</span><span class="w"> </span><span class="n">Alexander</span><span class="w"> </span><span class="n">Lehmann</span><span class="w"> </span><span class="o">&lt;</span><span class="n">schmorp</span><span class="nv">@schmorp</span><span class="p">.</span><span class="n">de</span><span class="o">&gt;</span><span class="w"></span>
+</code></pre></div>
+
+<h1 id="pod-errors">POD ERRORS</h1>
+<p>Hey! <strong>The above document had some coding errors, which are explained below:</strong></p>
+<p>Around line 5:</p>
+<p>Non-ASCII character seen before =encoding in &lsquo;Libecb目前是一个简单的头文件，可以在不需要任何配置的情况下加入到你自己的项目中。&rsquo;. Assuming UTF-8</p>
+<p>Around line 787:</p>
+<p>You forgot a &lsquo;=back&rsquo; before &lsquo;=head2&rsquo;</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="/tag/fan-yi.html">翻译</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://github.com/xvhfeng" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:xvhfeng@126.com">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  spk xu
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="/theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
