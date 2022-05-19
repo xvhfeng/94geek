@@ -610,6 +610,37 @@ CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
 
 </div>
 
+<div class="highlight"><pre><span></span><code>    <span class="nv">erDiagram</span>
+        <span class="nv">CUSTOMER</span> }<span class="o">|</span>..<span class="o">|</span>{ <span class="nv">DELIVERY</span><span class="o">-</span><span class="nv">ADDRESS</span> : <span class="nv">has</span>
+        <span class="nv">CUSTOMER</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">ORDER</span> : <span class="nv">places</span>
+        <span class="nv">CUSTOMER</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">INVOICE</span> : <span class="s2">&quot;</span><span class="s">liable for</span><span class="s2">&quot;</span>
+        <span class="nv">DELIVERY</span><span class="o">-</span><span class="nv">ADDRESS</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">ORDER</span> : <span class="nv">receives</span>
+        <span class="nv">INVOICE</span> <span class="o">||--|</span>{ <span class="nv">ORDER</span> : <span class="nv">covers</span>
+        <span class="nv">ORDER</span> <span class="o">||--|</span>{ <span class="nv">ORDER</span><span class="o">-</span><span class="nv">ITEM</span> : <span class="nv">includes</span>
+        <span class="nv">PRODUCT</span><span class="o">-</span><span class="nv">CATEGORY</span> <span class="o">||--|</span>{ <span class="nv">PRODUCT</span> : <span class="nv">contains</span>
+        <span class="nv">PRODUCT</span> <span class="o">||--</span><span class="nv">o</span>{ <span class="nv">ORDER</span><span class="o">-</span><span class="nv">ITEM</span> : <span class="s2">&quot;</span><span class="s">ordered in</span><span class="s2">&quot;</span>
+</code></pre></div>
+
+<div class="mermaid">
+erDiagram
+
+CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+
+CUSTOMER ||--o{ ORDER : places
+
+CUSTOMER ||--o{ INVOICE : "liable for"
+
+DELIVERY-ADDRESS ||--o{ ORDER : receives
+
+INVOICE ||--|{ ORDER : covers
+
+ORDER ||--|{ ORDER-ITEM : includes
+
+PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+
+PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+</div>
+
 <h2 id="6user-journey-diagram">6.User Journey Diagram</h2>
 <div class="highlight"><pre><span></span><code><span class="w">    </span><span class="n">journey</span><span class="w"></span>
 <span class="w">        </span><span class="n">title</span><span class="w"> </span><span class="n">My</span><span class="w"> </span><span class="n">working</span><span class="w"> </span><span class="nf">day</span><span class="w"></span>
@@ -710,6 +741,34 @@ pie title Pets adopted by volunteers
 "Dogs" : 386
 "Cats" : 85
 "Rats" : 15
+</div>
+
+<h2 id="git">git</h2>
+<div class="highlight"><pre><span></span><code>    gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    commit
+</code></pre></div>
+
+<div class="mermaid">
+gitGraph
+commit
+commit
+branch develop
+checkout develop
+commit
+commit
+checkout main
+merge develop
+commit
+commit
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>

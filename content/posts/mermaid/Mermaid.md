@@ -85,7 +85,7 @@ emperor4((朱高炽))--长子-->emperor3
 
 
 ```mermaid
-pie
+	pie
     title 为什么总是宅在家里？
     "喜欢宅" : 15
     "天气太热或太冷" : 20
@@ -499,6 +499,35 @@ classDiagram
 	CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
 		
 ```
+		erDiagram
+			CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+			CUSTOMER ||--o{ ORDER : places
+			CUSTOMER ||--o{ INVOICE : "liable for"
+			DELIVERY-ADDRESS ||--o{ ORDER : receives
+			INVOICE ||--|{ ORDER : covers
+			ORDER ||--|{ ORDER-ITEM : includes
+			PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+			PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+
+```mermaid
+erDiagram
+
+CUSTOMER }|..|{ DELIVERY-ADDRESS : has
+
+CUSTOMER ||--o{ ORDER : places
+
+CUSTOMER ||--o{ INVOICE : "liable for"
+
+DELIVERY-ADDRESS ||--o{ ORDER : receives
+
+INVOICE ||--|{ ORDER : covers
+
+ORDER ||--|{ ORDER-ITEM : includes
+
+PRODUCT-CATEGORY ||--|{ PRODUCT : contains
+
+PRODUCT ||--o{ ORDER-ITEM : "ordered in"
+```
 
 ## 6.User Journey Diagram
 		journey
@@ -597,4 +626,32 @@ gantt
     "Dogs" : 386
     "Cats" : 85
     "Rats" : 15
+```
+
+## git
+		gitGraph
+		commit
+		commit
+		branch develop
+		checkout develop
+		commit
+		commit
+		checkout main
+		merge develop
+		commit
+		commit
+
+
+```mermaid
+		gitGraph
+		commit
+		commit
+		branch develop
+		checkout develop
+		commit
+		commit
+		checkout main
+		merge develop
+		commit
+		commit
 ```

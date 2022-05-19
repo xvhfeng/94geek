@@ -94,7 +94,9 @@ MARKDOWN = {
         'markdown.extensions.smarty':{},
         'markdown.extensions.toc': {},
         'markdown.extensions.wikilinks': {},
-        'markdown.extensions.mermaid': {},  # 启用mermaid, 需要将附件中的mermaid.py放入venv/lib/python-version/site-packages/markdown/extensions,   
+         # 启用mermaid, 需要将附件中的mermaid.py放入venv/lib/python-version/site-packages/markdown/extensions,
+         # 如果cdn失效,可以使用附件中自己的js
+        'markdown.extensions.mermaid': {},   
     },
     'output_format': 'html5',
 }
