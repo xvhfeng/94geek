@@ -76,5 +76,8 @@ github: html
 	# ghp-import -m "Generate Pelican site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUTDIR)"
 	# git push origin $(GITHUB_PAGES_BRANCH)
 
+run: html
+	$(PELICAN) --autoreload --listen
+
 
 .PHONY: html help clean regenerate serve serve-global devserver publish github
