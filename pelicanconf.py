@@ -87,7 +87,7 @@ MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.extra': {},
         'markdown.extensions.admonition': {},
-        'markdown.extensions.codehilite': {'css_class': 'highlight'},
+        'markdown.extensions.codehilite': {'css_class': 'highlight','linenums':False},
         'markdown.extensions.meta': {},
         'markdown.extensions.nl2br': {},
         'markdown.extensions.sane_lists': {},
