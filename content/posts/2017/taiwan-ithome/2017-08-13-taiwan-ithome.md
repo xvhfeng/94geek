@@ -1,7 +1,7 @@
 Title: 台湾技术交流见闻与感想
 Date: 2017-08-13
-Category: 随想
-Tags: 随想
+Category: 技术分享
+Tags: 技术分享
 Slug: taiwan-ithome
 Author: spk xu
 Status: published

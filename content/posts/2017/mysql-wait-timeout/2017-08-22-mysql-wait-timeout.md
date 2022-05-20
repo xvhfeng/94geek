@@ -1,7 +1,7 @@
 Title: mysql连接池不能回避的wait timeout问题
 Date: 2017-08-22
-Category: 技术
-Tags: 技术
+Category: 调试
+Tags: 调试
 Slug: mysql-wait-timeout
 Author: spk xu
 Status: published

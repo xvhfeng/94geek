@@ -1,7 +1,7 @@
 Title: 如何更好的做一堂技术topic分享的套路
 Date: 2017-06-15
-Category: 分享
-Tags: 分享
+Category: 技术分享
+Tags: 技术分享
 Slug: how-do-topic
 Author: spk xu
 Status: published

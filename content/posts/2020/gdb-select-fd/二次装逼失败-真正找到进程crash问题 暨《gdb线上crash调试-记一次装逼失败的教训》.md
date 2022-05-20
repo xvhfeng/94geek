@@ -5,7 +5,7 @@ Tags: 调试
 Slug: gdb-select-fd
 Author: spk xu
 Status: published
-Summary:很早之前，写过一遍文章[gdb线上crash调试-记一次装逼失败的教训]({filename}../gdb-stacksize/2017-06-27-gdb-stacksize.md)，这篇文章主要讲了我使用gdb来调试一次进程crash事件。当时因为没有注意core文件中参数的问题，导致了其实找到的问题引起点是错误的。问题再次出现，进程又crash了。
+Summary:很早之前，写过一遍文章[gdb线上crash调试-记一次装逼失败的教训]({filename}../../2017/gdb-stacksize/2017-06-27-gdb-stacksize.md)，这篇文章主要讲了我使用gdb来调试一次进程crash事件。当时因为没有注意core文件中参数的问题，导致了其实找到的问题引起点是错误的。问题再次出现，进程又crash了。
 
 可惜这是一次完完全全的装逼不成反被X的典型例子。
 
@@ -14,7 +14,7 @@ Summary:很早之前，写过一遍文章[gdb线上crash调试-记一次装逼�
 对不起大家，学艺不精，有待更加努力！ 
 
 ## 背景
-很早之前，我写过一遍文章[gdb线上crash调试-记一次装逼失败的教训]({filename}../gdb-stacksize/2017-06-27-gdb-stacksize.md)，这篇文章主要讲了我使用gdb来调试一次进程crash事件。当时因为没有注意core文件中参数的问题，导致了其实找到的问题引起点是错误的。
+很早之前，我写过一遍文章[gdb线上crash调试-记一次装逼失败的教训]({filename}../../2017/gdb-stacksize/2017-06-27-gdb-stacksize.md)，这篇文章主要讲了我使用gdb来调试一次进程crash事件。当时因为没有注意core文件中参数的问题，导致了其实找到的问题引起点是错误的。
 
 为什么我们后来知道当时找到问题的点错误了呢？嗯....因为问题再次出现，进程又crash了。
 
@@ -23,7 +23,7 @@ Summary:很早之前，写过一遍文章[gdb线上crash调试-记一次装逼�
 
 首先，我们发现stack的sym信息没了，然后我们靠寄存器恢复stack的信息。恢复stack的信息后我们再定位到调用的函数，进行分析。这个套路没有错，但是我们却大意了stack信息中的参数问题。
 
-具体的前面的操作我就不累述了，需要了解的请看前文《[gdb线上crash调试-记一次装逼失败的教训]({filename}../gdb-stacksize/2017-06-27-gdb-stacksize.md)。
+具体的前面的操作我就不累述了，需要了解的请看前文《[gdb线上crash调试-记一次装逼失败的教训]({filename}../../2017/gdb-stacksize/2017-06-27-gdb-stacksize.md)。
 
 我们开始这次的分析。为了对比，我就拿上一次的截图来分析：
 

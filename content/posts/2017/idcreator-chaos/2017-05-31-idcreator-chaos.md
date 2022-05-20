@@ -1,7 +1,7 @@
 Title: Chaos-ID生成器的前世今生
 Date: 2017-05-31
-Category: 架构
-Tags: 架构
+Category: 架构设计
+Tags: 架构设计
 Slug: idcreator-chaos
 Author: spk xu
 Status: published

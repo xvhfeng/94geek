@@ -1,7 +1,7 @@
 Title: libev 中文手册
 Date: 2017-05-29
-Category: 技术
-Tags: 技术
+Category: 技术翻译
+Tags: 技术翻译
 Slug: libev-manual-zh-cn
 Author: spk xu
 Status: published

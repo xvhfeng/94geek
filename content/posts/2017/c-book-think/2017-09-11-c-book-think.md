@@ -1,7 +1,7 @@
 Title: 情怀初体验--二周写书记
 Date: 2017-09-11
-Category: 技术
-Tags: 技术
+Category: 兴趣爱好
+Tags: 兴趣爱好
 Slug: c-book-think
 Author: spk xu
 Status: published

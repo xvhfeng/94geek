@@ -9,9 +9,9 @@ Summary: 我们设计并实现了一个分布式的id生成器。它是基于lin
 
 ### 名词解释  
 
-1. dfs: 分布式文件系统，具体的实现请参考:[分布式文件系统]({filename}../dfs/2015-09-24-DFS.md)
+1. dfs: 分布式文件系统，具体的实现请参考:[分布式文件系统]({filename}../../2015/dfs/2015-09-24-DFS.md)
 2. idc: idcreator的缩写，是指id生成器本身  
-3. albianj: 我们开发的一个分布式业务统一框架 具体实现请查考:[分布式统一框架]({filename}../albianj-design/albianj-design.md)
+3. albianj: 我们开发的一个分布式业务统一框架 具体实现请查考:[分布式统一框架]({filename}../../2015/albianj-design/albianj-design.md)
 4. 数据路由: 业务系统中经常会用到的分库分表操作  
 
 ### 摘要  

@@ -1,7 +1,7 @@
 Title: libecb中文翻译
 Date: 2022-05-26
-Category: 翻译
-Tags: 翻译
+Category: 技术翻译
+Tags: 技术翻译
 Slug: libecb-zhcn
 Author: spk xu
 Status: published
@@ -15,7 +15,7 @@ Libecb目前是一个简单的头文件，可以在不需要任何配置的情�
 
 它是整个套件的一部分，其他成员包括libev libeio。
 
-[主页]( [http://software.schmorp.de/pkg/libecb](http://software.schmorp.de/pkg/libecb))可在此找到(但是这个网址已经失效了,可惜):
+[主页](http://software.schmorp.de/pkg/libecb)可在此找到(但是这个网址已经失效了,可惜):
 
 它主要为许多内置编译器提供了许多包装器，以及其他编译器的替换函数。 除此之外，它还提供了许多其他比较底层的C实用程序，如字节交换或位旋转。
 

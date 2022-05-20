@@ -1,7 +1,7 @@
 Title: jekyll图片管理插件
 Date: 2017-05-26
-Category: 技术
-Tags: 技术
+Category: 兴趣爱好
+Tags: 兴趣爱好
 Slug: blog
 Author: spk xu
 Status: published

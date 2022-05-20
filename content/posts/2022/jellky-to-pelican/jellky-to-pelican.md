@@ -1,7 +1,7 @@
 Title: 从jellky迁移至pelican
 Date: 2022-05-15
-Category: 生活
-Tags: 生活
+Category: 兴趣爱好
+Tags: 兴趣爱好
 Slug: jellky-to-pelican
 Author: spk xu
 Status: published
