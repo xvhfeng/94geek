@@ -15,7 +15,7 @@ Libecb目前是一个简单的头文件，可以在不需要任何配置的情�
 
 它是整个套件的一部分，其他成员包括libev libeio。
 
-[主页](http://software.schmorp.de/pkg/libecb)可在此找到(但是这个网址已经失效了,可惜):
+[主页](http://software.schmorp.de/pkg/libecb "libecb#@#_blank" )可在此找到(但是这个网址已经失效了,可惜):
 
 它主要为许多内置编译器提供了许多包装器，以及其他编译器的替换函数。 除此之外，它还提供了许多其他比较底层的C实用程序，如字节交换或位旋转。
 
@@ -23,7 +23,7 @@ Libecb目前是一个简单的头文件，可以在不需要任何配置的情�
 
 **_译者注:_** libecb是一个不需要configurtion脚本就可以在c语言中直接使用的接近编译器分类的简单头文件.几年前偶然看到这个库,然后忘记名字了.直到去看libev源码才发现原来两者是一起的.它们应该出于同一家公司,可能还是同一个项目.本着这个比较实用的原则,我花了点时间把它原来的文档给翻译了.然后,因为经常做开发的原因,我也在libecb的基础上添加了一些宏定义,所以libceb的源文件和我添加的文件一直组成了我自己使用的基础头文件.
 
-[libecb开源地址](https://github.com/xvhfeng/libecb)
+[libecb开源地址](https://github.com/xvhfeng/libecb "我的libecb开源地址#@#_blank")
 
 ## ABOUT THE HEADER
 
@@ -91,7 +91,7 @@ intptr_t     uintptr_t
 
 当该值为True,则表示当前实现符合C++11/C++14/C++17(ISO/IEC 14882:2011, :2014, :2017)或任何更新的版本.
 
-请注意，c++ 20的许多特性可能都有自己的特性测试(参见[c++ 20新特性](http://eel.is/c++draft/cpp.predefined#1.8))。
+请注意，c++ 20的许多特性可能都有自己的特性测试(参见[c++ 20新特性](http://eel.is/c++draft/cpp.predefined#1.8 "C++20新特性#@#_blank"))。
 
 ### ECB_OPTIMIZE_SIZE
 

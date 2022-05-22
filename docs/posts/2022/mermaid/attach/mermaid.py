@@ -62,7 +62,8 @@ class MermaidPreprocessor(Preprocessor):
 
         if is_mermaid:
             new_lines.append('')
-            new_lines.append('<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>')
+            new_lines.append('<script src="http://www.94geek.com/files/js/mermaid.min.js"></script>')
+            #new_lines.append('<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>')
             #new_lines.append('<script>mermaid.initialize({startOnLoad:true});</script>')
 
         return new_lines

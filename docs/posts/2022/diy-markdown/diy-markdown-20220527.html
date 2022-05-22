@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+        <title>修改Markdown解析器,实现自定义行为</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link href="/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="/theme/css/code_blocks/github.css" rel="stylesheet">
+
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="最近在摆弄blog,特别是jekyll换到pelican后开始写了几篇blog.不知道怎么的,突然觉有markdown的外链处理不能使用_blank的方式打开特别不能忍.开始在enumitem中处理的方式使用模版改动给解决了,然后markdown中的模版无法解决,想想只能改...">
+
+        <meta name="author" content="spk xu">
+
+        <meta name="tags" content="兴趣爱好">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="大嘴的嘴bu大">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="/author/spk-xu.html">
+	<meta property="og:url" content="/posts/2022/diy-markdown/diy-markdown-20220527.html">
+	<meta property="og:title" content="修改Markdown解析器,实现自定义行为">
+	<meta property="article:published_time" content="2022-05-27 00:00:00+08:00">
+            <meta property="og:description" content="最近在摆弄blog,特别是jekyll换到pelican后开始写了几篇blog.不知道怎么的,突然觉有markdown的外链处理不能使用_blank的方式打开特别不能忍.开始在enumitem中处理的方式使用模版改动给解决了,然后markdown中的模版无法解决,想想只能改...">
+
+            <meta property="og:image" content="/theme/images/post-bg.jpg">
+</head>
+
+<body class="article-diy-markdown">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">94geek.com</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                        <li><a href="/pages/about.html">About</a></li>
+                        <li><a href="/pages/sharing.html">Sharing</a></li>
+                        <li><a href="/pages/follow.html">Follow</a></li>
+                        <li><a href="/files/linuxc/main.htm" target="_blank">Linux C函数</a></li>
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-image: url('/theme/images/post-bg.jpg')">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>修改Markdown解析器,实现自定义行为</h1>
+                        <span class="meta">Posted by
+                                <a href="/author/spk-xu.html">spk xu</a>
+                             on Fri 27 May 2022
+                        </span>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <p>对于pelican来说,markdown解析器相当于整个体系的心脏,给pelican换markdown解析器的想法,主要来自于无法忍受markdown在转换成html的过程中个,无法通过给markdown进行标注来得到某些自定义的行为.特别是对于link来说,如果我ref的是一个站内link,那么替换当前页面是没有问题的;但如果ref的一个站外link,作为blog的作者,我是不太愿意直接用这个link来替换掉我的页面的,所以最好的方式应该是使用_blank的打开方式.不过markdown对于如何自定义打开方式并不支持.要解决这个问题,方法不外乎就3种:</p>
+<ul>
+<li>忍了,因为markdown不支持,相当于法律就是这样,能忍就忍.99.99%的人会这样选择,并且还会理直气壮的和你说,markdown都不支持,能怎么办?</li>
+<li>看看是不是有变通的办法,找找pelican中的处理方式,看看能不能通过配置解决?如果配置不能解决,那能不能通过模版来解决?如果还不能,那就这样吧!</li>
+<li>不通过pelican解决,使用js等来解决也是可以的,能想到这个的已经属于有点想法的</li>
+<li>现在的markdown不支持就不能解决了吗?我就不信,老子就是头铁,怎么了?markdown说不行的,老子并要让它可以;选择这个的一般不是疯了,就是一群捣蛋分子,偏偏我就是不按常理出牌的主.</li>
+</ul>
+<p>当然,并不是说改改配置,改改模版是不好的选择,只要问题能解决,就是有想法的.但是在pelican中,配置和模版都没办法解决问题.因为我去看了.哈哈</p>
+<p>所以剩下的就是要么通过js来解决,要么通过更改markdown解析器来解决2条路了.先看看js怎么解决.pelican中使用了jquery框架的,所以最简单啊办法就是在document的ready函数中找到所有的<code>&lt;a&gt;</code>并且带有<code>href</code>属性的标签,并对于增加一个<code>target="_blank"</code>的属性,代码如:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;script</span> <span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span><span class="nt">&gt;</span>
+    $(document).ready(function() {
+        //为超链接加上target=&#39;_blank&#39;属性
+        $(&#39;a[href^=&quot;http&quot;]&#39;).each(function() {
+            $(this).attr(&#39;target&#39;, &#39;_blank&#39;);
+        });
+    });
+<span class="nt">&lt;/script&gt;</span>
+</code></pre></div>
+
+<p>PS:此代码来源于网上,未做测试.</p>
+<p>把这个代码放在blog生成的base.html模版中,确实也能解决问题.但是不太符合我的需求,主要是这种方式对于整篇文章内的所有的link都做无差别的处理,这点就走到了另外一个&rdquo;全部&rdquo;的极端,所以还是放弃了.</p>
+<p>说一个题外话,虽然我未曾使用js控制这种方式,但也不是说就没办法精确控制link的target属性赋予.markdown对于link的支持虽然很少,但也有2个属性,一个是href,另外一个还是title,那么我们是否可以通过title来区分哪些link是需要增加target属性的,哪些是不需要的?比如说:对于站内的link,我们统一对title使用形如<code>title-sitename</code>的格式,更暴力一些的话,规定所有具有title属性的link都会被赋予target属性.这样可以变更一下上面的js,改为通过拿到的title,分析title的具体规则区分哪些link是需要target属性的,哪些是不需要的.比如像这样:</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="o">$</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">each</span><span class="p">(</span><span class="n">function</span><span class="p">(){</span><span class="w"> </span>
+<span class="w">    </span><span class="k">var</span><span class="w"> </span><span class="n">href</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">$</span><span class="p">(</span><span class="n">this</span><span class="p">)</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">);</span><span class="w"> </span>
+<span class="w">    </span><span class="k">if</span><span class="p">(</span><span class="n">href</span><span class="o">.</span><span class="n">indexOf</span><span class="p">(</span><span class="s2">&quot;:_blank&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span>
+<span class="w">        </span><span class="o">$</span><span class="p">(</span><span class="n">this</span><span class="p">)</span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;target&quot;</span><span class="p">,</span><span class="s2">&quot;_blank&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">                        </span><span class="o">.</span><span class="n">attr</span><span class="p">(</span><span class="s2">&quot;href&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">href</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;:_blank&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">));</span><span class="w"> </span>
+<span class="w">    </span><span class="p">});</span><span class="w"></span>
+<span class="w">    </span><span class="o">//</span><span class="w"> </span><span class="o">&lt;-.</span><span class="w"> </span><span class="o">^</span><span class="w"> </span><span class="o">.-&gt;</span><span class="err">你能看出来这个规则是什么吗?</span><span class="w"></span>
+</code></pre></div>
+
+<p>PS:此代码来源于网上,未做测试.</p>
+<p>其实&rdquo;以title存在等同于target存在&rdquo;的方式不错的,主要的优点有几个:</p>
+<ul>
+<li>这个最简单,最有效,在编写markdown的时候就能填写,对于编辑markdown没有大的区别;</li>
+<li>对技术要求最低,js大家都会,而且跟更改模板也更简单;</li>
+<li>对markdown原生影响最小的方式之一,因为在使用中,这个title本身就是锦上添花的作用,没有这个项,一样能很好的解析markdown文件;</li>
+</ul>
+<p>要不是开始选择了改markdown解析器,我可能就用这个方法了.但是我们选择了更改markdown解析器的方式来去实现这个问题.为什么选择这种解决方案,主要是因为觉得有意思,并且想看看markdown解析器到底长什么样?</p>
+<p>我们在网上搜了一下pelican使用的markdown解析器的信息,了解到pelican使用的markdown解析器是python-markdown,python自带的,在我们安装pelican的时候,如果按照了markdown的扩展模块那么就已经被按照了,去到lib目录下查看一下,确实有markdown这个文件夹存在.另外也从搜索的信息中得到一个信息,python-markdown模块有挺多的问题.虽然在使用的过程中,至少到目前为止还没碰到,可能我不算是重度用户.</p>
+<p>另外找到一个开源的markdown解析器,<a href="https://github.com/hoedown/hoedown" target="_blank_" title="hoedown">hoedown/hoedown: Standards compliant, fast, secure markdown processing library in C</a>,这个解析器适合我,用C写的,这个熟啊,改起来也方便.另外它也被广泛的使用不说,还有一个python的绑定器:<a href="https://github.com/FSX/misaka" target="_blank_" title="misaka">FSX/misaka: A Python binding for Hoedown</a> 这对于pelican来说简直就是完美不?所以就开始开搞这个markdown解析器.</p>
+<p>把hoedown的代码down下来,首先运行一下看看效果.编译也很简单,只要一个<code>make</code>命令即可编译完成,找到可执行文件,help一下看到用法,直接用<code>./hoedown url-test-file</code>命令进行测试,发现运行完好.那么就开始修改代码的历程.</p>
+<p>对于hoedown的运行机制,我们都不熟悉,但是我们需要的是和链接有关系的地方.另外对于解析器,虽然没玩过,但是总体的流程应该是读入一个file,比如上面的url-test-file文件,然后进行转换,然后进行输出.一般是这样的流程.所以找到main函数,看到main函数中的代码如下&rdquo;</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* Open input file, if needed */</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">file</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Unable to open input file </span><span class="se">\&quot;</span><span class="s">%s</span><span class="se">\&quot;</span><span class="s">: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                </span><span class="n">data</span><span class="p">.</span><span class="n">filename</span><span class="p">,</span><span class="w"> </span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="p">));</span><span class="w"></span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="cm">/* Read everything */</span><span class="w"></span>
+<span class="n">ib</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_buffer_new</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">iunit</span><span class="p">);</span><span class="w"></span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">hoedown_buffer_putf</span><span class="p">(</span><span class="n">ib</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;I/O errors found while reading input.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">file</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">stdin</span><span class="p">)</span><span class="w"> </span><span class="n">fclose</span><span class="p">(</span><span class="n">file</span><span class="p">);</span><span class="w"></span>
+<span class="cm">/* Create the renderer */</span><span class="w"></span>
+<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">renderer</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">RENDERER_HTML</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">renderer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_html_renderer_new</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">html_flags</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="n">toc_level</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">renderer_free</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_html_renderer_free</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="no">RENDERER_HTML_TOC</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="n">renderer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_html_toc_renderer_new</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">toc_level</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">renderer_free</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_html_renderer_free</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+
+<span class="cm">/* Perform Markdown rendering */</span><span class="w"></span>
+<span class="n">ob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_buffer_new</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">ounit</span><span class="p">);</span><span class="w"></span>
+<span class="n">document</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hoedown_document_new</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="n">extensions</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">.</span><span class="n">max_nesting</span><span class="p">);</span><span class="w"></span>
+<span class="n">t1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clock</span><span class="p">();</span><span class="w"></span>
+<span class="n">hoedown_document_render</span><span class="p">(</span><span class="n">document</span><span class="p">,</span><span class="w"> </span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">ib</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">ib</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="n">t2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clock</span><span class="p">();</span><span class="w"></span>
+
+<span class="cm">/* Cleanup */</span><span class="w"></span>
+<span class="n">hoedown_buffer_free</span><span class="p">(</span><span class="n">ib</span><span class="p">);</span><span class="w"></span>
+<span class="n">hoedown_document_free</span><span class="p">(</span><span class="n">document</span><span class="p">);</span><span class="w"></span>
+<span class="n">renderer_free</span><span class="p">(</span><span class="n">renderer</span><span class="p">);</span><span class="w"></span>
+
+<span class="cm">/* Write the result to stdout */</span><span class="w"></span>
+<span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">fwrite</span><span class="p">(</span><span class="n">ob</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">ob</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">,</span><span class="w"> </span><span class="n">stdout</span><span class="p">);</span><span class="w"></span>
+<span class="n">hoedown_buffer_free</span><span class="p">(</span><span class="n">ob</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>这个代码的流程和我们预想的大概一致,所以我们如果想要搞清楚里面的代码构造结构,完全可以从<code>hoedown_document_render</code>这个函数中剥洋葱似的一层一层处理,我们剥离到里面的时候,发现很多的代码是结构体+函数指针的模式.这就有点头疼,因为虽然函数指针运行时静态的可能性比较大,但是也保不齐会有运行时更改函数指针的&rdquo;骚操作&rdquo;出现.所以最好是我们能看看运行时是什么样?</p>
+<p>我们需要处理的link相关的信息,所以我们先试试看能不能通过搜索的方式能找有关link的信息.搜一下link,发现有很多的代码和link有关,这样,我们先整理出来和link有关的函数,然后每个函数都大概看一看在做什么?我们发现一个<code>rndr_link</code>的函数做的是组装<code>&lt;a&gt;</code>的工作,那个这个函数大概率是已经parser完markdown的原始信息后,利用这些原始信息来组装输出的html文件了.</p>
+<p>为了印证这个结果,我们在gdb中在这个函数上打一个断点,然后运行一下gdb看看情况.如下图:<br>
+<img alt="gdb stack" src="./attach/stack.png"><br>
+整理一下,我们可以到如下的调用栈:</p>
+<div class="highlight"><pre><span></span><code>hoedown_document_render
+parse_block
+parse_block
+parse_paragraph
+parse_inline
+char_link
+rndr_link
+</code></pre></div>
+
+<p>前面的都是parser函数,最后一个是render函数,那么,<code>char_link</code>函数最有可能就是那个parser_link的函数.(PS:一直没找到一个能通过运行命令直接能打印出来所有被调用执行函数的工具,有知道好用的工具的话,麻烦<a href="mailto:xvhfeng@126.com">联系我</a>.)我们找到<code>char_link</code>,查看代码发现确实是parser link的函数.现在link的parser函数和render函数全部找到,我们只要在这两个里面修改即可.</p>
+<p>准备开始改代码,找到函数<code>char_link</code>,看一下代码,发现ref-url的解析一共有3中模式,如下:</p>
+<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="n">https</span><span class="o">:</span><span class="c1">//www.runoob.com&gt; #第一种,直接引用</span>
+<span class="n">第二种引用</span><span class="o">-</span><span class="n">数字</span><span class="w"> </span><span class="p">[</span><span class="n">Google</span><span class="p">][{</span><span class="mi">1</span><span class="p">]</span><span class="w"></span>
+<span class="n">第二种引用</span><span class="o">-</span><span class="n">名字</span><span class="w"> </span><span class="p">[</span><span class="n">Runoob</span><span class="w"> </span><span class="n">text</span><span class="p">][</span><span class="n">runoob</span><span class="p">]</span><span class="w"></span>
+<span class="n">第三种</span><span class="w"> </span><span class="p">[</span><span class="n">Sundown</span><span class="p">](</span><span class="n">https</span><span class="o">:</span><span class="c1">//github.com/vmg/sundown)</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="n">http</span><span class="o">:</span><span class="c1">//www.google.com/</span>
+<span class="p">[</span><span class="n">runoob</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="n">http</span><span class="o">:</span><span class="c1">//www.runoob.com/</span>
+</code></pre></div>
+
+<p>要实现添加target属性,我们要先分析这三种格式,根据这三种格式的特点结合markdown的基础协议定下来一个Ex协议.这个Ex协议的唯一要求就是在尽可能不影响markdown标准协议的情况下,实现我们的功能.因为有第一种形式的存在,所以不太可能在<code>[]</code>中做手脚,所以显示的text被放弃,那么只能在<code>()</code>中做手脚.又因为这段时间一直使用Obsidian,该软件有一个功能是当ref一个站内的引用时,使用<code>[]({filename}file\path\filename)</code>的格式实现,其中<code>{filename}</code>即为站内ref的关键字.鉴于此种类型,首先想到的就是使用类似的语句,所以设计出来的格式为<code>[]({target="_blank"}ref-url)</code>凡是带有这种格式的ref-url即为需要增加target属性的,并且属性的值可以自定义.</p>
+<p>那么按照上面的协议定义,我们对于上面的设定基本上即为如下:</p>
+<div class="highlight"><pre><span></span><code><span class="o">&lt;</span><span class="p">{</span><span class="n">target</span><span class="o">=</span><span class="s">&quot;_blank&quot;</span><span class="p">}</span><span class="n">https</span><span class="o">:</span><span class="c1">//www.runoob.com&gt; #第一种,直接引用</span>
+<span class="n">第二种引用</span><span class="o">-</span><span class="n">数字</span><span class="w"> </span><span class="p">[</span><span class="n">Google</span><span class="p">][{{</span><span class="n">target</span><span class="o">=</span><span class="s">&quot;targetname&quot;</span><span class="mi">1</span><span class="p">]</span><span class="w"></span>
+<span class="n">第二种引用</span><span class="o">-</span><span class="n">名字</span><span class="w"> </span><span class="p">[</span><span class="n">Runoob</span><span class="w"> </span><span class="n">text</span><span class="p">][{</span><span class="n">target</span><span class="o">=</span><span class="s">&quot;top&quot;</span><span class="n">runoob</span><span class="p">]</span><span class="w"></span>
+<span class="n">第三种</span><span class="w"> </span><span class="p">[</span><span class="n">Sundown</span><span class="p">]({</span><span class="n">target</span><span class="o">=</span><span class="s">&quot;_blank&quot;</span><span class="n">https</span><span class="o">:</span><span class="c1">//github.com/vmg/sundown)</span>
+
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="n">http</span><span class="o">:</span><span class="c1">//www.google.com/</span>
+<span class="p">[</span><span class="n">runoob</span><span class="p">]</span><span class="o">:</span><span class="w"> </span><span class="n">http</span><span class="o">:</span><span class="c1">//www.runoob.com/</span>
+</code></pre></div>
+
+<p>修改<code>char_link</code>的函数为如下:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">/* char_link • &#39;[&#39;: parsing a link, a footnote or an image */</span><span class="w"></span>
+<span class="k">static</span><span class="w"> </span><span class="kt">size_t</span><span class="w"></span>
+<span class="nf">char_link</span><span class="p">(</span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">hoedown_document</span><span class="w"> </span><span class="o">*</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="kt">uint8_t</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">is_img</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">offset</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">-1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;!&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">is_escaped</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">));</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">is_footnote</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">ext_flags</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">HOEDOWN_EXT_FOOTNOTES</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;^&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">txt_e</span><span class="p">,</span><span class="w"> </span><span class="n">link_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">link_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">title_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">title_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">u_link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">org_work_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">work_bufs</span><span class="p">[</span><span class="n">BUFFER_SPAN</span><span class="p">].</span><span class="n">size</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">in_title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">qtype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*add for link target attribute --&gt; begin */</span><span class="w"></span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">target_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* &lt;--end  */</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* checking whether the correct renderer exists */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">is_footnote</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">footnote_ref</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">is_img</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">image</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">is_img</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">is_footnote</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">link</span><span class="p">))</span><span class="w"></span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* looking for the matching closing bracket */</span><span class="w"></span>
+<span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">find_emph_char</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;]&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">txt_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;]&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* footnote link */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_footnote</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="cm">/*{{{*/</span><span class="w"></span>
+<span class="w">        </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="p">,</span><span class="w"> </span><span class="nb">NULL</span><span class="w"> </span><span class="p">};</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">footnote_ref</span><span class="w"> </span><span class="o">*</span><span class="n">fr</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">txt_e</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">id</span><span class="p">.</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">id</span><span class="p">.</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">txt_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">fr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find_footnote_ref</span><span class="p">(</span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">footnotes_found</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* mark footnote used */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fr</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">fr</span><span class="o">-&gt;</span><span class="n">is_used</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">add_footnote_ref</span><span class="p">(</span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">footnotes_used</span><span class="p">,</span><span class="w"> </span><span class="n">fr</span><span class="p">))</span><span class="w"></span>
+<span class="w">                </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">fr</span><span class="o">-&gt;</span><span class="n">is_used</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">fr</span><span class="o">-&gt;</span><span class="n">num</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">footnotes_used</span><span class="p">.</span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="cm">/* render */</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">footnote_ref</span><span class="p">)</span><span class="w"></span>
+<span class="w">                </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">footnote_ref</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">fr</span><span class="o">-&gt;</span><span class="n">num</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="cm">/*}}}*/</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* skip any amount of spacing */</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* (this is much more laxist than original markdown syntax) */</span><span class="w"></span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* inline style link */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;(&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="cm">/*{{{*/</span><span class="w"></span>
+<span class="w">        </span><span class="kt">size_t</span><span class="w"> </span><span class="n">nb_p</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* skipping initial spacing */</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"></span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/*add for link target attribute --&gt; begin */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="sc">&#39;{&#39;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">target_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="sc">&#39;}&#39;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]){</span><span class="w"></span>
+<span class="w">                    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">target_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">target_b</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">target_e</span><span class="p">]))</span><span class="w"></span>
+<span class="w">                </span><span class="n">target_e</span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">target_e</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;\&#39;&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w">  </span><span class="n">data</span><span class="p">[</span><span class="n">target_e</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;&quot;&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">target_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">target_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">target_b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">target_b</span><span class="p">,</span><span class="w"> </span><span class="n">target_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">target_b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/*&lt;--end */</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">link_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* looking for link end: &#39; &quot; ) */</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/* Count the number of open parenthesis */</span><span class="w"></span>
+<span class="w">        </span><span class="n">nb_p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\\&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;(&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">nb_p</span><span class="o">++</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;)&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">nb_p</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">nb_p</span><span class="o">--</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="mi">-1</span><span class="p">])</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\&#39;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&quot;&#39;</span><span class="p">))</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">else</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">link_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* looking for title end if present */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\&#39;&#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&quot;&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">qtype</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">];</span><span class="w"></span>
+<span class="w">            </span><span class="n">in_title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">title_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;\\&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">qtype</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="n">in_title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;}</span><span class="w"></span>
+<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">((</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;)&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">in_title</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="k">else</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="cm">/* skipping spacing after title */</span><span class="w"></span>
+<span class="w">            </span><span class="n">title_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">title_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">title_b</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">title_e</span><span class="p">]))</span><span class="w"></span>
+<span class="w">                </span><span class="n">title_e</span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="cm">/* checking for closing quote presence */</span><span class="w"></span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">title_e</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;\&#39;&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w">  </span><span class="n">data</span><span class="p">[</span><span class="n">title_e</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;&quot;&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">title_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">title_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">link_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* remove spacing at the end of the link */</span><span class="w"></span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">link_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">link_b</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">link_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]))</span><span class="w"></span>
+<span class="w">            </span><span class="n">link_e</span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* remove optional angle brackets around the link */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">link_b</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&lt;&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">link_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;&gt;&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">link_b</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">link_e</span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* building escaped link and title */</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">link_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">link_b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">link</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">link_b</span><span class="p">,</span><span class="w"> </span><span class="n">link_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">link_b</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">title_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">title_b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">title_b</span><span class="p">,</span><span class="w"> </span><span class="n">title_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">title_b</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="cm">/*}}}*/</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* reference style link */</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="sc">&#39;[&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="cm">/*{{{*/</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* skipping initial spacing */</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"></span>
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/*add for link target attribute --&gt; begin */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="p">(</span><span class="sc">&#39;{&#39;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">target_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="k">if</span><span class="p">(</span><span class="sc">&#39;}&#39;</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]){</span><span class="w"></span>
+<span class="w">                    </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">                    </span><span class="k">break</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="p">}</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">target_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">target_b</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">target_e</span><span class="p">]))</span><span class="w"></span>
+<span class="w">                </span><span class="n">target_e</span><span class="o">--</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">target_e</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;\&#39;&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w">  </span><span class="n">data</span><span class="p">[</span><span class="n">target_e</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;&quot;&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">target_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">                </span><span class="n">target_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">if</span><span class="p">(</span><span class="n">target_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">target_b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">                </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">target_b</span><span class="p">,</span><span class="w"> </span><span class="n">target_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">target_b</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">_isspace</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="w"></span>
+<span class="w">                </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">        </span><span class="cm">/*&lt;--end */</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">link_ref</span><span class="w"> </span><span class="o">*</span><span class="n">lr</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* looking for the id */</span><span class="w"></span>
+<span class="w">        </span><span class="n">link_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;]&#39;</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">link_e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* finding the link_ref */</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">link_b</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">link_e</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="n">replace_spacing</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">txt_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">else</span><span class="w"></span>
+<span class="w">            </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">link_b</span><span class="p">,</span><span class="w"> </span><span class="n">link_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">link_b</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">lr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find_link_ref</span><span class="p">(</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">refs</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">lr</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* keeping link and title from link_ref */</span><span class="w"></span>
+<span class="w">        </span><span class="n">link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lr</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lr</span><span class="o">-&gt;</span><span class="n">title</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="o">++</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="cm">/*}}}*/</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* shortcut reference style link */</span><span class="w"></span>
+<span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="cm">/*{{{*/</span><span class="w"></span>
+<span class="w">        </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">link_ref</span><span class="w"> </span><span class="o">*</span><span class="n">lr</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* crafting the id */</span><span class="w"></span>
+<span class="w">        </span><span class="n">replace_spacing</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">txt_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* finding the link_ref */</span><span class="w"></span>
+<span class="w">        </span><span class="n">lr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">find_link_ref</span><span class="p">(</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">refs</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">lr</span><span class="p">)</span><span class="w"></span>
+<span class="w">            </span><span class="k">goto</span><span class="w"> </span><span class="n">cleanup</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* keeping link and title from link_ref */</span><span class="w"></span>
+<span class="w">        </span><span class="n">link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lr</span><span class="o">-&gt;</span><span class="n">link</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lr</span><span class="o">-&gt;</span><span class="n">title</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">        </span><span class="cm">/* rewinding the spacing */</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">txt_e</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="cm">/*}}}*/</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* building content: img alt is kept, only link content is parsed */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">txt_e</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">content</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_img</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">txt_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">            </span><span class="cm">/* disable autolinking when parsing inline the</span>
+<span class="cm">             * content of a link */</span><span class="w"></span>
+<span class="w">            </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">in_link_body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="w">            </span><span class="n">parse_inline</span><span class="p">(</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">txt_e</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+<span class="w">            </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">in_link_body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">link</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">u_link</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newbuf</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span><span class="w"> </span><span class="n">BUFFER_SPAN</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">unscape_text</span><span class="p">(</span><span class="n">u_link</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* calling the relevant rendering function */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">is_img</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">image</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">u_link</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">link</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">u_link</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/* cleanup */</span><span class="w"></span>
+<span class="w">    </span><span class="nl">cleanup</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">work_bufs</span><span class="p">[</span><span class="n">BUFFER_SPAN</span><span class="p">].</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">org_work_size</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ret</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>上面的代码中,凡是在</p>
+<div class="highlight"><pre><span></span><code><span class="w"> </span><span class="cm">/*add for link target attribute --&gt; begin */</span><span class="w"></span>
+
+<span class="w"> </span><span class="cm">/* &lt;--end */</span><span class="w"></span>
+</code></pre></div>
+
+<p>在这个注释中包围的代码都是增加的代码,另外还修改了一段代码:</p>
+<div class="highlight"><pre><span></span><code><span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">link</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">u_link</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+<span class="n">改为</span><span class="w"></span>
+<span class="n">ret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">md</span><span class="p">.</span><span class="n">link</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="n">u_link</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">doc</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+</code></pre></div>
+
+<p>这样的话,<code>doc-&gt;md.link</code>这个函数指针所对应的函数指针定义也需要更改.,这就不在累述.</p>
+<p>parser函数完成后,render函数<code>rndr_link</code>也需要更改,我们将其改为如下:</p>
+<div class="highlight"><pre><span></span><code><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"></span>
+<span class="nf">rndr_link</span><span class="p">(</span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">content</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">link</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">title</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">hoedown_buffer</span><span class="w"> </span><span class="o">*</span><span class="n">target</span><span class="p">,</span><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">hoedown_renderer_data</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">hoedown_html_renderer_state</span><span class="w"> </span><span class="o">*</span><span class="n">state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="o">-&gt;</span><span class="n">opaque</span><span class="p">;</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">HOEDOWN_BUFPUTSL</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&lt;a href=</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">link</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">escape_href</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="cm">/*add for link target attribute --&gt; begin */</span><span class="w"></span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">target</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">target</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">HOEDOWN_BUFPUTSL</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s"> &quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="n">target</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="n">target</span><span class="o">-&gt;</span><span class="n">size</span><span class="mi">-1</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="cm">/* &lt;--end */</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">title</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">HOEDOWN_BUFPUTSL</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s"> title=</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">escape_html</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">state</span><span class="o">-&gt;</span><span class="n">link_attributes</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">hoedown_buffer_putc</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;\&quot;&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">state</span><span class="o">-&gt;</span><span class="n">link_attributes</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">link</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="n">hoedown_buffer_putc</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="sc">&#39;&gt;&#39;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="n">HOEDOWN_BUFPUTSL</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&gt;&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">content</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">content</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">)</span><span class="w"> </span><span class="n">hoedown_buffer_put</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="o">-&gt;</span><span class="n">size</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">HOEDOWN_BUFPUTSL</span><span class="p">(</span><span class="n">ob</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;&lt;/a&gt;&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+
+<p>注意函数的签名增加了target的参数.</p>
+<p>到此markdown解析器的代码修改完毕.下一步就是如何和pelican结合起来.因为Misaka的存在,所以我们直接把修改好的整个的hoedown工程中修改的文件<code>document.c</code> <code>documenth</code> <code>html.c</code>3个文件cp到Misaka的相应目录进行替换,然后<strong>在py对应的venvs环境下</strong>,参照Misaka的README文件进行install即可.</p>
+<p>markdown解析器的问题解决后,再来对pelican进行Misaka的集成.</p>
+<p>在pelican中,查看代码,找到<code>readers.py</code>文件,其中有<code>class MarkdownReader</code>即为markdown解析器解析文件到html的地方.别问我怎么知道的?我说凭灵感和经验你相信吗?哈哈!其实还真的是经验让我去找这个文件的.在这个文件里,有个函数<code>read</code>,如下:</p>
+<div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse content and metadata of markdown files&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source_path</span> <span class="o">=</span> <span class="n">source_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_md</span> <span class="o">=</span> <span class="n">Markdown</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;MARKDOWN&#39;</span><span class="p">])</span>
+        <span class="k">with</span> <span class="n">pelican_open</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="p">,</span> <span class="s1">&#39;Meta&#39;</span><span class="p">):</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="o">.</span><span class="n">Meta</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">content</span><span class="p">,</span> <span class="n">metadata</span>
+</code></pre></div>
+
+<p>此函数即为pelican调用python-markdown来处理文件的地方.所以我们依葫芦画瓢,引入Misaka,然后用Misaka来解析即可.</p>
+<p>第一步,import misaka,所以在文件的import区域,增加以下代码,变成这样:</p>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">markdown</span> <span class="kn">import</span> <span class="n">Markdown</span>
+    <span class="kn">import</span> <span class="nn">misaka</span> 
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">Markdown</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># NOQA</span>
+</code></pre></div>
+
+<p>第二步讲原来的<code>read</code>函数改为Misaka驱动.</p>
+<div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source_path</span> <span class="o">=</span> <span class="n">source_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_md</span> <span class="o">=</span> <span class="n">Markdown</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;MARKDOWN&#39;</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="n">pelican_open</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">misaka</span><span class="o">.</span><span class="n">html</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="p">,</span> <span class="s1">&#39;Meta&#39;</span><span class="p">):</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="o">.</span><span class="n">Meta</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">return</span> <span class="n">content</span><span class="p">,</span> <span class="n">metadata</span>
+</code></pre></div>
+
+<p>理论上这样已经完成了markdown解析器的替换,但是运行的时候,不管弄,都会出错,blog不能生成.这个问题找了很久,终于在比较了<code>python-markdown</code>和<code>Misaka</code>生成的文件后,发现了问题.对于python-markdown生成的content,原文件中的head部分都没有了,只有正文部分.而misaka生成的content不仅带有正文部分,还有head部分.所以不管你怎么弄文件内容的格式错了,再怎么对都对不回来.</p>
+<p>那么就要解决这个问题,首先想到的是把head部分人为去掉就行了,有因为我们的blog的head部分基本是固定的,一般就是7行,所以只要去掉这最前面的7行即可.讲misaka的read函数改为如下:</p>
+<div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source_path</span> <span class="o">=</span> <span class="n">source_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_md</span> <span class="o">=</span> <span class="n">Markdown</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;MARKDOWN&#39;</span><span class="p">])</span>
+
+        <span class="k">with</span> <span class="n">pelican_open</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">txtlines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">ctxlines</span> <span class="o">=</span> <span class="n">txtlines</span><span class="p">[</span><span class="mi">8</span><span class="p">:]</span>
+            <span class="n">strlines</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ctxlines</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">misaka</span><span class="o">.</span><span class="n">html</span><span class="p">(</span><span class="n">strlines</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="p">,</span> <span class="s1">&#39;Meta&#39;</span><span class="p">):</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_metadata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_md</span><span class="o">.</span><span class="n">Meta</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">return</span> <span class="n">content</span><span class="p">,</span> <span class="n">metadata</span>
+</code></pre></div>
+
+<p>这样使用misaka作为pelican markdown解析器的工作就完成了.试试看运行一下pelican的生成命令,blog即可正常生成的.</p>
+<p>但是另外好奇心,让我去想看看如果我不更换markdown解析器,而是直接使用pelican的python-markdown解析器,在这个解析器的基础上怎么做呢?</p>
+<p>去venvs环境下的lib中找到markdown,然后看看的代码,因为对这个项目不熟悉,所以同样的手法,在这个项目里面直接搜link,发现了<code>class LinkInlineProcessor(InlineProcessor):</code>这个函数的存在,这个看上去就是link的处理器啊.直接定位到这个函数,这个类中就3个方法,一个match方法,一个getText,一个getLink,这还要解释吗?直接看getLink函数啊.观察了一下getLink的函数,发现它也是具有title和link两个属性,这里我想试试看使用title来实现target这个属性的添加.所以就设计了一个形如<code>title#@#_blank</code>这样的形式来完成.废话就不多说了,直接看看更改后的代码:</p>
+<div class="highlight"><pre><span></span><code>    <span class="k">def</span> <span class="nf">getLink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse data between `()` of `[Text]()` allowing recursive `()`. &quot;&quot;&quot;</span>
+
+        <span class="n">href</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">handled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RE_LINK</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">and</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># Matches [Text](&lt;link&gt; &quot;title&quot;)</span>
+            <span class="n">href</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">handled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">m</span><span class="p">:</span>
+            <span class="c1"># Track bracket nesting and index in string</span>
+            <span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">backtrack_count</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">start_index</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">start_index</span>
+            <span class="n">last_bracket</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="c1"># Primary (first found) quote tracking.</span>
+            <span class="n">quote</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">start_quote</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">exit_quote</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">ignore_matches</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Secondary (second found) quote tracking.</span>
+            <span class="n">alt_quote</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">start_alt_quote</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="n">exit_alt_quote</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+            <span class="c1"># Track last character</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+            <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;(&#39;</span><span class="p">:</span>
+                    <span class="c1"># Count nested (</span>
+                    <span class="c1"># Don&#39;t increment the bracket count if we are sure we&#39;re in a title.</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">ignore_matches</span><span class="p">:</span>
+                        <span class="n">bracket_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">backtrack_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">backtrack_count</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+                    <span class="c1"># Match nested ) to (</span>
+                    <span class="c1"># Don&#39;t decrement if we are sure we are in a title that is unclosed.</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">exit_quote</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">quote</span> <span class="o">==</span> <span class="n">last</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">exit_alt_quote</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">alt_quote</span> <span class="o">==</span> <span class="n">last</span><span class="p">)):</span>
+                        <span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">ignore_matches</span><span class="p">:</span>
+                        <span class="n">bracket_count</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="k">elif</span> <span class="n">backtrack_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">backtrack_count</span> <span class="o">-=</span> <span class="mi">1</span>
+                        <span class="c1"># We&#39;ve found our backup end location if the title doesn&#39;t resolve.</span>
+                        <span class="k">if</span> <span class="n">backtrack_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">last_bracket</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+
+                <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">):</span>
+                    <span class="c1"># Quote has started</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">quote</span><span class="p">:</span>
+                        <span class="c1"># We&#39;ll assume we are now in a title.</span>
+                        <span class="c1"># Brackets are quoted, so no need to match them (except for the final one).</span>
+                        <span class="n">ignore_matches</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="n">backtrack_count</span> <span class="o">=</span> <span class="n">bracket_count</span>
+                        <span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="n">start_quote</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="n">quote</span> <span class="o">=</span> <span class="n">c</span>
+                    <span class="c1"># Secondary quote (in case the first doesn&#39;t resolve): [text](link&#39;&quot;title&quot;)</span>
+                    <span class="k">elif</span> <span class="n">c</span> <span class="o">!=</span> <span class="n">quote</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">alt_quote</span><span class="p">:</span>
+                        <span class="n">start_alt_quote</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+                        <span class="n">alt_quote</span> <span class="o">=</span> <span class="n">c</span>
+                    <span class="c1"># Update primary quote match</span>
+                    <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="n">quote</span><span class="p">:</span>
+                        <span class="n">exit_quote</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="c1"># Update secondary quote match</span>
+                    <span class="k">elif</span> <span class="n">alt_quote</span> <span class="ow">and</span> <span class="n">c</span> <span class="o">==</span> <span class="n">alt_quote</span><span class="p">:</span>
+                        <span class="n">exit_alt_quote</span> <span class="o">=</span> <span class="n">index</span> <span class="o">+</span> <span class="mi">1</span>
+
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Link is closed, so let&#39;s break out of the loop</span>
+                <span class="k">if</span> <span class="n">bracket_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># Get the title if we closed a title string right before link closed</span>
+                    <span class="k">if</span> <span class="n">exit_quote</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">quote</span> <span class="o">==</span> <span class="n">last</span><span class="p">:</span>
+                        <span class="n">href</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">start_quote</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">start_quote</span><span class="p">:</span><span class="n">exit_quote</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="k">elif</span> <span class="n">exit_alt_quote</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">alt_quote</span> <span class="o">==</span> <span class="n">last</span><span class="p">:</span>
+                        <span class="n">href</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">start_alt_quote</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">start_alt_quote</span><span class="p">:</span><span class="n">exit_alt_quote</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">href</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="k">break</span>
+
+                <span class="k">if</span> <span class="n">c</span> <span class="o">!=</span> <span class="s1">&#39; &#39;</span><span class="p">:</span>
+                    <span class="n">last</span> <span class="o">=</span> <span class="n">c</span>
+
+            <span class="c1"># We have a scenario: [test](link&quot;notitle)</span>
+            <span class="c1"># When we enter a string, we stop tracking bracket resolution in the main counter,</span>
+            <span class="c1"># but we do keep a backup counter up until we discover where we might resolve all brackets</span>
+            <span class="c1"># if the title string fails to resolve.</span>
+            <span class="k">if</span> <span class="n">bracket_count</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">backtrack_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">href</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">last_bracket</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="n">last_bracket</span>
+                <span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">handled</span> <span class="o">=</span> <span class="n">bracket_count</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="n">ctitle</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">real_title</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#use title,so this code is modify#</span>
+
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ctitle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RE_TITLE_CLEAN</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">dequote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unescape</span><span class="p">(</span><span class="n">title</span><span class="o">.</span><span class="n">strip</span><span class="p">())))</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">ctitle</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;#@#&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">ctitle</span><span class="p">,</span><span class="s2">&quot; found #@#  &quot;</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ctitle</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#@#&quot;</span><span class="p">)</span> <span class="p">:</span>
+                    <span class="n">real_title</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ctitle</span><span class="p">[</span><span class="mi">3</span><span class="p">:])</span>
+                <span class="k">elif</span> <span class="n">ctitle</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;#@#&quot;</span><span class="p">)</span> <span class="p">:</span>
+                    <span class="n">real_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ctitle</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="p">:</span>
+                    <span class="n">real_title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ctitle</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">idx</span><span class="p">])</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ctitle</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">3</span> <span class="p">:])</span>
+            <span class="k">else</span> <span class="p">:</span>
+                <span class="n">real_title</span> <span class="o">=</span> <span class="n">ctitle</span>
+
+        <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unescape</span><span class="p">(</span><span class="n">href</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">href</span><span class="p">,</span> <span class="n">real_title</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">handled</span><span class="p">,</span><span class="n">target</span>
+</code></pre></div>
+
+<p>整个功能的更改基本都是在<code>if title is not None:</code>这个代码块中实现.除了更改了这个代码块,还给返回值增加了target的值,所以这个函数相应调用的地方也要补上target函数的承接,这部分不在累述.</p>
+<p>使用这个办法也可以增加target属性.</p>
+<p>一共讲了3中办法来使pelican的markdown文件在展现为html文件的时候支持link使用自定义的打开方式.中间js的最简单,最容易,最方便的一种办法,另外给pelican的python-markdown解析器增加功能难度次之,稍微懂一点python的可以直接徒手替换;使用misaka,不到万不得已别尝试,这种方式除了需要了解pelican,python之外,还需要对C有熟练的运用能力,所以可以作为兴趣来去做做看,是是是看.</p>
+<p>但是不管怎么说,给pelican换markdown解析器,相当于直接进行了一次心脏手术.对于我这个曾经只知道使用markdown解析器的人来说,难度与诱惑一样大.甚至内心的兴奋远远大于难度带来的恐惧,明知可能的结果是不了了之,特别是misaka解析器的运用,但还是功夫不负有心人,最后还是实现了我们需要的功能.其实在我的blog中,js的集成我也用了,而且我是另外一种形式.因为相比需要知道自定义的协议,不管是<code>{target}</code>的模式,还是<code>title#@#</code>的模式,你总归都需要额外的精确记忆一些东西.那么如果有一种办法,只要有title的直接能给与链接的<code>_blank</code>模式,是不是会会很香呢?</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="/tag/xing-qu-ai-hao.html">兴趣爱好</a></p>
+        </div>
+
+    <hr>
+
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://github.com/xvhfeng" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="mailto:xvhfeng@126.com">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+<p class="copyright text-muted">
+    Blog powered by <a href="http://getpelican.com">Pelican</a>,
+    which takes great advantage of <a href="http://python.org">Python</a>. <br />        &copy;  spk xu
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="/theme/js/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="/theme/js/clean-blog.min.js"></script>
+
+</body>
+
+</html>
