@@ -226,6 +226,23 @@ chaos生成的是一个uint64的数，最大的长度是64位，一共最长是1
         <!-- Custom Theme JavaScript -->
         <script src="/theme/js/clean-blog.min.js"></script>
 
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //为超链接加上target='_blank'属性
+            $('a').each(function() {
+                var href = $(this).attr('href');
+                var title = $(this).attr('title');
+                if(href && title){
+                    var target = $(this).attr('target')
+                    if(!target) {
+                        $(this).attr('target', '_blank');
+                    }
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

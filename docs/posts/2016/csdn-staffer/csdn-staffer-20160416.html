@@ -315,6 +315,23 @@ Snowflake，但是都被否决了。最后我决定自己来开发一个。开�
         <!-- Custom Theme JavaScript -->
         <script src="/theme/js/clean-blog.min.js"></script>
 
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //为超链接加上target='_blank'属性
+            $('a').each(function() {
+                var href = $(this).attr('href');
+                var title = $(this).attr('title');
+                if(href && title){
+                    var target = $(this).attr('target')
+                    if(!target) {
+                        $(this).attr('target', '_blank');
+                    }
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>

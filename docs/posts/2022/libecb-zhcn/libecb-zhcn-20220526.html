@@ -111,7 +111,7 @@
 <h2 id="about-libecb">ABOUT LIBECB</h2>
 <p>Libecb目前是一个简单的头文件，可以在不需要任何配置的情况下加入到你自己的项目中。</p>
 <p>它是整个套件的一部分，其他成员包括libev libeio。</p>
-<p><a href="http://software.schmorp.de/pkg/libecb" target="_blank" title="libecb">主页</a>可在此找到(但是这个网址已经失效了,可惜):</p>
+<p><a href="http://software.schmorp.de/pkg/libecb" title="libecb">主页</a>可在此找到(但是这个网址已经失效了,可惜):</p>
 <p>它主要为许多内置编译器提供了许多包装器，以及其他编译器的替换函数。 除此之外，它还提供了许多其他比较底层的C实用程序，如字节交换或位旋转。</p>
 <p>或者换句话说，libecb可以被引入到任何标准C开发的系统中， 它可以保证不同编译器中的通用性.</p>
 <p><strong><em>译者注:</em></strong> libecb是一个不需要configurtion脚本就可以在c语言中直接使用的接近编译器分类的简单头文件.几年前偶然看到这个库,然后忘记名字了.直到去看libev源码才发现原来两者是一起的.它们应该出于同一家公司,可能还是同一个项目.本着这个比较实用的原则,我花了点时间把它原来的文档给翻译了.然后,因为经常做开发的原因,我也在libecb的基础上添加了一些宏定义,所以libceb的源文件和我添加的文件一直组成了我自己使用的基础头文件.</p>
@@ -816,6 +816,23 @@ sometype *orig = ecb_ptrunmix&lt;sometype&gt; (hash); //从这个hash值恢复�
 
         <!-- Custom Theme JavaScript -->
         <script src="/theme/js/clean-blog.min.js"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //为超链接加上target='_blank'属性
+            $('a').each(function() {
+                var href = $(this).attr('href');
+                var title = $(this).attr('title');
+                if(href && title){
+                    var target = $(this).attr('target')
+                    if(!target) {
+                        $(this).attr('target', '_blank');
+                    }
+                }
+            });
+        });
+    </script>
 
 </body>
 
