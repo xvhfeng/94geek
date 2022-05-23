@@ -394,7 +394,7 @@ pelican-themes -lv <span class="c1">#查看一下themes是否已经被安装</sp
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

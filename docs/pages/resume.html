@@ -263,7 +263,7 @@ NameService配合，完成集团内部的数据一致性操作。  </p>
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

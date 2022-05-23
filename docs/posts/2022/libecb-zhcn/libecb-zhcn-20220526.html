@@ -826,7 +826,7 @@ sometype *orig = ecb_ptrunmix&lt;sometype&gt; (hash); //从这个hash值恢复�
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

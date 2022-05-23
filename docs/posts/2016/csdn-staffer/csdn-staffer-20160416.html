@@ -324,7 +324,7 @@ Snowflake，但是都被否决了。最后我决定自己来开发一个。开�
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

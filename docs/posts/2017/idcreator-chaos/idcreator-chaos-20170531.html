@@ -306,7 +306,7 @@ chaos采用了水平的分布式设计。服务器都是无状态的，也是去
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

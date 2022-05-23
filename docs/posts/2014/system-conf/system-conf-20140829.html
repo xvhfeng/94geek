@@ -858,7 +858,7 @@ EXEC <span class="m">01</span><span class="p">;</span><span class="m">32</span>
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

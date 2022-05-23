@@ -434,7 +434,7 @@ pull方式，那么我们必须要进过2次的通讯才能完成一条记录的
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

@@ -235,7 +235,7 @@ chaos生成的是一个uint64的数，最大的长度是64位，一共最长是1
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

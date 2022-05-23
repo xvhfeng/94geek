@@ -251,7 +251,7 @@ pmap的出来的文件名，都是m001的文件，而这个进程的业务就是
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

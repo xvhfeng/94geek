@@ -198,7 +198,7 @@ wait_timeout是mysql的一个设置，主要是用来断开不使用的数据库
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

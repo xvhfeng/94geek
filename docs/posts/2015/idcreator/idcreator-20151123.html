@@ -638,7 +638,7 @@ int32最大的值来算，基本上我们的idc使用的年限在175年左右。
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

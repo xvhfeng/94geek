@@ -1311,7 +1311,7 @@ nmap ha :call InsertHeadDefN()&lt;CR>
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }

@@ -165,7 +165,7 @@ Lazy, Super lazy. So lazy that they were often becomes &ldquo;rubbish&rdquo;, la
                 var title = $(this).attr('title');
                 if(href && title){
                     var target = $(this).attr('target')
-                    if(!target) {
+                    if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
                     }
                 }
