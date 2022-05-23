@@ -1,5 +1,5 @@
 Title: 修改Markdown解析器,实现自定义行为
-Date: 2022-05-27
+Date: 2022-06-01
 Category: 兴趣爱好
 Tags: 兴趣爱好
 Slug: diy-markdown
@@ -471,9 +471,10 @@ PS:此代码来源于网上,未做测试.
 	ret = doc->md.link(ob, content, u_link, title, &doc->data);
 	改为
 	ret = doc->md.link(ob, content, u_link, title,target, &doc->data);
-这样的话,`doc->md.link`这个函数指针所对应的函数指针定义也需要更改.,这就不在累述.
+这样的话,`doc->md.link`这个函数指针所对应的函数指针定义也需要更改.,这就不在累述.parser函数中的功能更改完成后,应该是徐找到render函数.在parser函数中,hoedown使用了一个函数指针`doc->md.link`来完成.他并不是直接调用该函数,所以我们同样使用gdb看一下运行时这个函数指针指向何处,如图:
+![render函数](./attach/doc-md.png)
 
-parser函数完成后,render函数`rndr_link`也需要更改,我们将其改为如下:
+  这样能一目了然的看到`link`指向了函数`rndr_link`,所以我们直接定义到此函数,对它进行修改,如下:
 
 	:::C
 	static int
