@@ -311,6 +311,15 @@ chaos采用了水平的分布式设计。服务器都是无状态的，也是去
                     }
                 }
             });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
+                    }
+                }
+            });
         });
     </script>
 

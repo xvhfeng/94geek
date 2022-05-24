@@ -643,6 +643,15 @@ int32最大的值来算，基本上我们的idc使用的年限在175年左右。
                     }
                 }
             });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
+                    }
+                }
+            });
         });
     </script>
 

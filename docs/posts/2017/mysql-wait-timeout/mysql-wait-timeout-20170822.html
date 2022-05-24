@@ -203,6 +203,15 @@ wait_timeout是mysql的一个设置，主要是用来断开不使用的数据库
                     }
                 }
             });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
+                    }
+                }
+            });
         });
     </script>
 

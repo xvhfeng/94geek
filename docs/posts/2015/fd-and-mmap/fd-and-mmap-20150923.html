@@ -256,6 +256,15 @@ pmap的出来的文件名，都是m001的文件，而这个进程的业务就是
                     }
                 }
             });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
+                    }
+                }
+            });
         });
     </script>
 

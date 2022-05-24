@@ -83,6 +83,8 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <dl>
+            <dt>Mon 06 June 2022</dt>
+            <dd><a href="/posts/2022/work-athome/work-athome-20220606.html">Work@Home的一点"牢骚"</a></dd>
             <dt>Wed 01 June 2022</dt>
             <dd><a href="/posts/2022/diy-markdown/diy-markdown-20220601.html">修改Markdown解析器,实现自定义行为</a></dd>
             <dt>Thu 26 May 2022</dt>
@@ -204,6 +206,15 @@
                     var target = $(this).attr('target')
                     if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
+                    }
+                }
+            });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
                     }
                 }
             });

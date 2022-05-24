@@ -88,6 +88,7 @@
         <li><a href="/tag/ji-zhu.html">技术</a> (2)</li>
         <li><a href="/tag/ji-zhu-fan-yi.html">技术翻译</a> (2)</li>
         <li><a href="/tag/ji-zhu-fen-xiang.html">技术分享</a> (4)</li>
+        <li><a href="/tag/ji-zhu-guan-li.html">技术管理</a> (1)</li>
         <li><a href="/tag/ji-zhu-xiao-ji-qiao.html">技术 小技巧</a> (1)</li>
         <li><a href="/tag/jia-gou-chan-hui-lu.html">架构忏悔录</a> (1)</li>
         <li><a href="/tag/jia-gou-she-ji.html">架构设计</a> (4)</li>
@@ -151,6 +152,15 @@
                     var target = $(this).attr('target')
                     if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
+                    }
+                }
+            });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
                     }
                 }
             });

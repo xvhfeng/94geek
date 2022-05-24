@@ -84,6 +84,20 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
         <div class="post-preview">
+            <a href="/posts/2014/vim-conf/vim-conf-20140830.html" rel="bookmark" title="Permalink to 我的vim配置">
+                <h2 class="post-title">
+                    我的vim配置
+                </h2>
+            </a>
+                <p class="article-summary">
+                    先聊聊VIM对于一些”古怪”按键绑定的前因后果,有助于我们更加了解VIM的历史。然后再讲一下，在现在的键盘上，我们怎么通过”经济”的办法来达到使用VIM时，能保证小手指尽量的舒适，一些按键能尽量的控制在键盘的大区内；然后，我会讲一下我的VIM配置文件的组成，以及为什么我要用...
+                </p>
+            <p class="post-meta">Posted by
+                    <a href="/author/spk-xu.html">spk xu</a>
+                 on Sat 30 August 2014
+            </p>
+        </div>
+        <div class="post-preview">
             <a href="/posts/2014/system-conf/system-conf-20140829.html" rel="bookmark" title="Permalink to Linux系统配置">
                 <h2 class="post-title">
                     Linux系统配置
@@ -164,6 +178,15 @@
                     var target = $(this).attr('target')
                     if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
+                    }
+                }
+            });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
                     }
                 }
             });

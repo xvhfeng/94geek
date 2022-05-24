@@ -284,6 +284,15 @@ dfs是我们的核心服务，绝对不能down机的，所以就先紧急把它�
                     }
                 }
             });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
+                    }
+                }
+            });
         });
     </script>
 

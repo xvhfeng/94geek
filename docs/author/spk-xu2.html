@@ -89,6 +89,20 @@
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
         <div class="post-preview">
+            <a href="/posts/2017/c-book/c-book-20170904.html" rel="bookmark" title="Permalink to 为了情怀，我又想写书了">
+                <h2 class="post-title">
+                    为了情怀，我又想写书了
+                </h2>
+            </a>
+                <p class="article-summary">
+                    对于一个写过书，知道写书辛苦、发誓不想再写书的人来说，这几天一直有一个想法在我心里挥之不去：我想写一本书，不是为了钱，也不想为了名，只是想作为一个礼物送给我的那份情怀。
+                </p>
+            <p class="post-meta">Posted by
+                    <a href="/author/spk-xu.html">spk xu</a>
+                 on Mon 04 September 2017
+            </p>
+        </div>
+        <div class="post-preview">
             <a href="/posts/2017/mysql-wait-timeout/mysql-wait-timeout-20170822.html" rel="bookmark" title="Permalink to mysql连接池不能回避的wait timeout问题">
                 <h2 class="post-title">
                     mysql连接池不能回避的wait timeout问题
@@ -214,20 +228,6 @@
                  on Wed 07 June 2017
             </p>
         </div>
-        <div class="post-preview">
-            <a href="/posts/2017/idcreator-chaos/idcreator-chaos-20170531.html" rel="bookmark" title="Permalink to Chaos-ID生成器的前世今生">
-                <h2 class="post-title">
-                    Chaos-ID生成器的前世今生
-                </h2>
-            </a>
-                <p class="article-summary">
-                    从mongodb的objectid到twitter的snowflake，目前国内的几个互联网大厂也开始重视到了分布式系统中数据id，甚至一些大厂已经公开了它们关于id生成器的设计和实现。我们当然也注意到了分布式系统中id的重要性，并且在系统开始开发的时候就设计并且实现了一个...
-                </p>
-            <p class="post-meta">Posted by
-                    <a href="/author/spk-xu.html">spk xu</a>
-                 on Wed 31 May 2017
-            </p>
-        </div>
 
     <hr>
     <!-- Pager -->
@@ -296,6 +296,15 @@
                     var target = $(this).attr('target')
                     if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
+                    }
+                }
+            });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
                     }
                 }
             });

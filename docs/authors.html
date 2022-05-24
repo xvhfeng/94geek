@@ -85,7 +85,7 @@
         <div class="post-preview">
             <a href="/author/spk-xu.html" rel="bookmark">
                 <h2 class="post-title">
-                    spk xu (31)
+                    spk xu (32)
                 </h2>
             </a>
         </div>
@@ -147,6 +147,15 @@
                     var target = $(this).attr('target')
                     if(!target && !title.startsWith("Permalink to")) {
                         $(this).attr('target', '_blank');
+                    }
+                }
+            });
+            $('img').each(function() {
+                var title = $(this).attr('title');
+                var href = $(this).attr('src');
+                if(href && title){
+                    if(href && title.startsWith("Show->")) {
+                        $(this).wrap("<center></center>");
                     }
                 }
             });
