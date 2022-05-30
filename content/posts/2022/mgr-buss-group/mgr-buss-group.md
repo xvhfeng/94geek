@@ -1,5 +1,5 @@
-Title: 管理业务团队的一点心得
-Date: 2022-06-05
+Title: 管理业务团队的思考
+Date: 2022-06-27
 Category: 技术管理
 Tags: 技术管理
 Slug: mgr-buss-group
