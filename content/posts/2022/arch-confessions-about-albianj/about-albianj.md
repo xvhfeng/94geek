@@ -1,5 +1,5 @@
 Title: 架构忏悔录--Albianj的诞生之趣
-Date: 2022-06-15
+Date: 2022-06-30
 Category: 架构忏悔录
 Tags: 架构忏悔录
 Slug: arch-confessions-about-albianj
